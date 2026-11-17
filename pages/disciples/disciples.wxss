@@ -565,3 +565,61 @@ page {
   background: rgba(85, 37, 131, 0.06);
   border-radius: 12rpx;
 }
+
+/* ---------- 从车队导入 ---------- */
+.import-btn {
+  margin: 10rpx 40rpx;
+  padding: 22rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #552583;
+  background: rgba(85, 37, 131, 0.06);
+  border: 2rpx dashed rgba(85, 37, 131, 0.35);
+  border-radius: 12rpx;
+}
+
+.import-textarea {
+  height: 200rpx;
+  font-size: 24rpx;
+}
+
+.import-result {
+  margin: 20rpx 40rpx 0;
+  padding: 22rpx;
+  background: #faf8fd;
+  border-radius: 12rpx;
+}
+
+.result-line {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.7;
+}
+
+.result-line.is-preview {
+  color: #b8860b;
+  font-weight: 600;
+}
+
+.result-line.is-done {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.result-list {
+  margin-top: 12rpx;
+  max-height: 200rpx;
+  overflow-y: auto;
+}
+
+.result-item {
+  display: block;
+  font-size: 23rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+.result-item.miss {
+  color: #c0392b;
+}

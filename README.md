@@ -115,6 +115,7 @@ npm install
 | `approveDisciple` / `rejectDisciple` | 主演徒弟：审批拜师申请（师傅或管理员） |
 | `updateDiscipleInfo` | 主演徒弟：改资料；定线由师傅或管理员录入 |
 | `claimDiscipleMaster` | 主演徒弟：**一次性**初始化师傅，已有 master 后永久失效 |
+| `migrateTeamMembers` | 主演徒弟：从车队 `members` 批量迁移（跳过申请，默认预览不写库） |
 
 ## 数据库集合
 
@@ -180,6 +181,39 @@ disciples
 **任命管理员**：不做界面，需要时在云开发控制台把该徒弟记录的 `role` 字段改成 `admin` 即可。
 
 **定线流程**：师傅或管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
+
+### 从车队批量迁移（跳过拜师申请）
+
+用于把车队 `members` 里已有的人一次性搬进 `disciples`，不走申请审批。
+
+**页面操作**：主演徒弟 → ⚙️ 管理 → 📥 从车队批量导入 → 粘贴 `_id`（换行或逗号分隔）→ 预览 → 导入。
+
+**直接调云函数**（云开发控制台「云端测试」）：
+
+```json
+{
+  "memberIds": ["<members._id>", "<members._id>"],
+  "dryRun": true,
+  "masterLine": "",
+  "useOverallLine": false
+}
+```
+
+| 参数 | 默认 | 说明 |
+|---|---|---|
+| `memberIds` | `[]` | 车队 `members._id` 列表，单次 ≤ 500 |
+| `openids` | `[]` | 也可按 `_openid` 指定 |
+| `dryRun` | `true` | 只预览，不写库；必须显式传 `false` 才写入 |
+| `masterLine` | `''` | 统一指定定线（14 档之一） |
+| `useOverallLine` | `false` | 用车队 `overallLine` 作为「师傅定线」 |
+| `includeLeft` | `false` | 是否迁移已离队成员 |
+| `keepJoinedAt` | `true` | 保留原入队时间，否则用迁移时间 |
+
+**字段映射**：`_openid` / `nickname` / `gameName` / `gameId` / `statement` / `joinedAt` 原样带过来；`status` 固定 `approved`；`role` 固定 `member`（车队 admin **不会**继承为主演徒弟管理员）；另外写入 `migratedFrom`（原 `members._id`）便于追溯。
+
+**执行顺序建议**：先「初始化师傅」，再批量迁移其他人 —— 否则师傅本人也可能被迁成普通徒弟。
+
+**安全**：仅 `master` / `admin` 可执行。若用云端测试（无登录态），需在云函数配置里设置环境变量 `MIGRATE_KEY`，调用时传 `bypassKey`。这是一次性运维函数，迁移完成后建议直接删除该云函数。
 
 ## 数据管道
 

@@ -151,6 +151,8 @@
         <view class="empty-hint" wx:if="{{pendingApplications.length === 0}}">暂无待审批申请</view>
       </scroll-view>
 
+      <view class="import-btn" catchtap="openImportModal">📥 从车队批量导入</view>
+
       <view class="modal-close" catchtap="toggleAdminPanel">关闭</view>
     </view>
   </view>
@@ -243,6 +245,54 @@
       <view class="modal-buttons">
         <view class="btn cancel" bindtap="hideEditModal">取消</view>
         <view class="btn confirm" bindtap="saveEdit">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 从车队批量导入 -->
+  <view class="modal-mask" wx:if="{{showImportModal}}" bindtap="closeImportModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📥 从车队批量导入</view>
+
+      <scroll-view scroll-y="true" class="detail-content">
+        <view class="form-item">
+          <text class="label">车队成员 _id（换行或逗号分隔，最多 500 个）</text>
+          <textarea class="textarea import-textarea" placeholder="粘贴 members 集合里的 _id" value="{{importText}}" bindinput="onImportInput"/>
+        </view>
+
+        <view class="detail-item">
+          <text class="detail-label">用综合分线做定线</text>
+          <switch checked="{{useOverallLine}}" color="#552583" bindchange="onUseOverallLineChange"/>
+        </view>
+
+        <view class="detail-item">
+          <text class="detail-label">统一定线</text>
+          <picker mode="selector" range="{{lineOptionsWithEmpty}}" value="{{importLineIndex}}" bindchange="onImportLineChange">
+            <view class="picker-value">
+              <text>{{importLineIndex === 0 ? '不指定' : lineOptionsWithEmpty[importLineIndex]}}</text>
+              <text class="picker-arrow">▾</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="import-result" wx:if="{{importResult}}">
+          <text class="result-line {{importResult.dryRun ? 'is-preview' : 'is-done'}}">{{importResult.dryRun ? '预览结果（未写入）' : '导入完成'}}</text>
+          <text class="result-line">输入 {{importResult.summary.input}} · 匹配 {{importResult.summary.matched}}</text>
+          <text class="result-line">新增 {{importResult.summary.created}} · 已存在 {{importResult.summary.skippedExisting}} · 未找到 {{importResult.summary.notFound}}</text>
+          <text class="result-line" wx:if="{{importResult.summary.skippedNotApproved > 0}}">跳过非在队 {{importResult.summary.skippedNotApproved}}</text>
+          <text class="result-line" wx:if="{{importResult.summary.failed > 0}}">失败 {{importResult.summary.failed}}</text>
+
+          <view class="result-list">
+            <text class="result-item" wx:for="{{importResult.created}}" wx:key="memberId">{{item.gameName || item.nickname || item.memberId}}{{item.masterLine ? ' · ' + item.masterLine : ''}}</text>
+            <text class="result-item miss" wx:for="{{importResult.notFound}}" wx:key="memberId">{{item.memberId}}（未找到）</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="closeImportModal">关闭</view>
+        <view class="btn edit" bindtap="runImport" data-dry="1">预览</view>
+        <view class="btn confirm" bindtap="runImport" data-dry="0">导入</view>
       </view>
     </view>
   </view>

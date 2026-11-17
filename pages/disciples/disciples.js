@@ -26,6 +26,14 @@ Page({
     pendingApplications: [],
     showAdminPanel: false,
 
+    // 从车队批量导入
+    showImportModal: false,
+    importText: '',
+    useOverallLine: false,
+    importLineIndex: 0,
+    lineOptionsWithEmpty: ['不指定', '国服记录', '顶尖职业', '职业', '强主', '主力', '强一', '一线', '弱一', '强二', '二线', '弱二', '强三', '三线', '娱乐'],
+    importResult: null,
+
     showApplyModal: false,
     showDetail: false,
     showEditModal: false,
@@ -391,6 +399,108 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '操作失败', icon: 'none' });
     }
+  },
+
+  /* ---------------- 从车队批量导入 ---------------- */
+
+  openImportModal() {
+    this.setData({ showImportModal: true });
+  },
+
+  closeImportModal() {
+    this.setData({ showImportModal: false });
+  },
+
+  onImportInput(e) {
+    this.setData({ importText: e.detail.value });
+  },
+
+  onUseOverallLineChange(e) {
+    this.setData({ useOverallLine: !!e.detail.value });
+  },
+
+  onImportLineChange(e) {
+    this.setData({ importLineIndex: Number(e.detail.value) });
+  },
+
+  parseImportIds() {
+    return String(this.data.importText || '')
+      .split(/[\s,，;；、]+/)
+      .map((v) => v.trim())
+      .filter(Boolean);
+  },
+
+  async callImport(dryRun) {
+    const ids = this.parseImportIds();
+    if (ids.length === 0) {
+      this.showError('请先粘贴车队成员的 _id');
+      return null;
+    }
+
+    wx.showLoading({ title: dryRun ? '预览中...' : '导入中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'migrateTeamMembers',
+        data: {
+          memberIds: ids,
+          dryRun: !!dryRun,
+          useOverallLine: !!this.data.useOverallLine,
+          masterLine: this.data.importLineIndex > 0 ? LINE_LEVELS[this.data.importLineIndex - 1] : ''
+        }
+      });
+      wx.hideLoading();
+
+      const r = (res && res.result) || {};
+      if (!r.success) {
+        this.showError(r.error || '迁移失败');
+        return null;
+      }
+
+      this.setData({ importResult: r });
+
+      if (!dryRun) {
+        await this.loadMyStatus(true);
+        if (this.data.showDisciples) {
+          await this.loadDisciples();
+        }
+      }
+      return r;
+    } catch (err) {
+      console.error('迁移失败', err);
+      wx.hideLoading();
+      this.showError('迁移失败，请查看云函数日志');
+      return null;
+    }
+  },
+
+  async runImport(e) {
+    const dry = String(e.currentTarget.dataset.dry) === '1';
+
+    if (dry) {
+      await this.callImport(true);
+      return;
+    }
+
+    // 真正写入前先预览一次，让用户确认数量
+    const preview = await this.callImport(true);
+    if (!preview || !preview.success) return;
+
+    const n = preview.summary.created;
+    if (n === 0) {
+      this.showError('没有需要新增的成员（可能都已存在，或 _id 没匹配到）');
+      return;
+    }
+
+    wx.showModal({
+      title: '确认导入',
+      content: '将新增 ' + n + ' 位徒弟，导入后走正常徒弟数据，是否继续？',
+      confirmText: '确认导入',
+      success: (r) => {
+        if (r.confirm) {
+          this.callImport(false);
+        }
+      }
+    });
   },
 
   /* ---------------- 详情 ---------------- */

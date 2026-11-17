@@ -1,0 +1,9 @@
+{
+  "name": "migrateTeamMembers",
+  "version": "1.0.0",
+  "description": "主演徒弟：从车队 members 批量迁移到 disciples",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
