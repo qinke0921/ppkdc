@@ -15,6 +15,7 @@
 | 比赛详情 | `pages/competition` | 逐局录入名次，按规则实时累计积分并判定胜负 |
 | 分线查询 | `pages/line` | 地图分线成绩查询，TabBar 之一 |
 | PLAY 车队 | `pages/team` | 成员列表、入队申请审批、成员状态管理，TabBar 之一 |
+| 主演徒弟 | `pages/disciples` | 徒弟名单、拜师申请审批、师傅定线，TabBar 之一 |
 | 车队主页 | `pages/home` | 车队概览与快捷入口 |
 | 分组池 | `pages/group-pool` | 按颜色/分组管理队员，支持抽签分组 |
 | 今日交流 | `pages/exchange` | 日常交流/约跑登记与名单管理 |
@@ -109,6 +110,11 @@ npm install
 | `deleteRegistration` | 删除报名记录并维护关联数据 |
 | `sendNotification` | 订阅消息推送（比赛开始等事件） |
 | `fixJoinedAt` / `fixMapName` / `fixMapNames` | **一次性数据修复脚本**，历史遗留，日常勿调用（`fixMapName` 已被 `fixMapNames` 取代） |
+| `getMyDiscipleInfo` | 主演徒弟：本人身份、徒弟总数、管理员待审批列表 |
+| `getAllDisciples` | 主演徒弟：分批读取全部徒弟 |
+| `approveDisciple` / `rejectDisciple` | 主演徒弟：审批拜师申请（仅管理员） |
+| `updateDiscipleInfo` | 主演徒弟：改资料；定线仅管理员可改 |
+| `claimDiscipleAdmin` | 主演徒弟：**一次性**初始化管理员，已有 admin 后永久失效 |
 
 ## 数据库集合
 
@@ -128,6 +134,40 @@ npm install
 | `team_activities` | 车队活动 |
 | `team_activity_participants` | 活动报名人员 |
 | `team_activity_prizes` | 活动奖品 |
+| `disciples` | 主演徒弟：徒弟档案（含 `masterLine` 师傅定线） |
+| `discipleApplications` | 主演徒弟：拜师申请 |
+
+## 主演徒弟模块
+
+与 PLAY 车队**逻辑完全独立**：独立页面、独立云函数、独立集合，唯一的共用是 `getOpenId` 这类纯技术函数（微信 openid 本身无法按模块拆分）。
+
+**集合与权限**
+
+| 集合 | 建议权限 | 说明 |
+|---|---|---|
+| `disciples` | 仅创建者可读写（默认即可） | 读取全部走云函数，前端不需要直接读 |
+| `discipleApplications` | 仅创建者可读写（默认即可） | 用户直接提交申请，`_openid` 由系统自动写入 |
+
+> 与车队模块不同，本模块的管理员审批**全部走云函数**（云函数有管理员权限，绕过集合权限），因此不需要把集合权限放宽到「所有用户可读」。
+
+**字段**
+
+```
+disciples
+  _openid, nickname, gameName, gameId, statement,
+  masterLine   # 师傅定线，手动录入，取值见分线等级体系
+  status       # approved（本模块无离队状态）
+  role         # member | admin
+  joinedAt, createdAt, createdBy, updatedAt
+```
+
+**首次初始化管理员**
+
+1. 部署 `claimDiscipleAdmin` 云函数
+2. 用管理员本人的微信打开「主演徒弟」页，出现「初始化管理员」按钮，点击即成为管理员
+3. 该入口在 `disciples` 中存在任一 `admin` 后自动失效，不会被人重复利用
+
+**定线流程**：管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
 
 ## 数据管道
 

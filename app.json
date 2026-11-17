@@ -5,6 +5,7 @@
     "pages/index/index",
     "pages/line/line",
     "pages/team/team",
+    "pages/disciples/disciples",
     "pages/competition/competition",
     "pages/group-pool/group-pool",
     "pages/exchange/exchange",
@@ -37,6 +38,10 @@
       {
         "pagePath": "pages/team/team",
         "text": "PLAY车队"
+      },
+      {
+        "pagePath": "pages/disciples/disciples",
+        "text": "主演徒弟"
       }
     ]
   },

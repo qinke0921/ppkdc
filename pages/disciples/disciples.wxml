@@ -1,0 +1,223 @@
+<!--pages/disciples/disciples.wxml-->
+<view class="container">
+
+  <!-- 加载中 -->
+  <view class="loading-box" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 非徒弟：申请入口 -->
+  <block wx:elif="{{!isDisciple}}">
+    <view class="lock-section">
+      <view class="lock-icon">🥋</view>
+      <text class="lock-title">主演徒弟</text>
+      <text class="lock-desc">提交拜师申请，通过后即可查看徒弟名单</text>
+      <view class="apply-btn" bindtap="showApplyModal">
+        <text>申请拜师</text>
+      </view>
+      <view class="claim-btn" wx:if="{{canClaimAdmin}}" bindtap="claimAdmin">
+        <text>初始化管理员</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 徒弟专区 -->
+  <block wx:else>
+    <view class="welcome">
+      <text class="welcome-text">欢迎，{{discipleInfo.nickname}}</text>
+      <text class="welcome-sub">{{isAdmin ? '⭐ 管理员' : '👤 徒弟'}}</text>
+    </view>
+
+    <!-- 统计卡 -->
+    <view class="stat-row">
+      <view class="stat-card">
+        <text class="stat-num">{{discipleCount}}</text>
+        <text class="stat-label">徒弟人数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num line-num">{{discipleInfo.masterLine || '—'}}</text>
+        <text class="stat-label">我的师傅定线</text>
+      </view>
+    </view>
+
+    <!-- 管理员入口 -->
+    <view class="admin-btn" wx:if="{{isAdmin}}" bindtap="toggleAdminPanel">
+      <text>⚙️ 管理</text>
+      <view class="badge" wx:if="{{pendingApplications.length > 0}}">{{pendingApplications.length}}</view>
+    </view>
+
+    <!-- 徒弟名单 -->
+    <view class="members-header" bindtap="toggleDisciples">
+      <text>👥 徒弟名单 ({{discipleCount}}人)</text>
+      <text>{{showDisciples ? '▲' : '▼'}}</text>
+    </view>
+
+    <view class="member-list" wx:if="{{showDisciples}}">
+      <view class="member-card" wx:for="{{disciples}}" wx:key="_id" bindtap="viewDetail" data-item="{{item}}">
+        <view class="member-info">
+          <text class="member-game">{{item.gameName}}</text>
+          <text class="member-name">{{item.nickname}}</text>
+        </view>
+        <view class="line-badge" wx:if="{{item.masterLine}}">
+          <text>{{item.masterLine}}</text>
+        </view>
+        <view class="line-badge empty" wx:else>
+          <text>未定线</text>
+        </view>
+      </view>
+      <text class="empty-hint" wx:if="{{disciples.length === 0}}">暂无徒弟</text>
+    </view>
+  </block>
+
+  <!-- 拜师申请弹窗 -->
+  <view class="modal-mask" wx:if="{{showApplyModal}}" bindtap="hideApplyModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📝 申请拜师</view>
+      <view class="form-item">
+        <text class="label">昵称</text>
+        <input class="input" placeholder="请输入昵称" value="{{applyForm.nickname}}" data-field="nickname" bindinput="onInput"/>
+      </view>
+      <view class="form-item">
+        <text class="label">游戏昵称</text>
+        <input class="input" placeholder="游戏内名字" value="{{applyForm.gameName}}" data-field="gameName" bindinput="onInput"/>
+      </view>
+      <view class="form-item">
+        <text class="label">游戏ID</text>
+        <input class="input" placeholder="请输入游戏ID" value="{{applyForm.gameId}}" data-field="gameId" bindinput="onInput"/>
+      </view>
+      <view class="form-item">
+        <text class="label">个人宣言</text>
+        <textarea class="textarea" placeholder="介绍一下自己（选填）" value="{{applyForm.statement}}" data-field="statement" bindinput="onInput"/>
+      </view>
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideApplyModal">取消</view>
+        <view class="btn confirm" bindtap="submitApplication">提交申请</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员审批面板 -->
+  <view class="modal-mask" wx:if="{{showAdminPanel}}" bindtap="toggleAdminPanel">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">⚙️ 待审批 ({{pendingApplications.length}})</view>
+
+      <scroll-view scroll-y="true" class="app-list">
+        <view class="app-item" wx:for="{{pendingApplications}}" wx:key="_id">
+          <text class="app-name">{{item.nickname}}</text>
+          <text class="app-game">游戏: {{item.gameName}} | ID: {{item.gameId}}</text>
+          <text class="app-statement" wx:if="{{item.statement}}">“{{item.statement}}”</text>
+          <text class="app-date">申请时间: {{item.formattedCreatedAt}}</text>
+
+          <picker mode="selector" range="{{lineOptions}}" data-index="{{index}}" bindchange="onApproveLineChange">
+            <view class="line-pick">
+              <text>{{item.pickedLine ? '定线：' + item.pickedLine : '点击选择定线（可留空，稍后再录）'}}</text>
+              <text class="picker-arrow">▾</text>
+            </view>
+          </picker>
+
+          <view class="modal-buttons">
+            <view class="btn confirm" catchtap="approveApplication" data-id="{{item._id}}" data-index="{{index}}">批准</view>
+            <view class="btn cancel" catchtap="rejectApplication" data-id="{{item._id}}">拒绝</view>
+          </view>
+        </view>
+
+        <view class="empty-hint" wx:if="{{pendingApplications.length === 0}}">暂无待审批申请</view>
+      </scroll-view>
+
+      <view class="modal-close" catchtap="toggleAdminPanel">关闭</view>
+    </view>
+  </view>
+
+  <!-- 徒弟详情 -->
+  <view class="modal-mask" wx:if="{{showDetail}}" bindtap="closeDetail">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">👤 徒弟详情</view>
+
+      <scroll-view scroll-y="true" class="detail-content">
+        <view class="detail-item">
+          <text class="detail-label">昵称</text>
+          <text class="detail-value">{{selectedDisciple.nickname}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">身份</text>
+          <text class="detail-value {{selectedDisciple.role === 'admin' ? 'role-admin' : ''}}">{{selectedDisciple.role === 'admin' ? '⭐ 管理员' : '👤 徒弟'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏昵称</text>
+          <text class="detail-value">{{selectedDisciple.gameName}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏ID</text>
+          <text class="detail-value {{selectedDisciple.gameId ? '' : 'no-data'}}">{{selectedDisciple.gameId || '暂未填写'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">师傅定线</text>
+          <text class="detail-value line-value {{selectedDisciple.masterLine ? '' : 'no-data'}}">{{selectedDisciple.masterLine || '暂未定线'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">个人宣言</text>
+          <text class="detail-value {{selectedDisciple.statement ? '' : 'no-data'}}">{{selectedDisciple.statement || '暂未填写'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">拜师时间</text>
+          <text class="detail-value">{{selectedDisciple.formattedJoinedAt}}</text>
+        </view>
+      </scroll-view>
+
+      <view class="modal-buttons" wx:if="{{isMyOwnProfile || isAdmin}}">
+        <view class="btn edit" bindtap="showEditModal">✏️ {{isAdmin ? '编辑资料 / 定线' : '编辑资料'}}</view>
+        <view class="btn cancel" catchtap="closeDetail">关闭</view>
+      </view>
+      <view class="modal-buttons" wx:else>
+        <view class="btn cancel" catchtap="closeDetail">关闭</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑资料 -->
+  <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEditModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">✏️ 编辑资料</view>
+
+      <scroll-view scroll-y="true" class="detail-content">
+        <view class="detail-item">
+          <text class="detail-label">昵称</text>
+          <input class="edit-input" placeholder="请输入昵称" value="{{editForm.nickname}}" data-field="nickname" bindinput="onEditInput"/>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏昵称</text>
+          <input class="edit-input" placeholder="游戏内名字" value="{{editForm.gameName}}" data-field="gameName" bindinput="onEditInput"/>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏ID</text>
+          <input class="edit-input" placeholder="请输入游戏ID" value="{{editForm.gameId}}" data-field="gameId" bindinput="onEditInput"/>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">个人宣言</text>
+          <textarea class="edit-textarea" placeholder="介绍一下自己" value="{{editForm.statement}}" data-field="statement" bindinput="onEditInput"/>
+        </view>
+
+        <!-- 定线：仅管理员可改 -->
+        <view class="detail-item" wx:if="{{isAdmin}}">
+          <text class="detail-label">师傅定线</text>
+          <picker mode="selector" range="{{lineOptions}}" value="{{editLineIndex}}" bindchange="onEditLineChange">
+            <view class="picker-value">
+              <text>{{editForm.masterLine || '点击选择定线'}}</text>
+              <text class="picker-arrow">▾</text>
+            </view>
+          </picker>
+        </view>
+        <view class="detail-item" wx:else>
+          <text class="detail-label">师傅定线</text>
+          <text class="detail-value line-value {{editForm.masterLine ? '' : 'no-data'}}">{{editForm.masterLine || '暂未定线'}}</text>
+        </view>
+      </scroll-view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideEditModal">取消</view>
+        <view class="btn confirm" bindtap="saveEdit">保存</view>
+      </view>
+    </view>
+  </view>
+
+</view>
