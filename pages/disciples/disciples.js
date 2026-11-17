@@ -106,7 +106,9 @@ Page({
       const r = (res && res.result) || {};
 
       if (!r.success) {
-        throw new Error(r.error || '加载失败');
+        this.setData({ loading: false });
+        this.showError(r.error);
+        return;
       }
 
       const info = r.disciple || null;
@@ -129,7 +131,22 @@ Page({
     } catch (err) {
       console.error('加载徒弟身份失败', err);
       this.setData({ loading: false });
-      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
+      this.showError('加载失败，请检查云函数是否已部署');
+    }
+  },
+
+  showError(msg) {
+    const text = msg || '操作失败';
+    // 集合未创建这类长文案用弹窗，避免 toast 被截断
+    if (text.indexOf('集合') >= 0) {
+      wx.showModal({
+        title: '还差一步',
+        content: text,
+        showCancel: false,
+        confirmText: '知道了'
+      });
+    } else {
+      wx.showToast({ title: text, icon: 'none' });
     }
   },
 
@@ -154,7 +171,7 @@ Page({
         wx.showToast({ title: r.message || '已设为师傅', icon: 'success' });
         await this.loadMyStatus();
       } else {
-        wx.showToast({ title: r.error || '初始化失败', icon: 'none' });
+        this.showError(r.error || '初始化失败');
       }
     } catch (err) {
       wx.hideLoading();
@@ -285,7 +302,7 @@ Page({
       wx.hideLoading();
 
       if (!r.success) {
-        wx.showToast({ title: r.error || '操作失败', icon: 'none' });
+        this.showError(r.error || '操作失败');
         return;
       }
 
@@ -313,7 +330,7 @@ Page({
       wx.hideLoading();
 
       if (!r.success) {
-        wx.showToast({ title: r.error || '操作失败', icon: 'none' });
+        this.showError(r.error || '操作失败');
         return;
       }
 
@@ -413,7 +430,7 @@ Page({
       wx.hideLoading();
 
       if (!r.success) {
-        wx.showToast({ title: r.error || '保存失败', icon: 'none' });
+        this.showError(r.error || '保存失败');
         return;
       }
 

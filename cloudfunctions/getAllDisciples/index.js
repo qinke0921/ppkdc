@@ -21,6 +21,13 @@ function pick(d) {
   };
 }
 
+// 集合不存在时（云开发错误码 -502005）给出可操作的提示，而不是抛出英文技术错误
+function isMissingCollection(err) {
+  const code = err && err.errCode;
+  const msg = (err && err.message) || '';
+  return code === -502005 || /collection not exist|COLLECTION_NOT_EXIST|Db or Table not exist/i.test(msg);
+}
+
 exports.main = async () => {
   try {
     const countRes = await db.collection('disciples')
@@ -55,6 +62,13 @@ exports.main = async () => {
       master
     };
   } catch (err) {
+    if (isMissingCollection(err)) {
+      return {
+        success: false,
+        needInitCollections: true,
+        error: '数据集合还没创建：请在云开发控制台新建 disciples 与 discipleApplications 两个集合（权限用默认）'
+      };
+    }
     return { success: false, error: err.message };
   }
 };
