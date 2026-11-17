@@ -1,12 +1,20 @@
 <!--pages/disciples/disciples.wxml-->
 <view class="container">
 
-  <!-- 加载中 -->
-  <view class="loading-box" wx:if="{{loading}}">
+  <!-- 朋友圈单页模式：无登录态，只做静态介绍 -->
+  <block wx:if="{{singlePageMode}}">
+    <view class="single-page">
+      <view class="lock-icon">🥋</view>
+      <text class="lock-title">主演徒弟</text>
+      <text class="lock-desc">拜师申请 · 实力定线</text>
+      <view class="single-hint">点击底部「前往小程序」，查看徒弟名单并提交拜师申请</view>
+    </view>
+  </block>
+
+  <view class="loading-box" wx:elif="{{loading}}">
     <text>加载中...</text>
   </view>
 
-  <!-- 非徒弟：申请入口 -->
   <block wx:elif="{{!isDisciple}}">
     <view class="lock-section">
       <view class="lock-icon">🥋</view>
@@ -15,6 +23,9 @@
       <view class="apply-btn" bindtap="showApplyModal">
         <text>申请拜师</text>
       </view>
+      <button class="share-btn ghost" open-type="share">
+        <text>分享给好友</text>
+      </button>
       <view class="claim-btn" wx:if="{{canClaimMaster}}" bindtap="claimMaster">
         <text>初始化师傅</text>
       </view>
@@ -47,6 +58,13 @@
         <text class="stat-num line-num">{{discipleInfo.masterLine || '—'}}</text>
         <text class="stat-label">我的师傅定线</text>
       </view>
+    </view>
+
+    <!-- 分享入口 -->
+    <view class="share-row">
+      <button class="share-btn" open-type="share">
+        <text>🔗 分享给好友</text>
+      </button>
     </view>
 
     <!-- 管理员入口 -->

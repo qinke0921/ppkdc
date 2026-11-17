@@ -10,6 +10,7 @@ const LINE_LEVELS = ['国服记录', '顶尖职业', '职业', '强主', '主力
 Page({
   data: {
     loading: true,
+    singlePageMode: false,
     isDisciple: false,
     isMaster: false,
     isAdmin: false,
@@ -50,8 +51,28 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
     this._firstShow = true;
+
+    // 场景值 1154 = 朋友圈单页模式：无登录态，云函数调不通，只做静态展示
+    let scene = 0;
+    try {
+      scene = (wx.getLaunchOptionsSync && wx.getLaunchOptionsSync().scene) || 0;
+    } catch (err) {
+      scene = 0;
+    }
+
+    if (scene === 1154) {
+      this.setData({ singlePageMode: true, loading: false });
+      return;
+    }
+
+    // 开启右上角菜单的「转发给好友」和「分享到朋友圈」
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage', 'shareTimeline']
+    });
+
     this.loadMyStatus();
   },
 
@@ -133,6 +154,36 @@ Page({
       this.setData({ loading: false });
       this.showError('加载失败，请检查云函数是否已部署');
     }
+  },
+
+  /* ---------------- 分享转发 ---------------- */
+
+  buildShareTitle() {
+    const m = this.data.masterInfo;
+    const name = m ? (m.nickname || m.gameName || '') : '';
+    const count = this.data.discipleCount || 0;
+
+    if (name && count > 0) return name + ' 的徒弟招募｜已收 ' + count + ' 位';
+    if (name) return name + ' 的徒弟招募';
+    if (count > 0) return '主演徒弟｜已收 ' + count + ' 位';
+    return '主演徒弟｜拜师申请通道';
+  },
+
+  // 转发给好友
+  onShareAppMessage() {
+    return {
+      title: this.buildShareTitle(),
+      path: '/pages/disciples/disciples',
+      imageUrl: '/images/share-disciples.png'
+    };
+  },
+
+  // 分享到朋友圈（单页模式打开）
+  onShareTimeline() {
+    return {
+      title: this.buildShareTitle(),
+      imageUrl: '/images/share-disciples.png'
+    };
   },
 
   showError(msg) {
