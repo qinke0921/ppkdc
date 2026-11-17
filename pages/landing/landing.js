@@ -23,6 +23,12 @@ Page({
     });
   },
 
+  goToDisciples() {
+    wx.switchTab({
+      url: '/pages/disciples/disciples'
+    });
+  },
+
   goToCompetition() {
     wx.switchTab({
       url: '/pages/index/index'

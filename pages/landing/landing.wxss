@@ -128,3 +128,18 @@
   color: #333;
   font-weight: 500;
 }
+/* 新增模块入口标记 */
+.menu-item-new {
+  border-left-color: #ffffff;
+  position: relative;
+}
+
+.menu-badge {
+  margin-left: auto;
+  padding: 4rpx 14rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #552583;
+  background: #FDB927;
+  border-radius: 20rpx;
+}

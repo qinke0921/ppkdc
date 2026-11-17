@@ -37,5 +37,10 @@
       <text class="menu-icon">🗺️</text>
       <text class="menu-text">分线查询</text>
     </view>
+    <view class="menu-item menu-item-new" bindtap="goToDisciples">
+      <text class="menu-icon">🥋</text>
+      <text class="menu-text">主演徒弟</text>
+      <text class="menu-badge">新</text>
+    </view>
   </view>
 </view>
