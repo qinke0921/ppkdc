@@ -1,11 +1,11 @@
 // cloudfunctions/migrateTeamMembers/index.js
 // 主演徒弟：把车队 members 里的成员批量迁移成 disciples 档案（跳过拜师申请流程）
 //
-// 安全设计
-// - 仅师傅(master) / 管理员(admin) 可执行
-// - 或使用云开发控制台的「云端测试」时，通过环境变量 MIGRATE_KEY 鉴权：
-//   在云函数配置里设 MIGRATE_KEY=任意随机串，调用时传 { bypassKey: '同一个串' }
-//   （密钥存在云函数环境变量里，不写进代码，迁移完成后请删除本云函数）
+// ⚠️ 本函数【无鉴权】，任何人都能调用 —— 仅供开发期一次性数据迁移使用
+//   迁移完成后请立即在云开发控制台删除本云函数，不要留在线上环境
+//
+// - 之所以不做鉴权：云开发控制台的「云端测试」没有登录态，
+//   getWXContext().OPENID 为空，任何基于身份的判断都无法通过
 // - dryRun 默认为 true：只预览不写库，必须显式传 dryRun:false 才会真正写入
 // - 按 _openid 幂等：已存在徒弟档案的人会被跳过，重复执行不会重复建档
 const cloud = require('wx-server-sdk');
@@ -32,38 +32,12 @@ function isMissingCollection(err) {
   return code === -502005 || /collection not exist|COLLECTION_NOT_EXIST|Db or Table not exist/i.test(msg);
 }
 
-async function getCaller(openid) {
-  if (!openid) return null;
-  const res = await db.collection('disciples').where({ _openid: openid }).get();
-  return res.data[0] || null;
-}
-
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const payload = event || {};
 
   try {
-    // ---------- 1. 鉴权 ----------
-    let caller = null;
-    try {
-      caller = await getCaller(OPENID);
-    } catch (err) {
-      // disciples 集合还没建时，只有控制台密钥这条路径可用
-      if (!isMissingCollection(err)) throw err;
-    }
-
-    const isManager = !!caller && (caller.role === 'master' || caller.role === 'admin');
-    const key = process.env.MIGRATE_KEY || '';
-    const bypass = !!key && payload.bypassKey === key;
-
-    if (!isManager && !bypass) {
-      return {
-        success: false,
-        error: '仅师傅或管理员可执行迁移；控制台测试请在云函数环境变量配置 MIGRATE_KEY 并传入 bypassKey'
-      };
-    }
-
-    // ---------- 2. 参数 ----------
+    // ---------- 1. 参数 ----------
     const memberIds = Array.isArray(payload.memberIds) ? payload.memberIds.filter(Boolean).map(String) : [];
     const openids = Array.isArray(payload.openids) ? payload.openids.filter(Boolean).map(String) : [];
     const dryRun = payload.dryRun !== false;          // 默认预览
@@ -82,7 +56,7 @@ exports.main = async (event) => {
       return { success: false, error: '单次最多 ' + MAX_IDS + ' 人，请分批执行' };
     }
 
-    // ---------- 3. 取车队成员 ----------
+    // ---------- 2. 取车队成员 ----------
     let members = [];
 
     for (const part of chunk(memberIds, CHUNK)) {
@@ -113,7 +87,7 @@ exports.main = async (event) => {
     memberIds.forEach((id) => { if (!foundIds[id]) notFound.push({ memberId: id, type: 'id' }); });
     openids.forEach((o) => { if (!foundOpenids[o]) notFound.push({ memberId: o, type: 'openid' }); });
 
-    // ---------- 4. 已存在的徒弟（按 openid 幂等） ----------
+    // ---------- 3. 已存在的徒弟（按 openid 幂等） ----------
     const existing = {};
     const openidList = members.map((m) => m._openid).filter(Boolean);
 
@@ -122,7 +96,7 @@ exports.main = async (event) => {
       res.data.forEach((d) => { existing[d._openid] = true; });
     }
 
-    // ---------- 5. 逐条处理 ----------
+    // ---------- 4. 逐条处理 ----------
     const created = [];
     const skippedExisting = [];
     const skippedNotApproved = [];
@@ -177,8 +151,6 @@ exports.main = async (event) => {
         failed.push({ memberId: m._id, gameName: m.gameName || '', reason: err.message });
       }
     }
-
-    masterLine = masterLine || '';
 
     return {
       success: true,
