@@ -1,7 +1,7 @@
 // cloudfunctions/updateDiscipleInfo/index.js
 // 主演徒弟：修改徒弟资料
 // - 本人可改：昵称 / 游戏名 / 游戏ID / 个人宣言
-// - 管理员可改：以上全部 + 师傅定线（手动录入）
+// - 师傅（master）与管理员（admin）可改：以上全部 + 师傅定线（手动录入）
 const cloud = require('wx-server-sdk');
 cloud.init();
 
@@ -24,7 +24,7 @@ exports.main = async (event) => {
 
   try {
     const caller = await getCaller(OPENID);
-    const isAdmin = !!caller && caller.role === 'admin';
+    const canManage = !!caller && (caller.role === 'master' || caller.role === 'admin');
 
     const targetRes = await db.collection('disciples').doc(discipleId).get();
     const target = targetRes.data;
@@ -33,7 +33,7 @@ exports.main = async (event) => {
     }
 
     const isSelf = target._openid === OPENID;
-    if (!isAdmin && !isSelf) {
+    if (!canManage && !isSelf) {
       return { success: false, error: '无权修改他人资料' };
     }
 
@@ -56,10 +56,10 @@ exports.main = async (event) => {
       data.statement = String(statement).trim();
     }
 
-    // 定线只允许管理员改
+    // 定线只允许师傅或管理员改
     if (masterLine !== undefined) {
-      if (!isAdmin) {
-        return { success: false, error: '仅管理员可设定线' };
+      if (!canManage) {
+        return { success: false, error: '仅师傅或管理员可设定线' };
       }
       const v = String(masterLine).trim();
       if (v && LINE_LEVELS.indexOf(v) === -1) {

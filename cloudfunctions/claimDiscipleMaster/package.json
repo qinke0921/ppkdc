@@ -1,7 +1,7 @@
 {
-  "name": "claimDiscipleAdmin",
+  "name": "claimDiscipleMaster",
   "version": "1.0.0",
-  "description": "主演徒弟模块",
+  "description": "主演徒弟：一次性初始化师傅",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3"

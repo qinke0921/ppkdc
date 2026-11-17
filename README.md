@@ -110,11 +110,11 @@ npm install
 | `deleteRegistration` | 删除报名记录并维护关联数据 |
 | `sendNotification` | 订阅消息推送（比赛开始等事件） |
 | `fixJoinedAt` / `fixMapName` / `fixMapNames` | **一次性数据修复脚本**，历史遗留，日常勿调用（`fixMapName` 已被 `fixMapNames` 取代） |
-| `getMyDiscipleInfo` | 主演徒弟：本人身份、徒弟总数、管理员待审批列表 |
-| `getAllDisciples` | 主演徒弟：分批读取全部徒弟 |
-| `approveDisciple` / `rejectDisciple` | 主演徒弟：审批拜师申请（仅管理员） |
-| `updateDiscipleInfo` | 主演徒弟：改资料；定线仅管理员可改 |
-| `claimDiscipleAdmin` | 主演徒弟：**一次性**初始化管理员，已有 admin 后永久失效 |
+| `getMyDiscipleInfo` | 主演徒弟：本人身份（师傅/管理员/徒弟）、徒弟总数、待审批列表 |
+| `getAllDisciples` | 主演徒弟：分批读取全部徒弟（师傅单独返回） |
+| `approveDisciple` / `rejectDisciple` | 主演徒弟：审批拜师申请（师傅或管理员） |
+| `updateDiscipleInfo` | 主演徒弟：改资料；定线由师傅或管理员录入 |
+| `claimDiscipleMaster` | 主演徒弟：**一次性**初始化师傅，已有 master 后永久失效 |
 
 ## 数据库集合
 
@@ -157,17 +157,29 @@ disciples
   _openid, nickname, gameName, gameId, statement,
   masterLine   # 师傅定线，手动录入，取值见分线等级体系
   status       # approved（本模块无离队状态）
-  role         # member | admin
+  role         # master | admin | member
   joinedAt, createdAt, createdBy, updatedAt
 ```
 
-**首次初始化管理员**
+**角色模型**：师傅与管理员是两个独立概念，不能混为一谈。
 
-1. 部署 `claimDiscipleAdmin` 云函数
-2. 用管理员本人的微信打开「主演徒弟」页，出现「初始化管理员」按钮，点击即成为管理员
-3. 该入口在 `disciples` 中存在任一 `admin` 后自动失效，不会被人重复利用
+| 角色 | 含义 | 数量 | 权限 |
+|---|---|---|---|
+| `master` | 师傅（主演）本人 | 全平台唯一 | 审批 + 录入定线 + 维护资料 |
+| `admin` | 平台协助管理 | 可多人 | 审批 + 录入定线 + 维护资料 |
+| `member` | 普通徒弟 | 若干 | 只能改自己的昵称/游戏名/游戏ID/宣言 |
 
-**定线流程**：管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
+> 师傅不进入「徒弟名单」，界面顶部单独以师傅卡片展示；徒弟人数统计也不含师傅本人。
+
+**首次初始化师傅**
+
+1. 部署 `claimDiscipleMaster` 云函数
+2. 用师傅本人的微信打开「主演徒弟」页，出现「初始化师傅」按钮，点击即成为 `master`
+3. 该入口在 `disciples` 中存在任一 `master` 后自动失效，不会被人重复利用
+
+**任命管理员**：不做界面，需要时在云开发控制台把该徒弟记录的 `role` 字段改成 `admin` 即可。
+
+**定线流程**：师傅或管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
 
 ## 数据管道
 

@@ -1,5 +1,5 @@
 // cloudfunctions/rejectDisciple/index.js
-// 主演徒弟：管理员拒绝拜师申请
+// 主演徒弟：师傅或管理员拒绝拜师申请
 const cloud = require('wx-server-sdk');
 cloud.init();
 
@@ -20,8 +20,8 @@ exports.main = async (event) => {
 
   try {
     const caller = await getCaller(OPENID);
-    if (!caller || caller.role !== 'admin') {
-      return { success: false, error: '仅管理员可审批' };
+    if (!caller || (caller.role !== 'master' && caller.role !== 'admin')) {
+      return { success: false, error: '仅师傅或管理员可审批' };
     }
 
     const appRes = await db.collection('discipleApplications').doc(applicationId).get();

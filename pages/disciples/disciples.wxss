@@ -472,3 +472,45 @@ page {
   background: rgba(85, 37, 131, 0.06);
   border-radius: 10rpx;
 }
+
+/* ---------- 师傅（主演）卡片 ---------- */
+.master-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20rpx 30rpx 0;
+  padding: 26rpx 30rpx;
+  background: linear-gradient(135deg, #fff8e6, #ffffff);
+  border: 2rpx solid rgba(253, 185, 39, 0.45);
+  border-radius: 16rpx;
+}
+
+.master-left {
+  display: flex;
+  align-items: center;
+}
+
+.master-tag {
+  padding: 6rpx 16rpx;
+  margin-right: 16rpx;
+  font-size: 22rpx;
+  color: #7a5200;
+  background: rgba(253, 185, 39, 0.25);
+  border-radius: 8rpx;
+}
+
+.master-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.master-game {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.detail-value.role-master {
+  color: #b8860b;
+  font-weight: 600;
+}

@@ -1,5 +1,5 @@
 // cloudfunctions/approveDisciple/index.js
-// 主演徒弟：管理员批准拜师申请，写入 disciples 并可同时指定「师傅定线」
+// 主演徒弟：师傅或管理员批准拜师申请，写入 disciples 并可同时指定「师傅定线」
 const cloud = require('wx-server-sdk');
 cloud.init();
 
@@ -21,10 +21,10 @@ exports.main = async (event) => {
   }
 
   try {
-    // 1. 仅管理员可审批
+    // 1. 仅师傅或管理员可审批
     const caller = await getCaller(OPENID);
-    if (!caller || caller.role !== 'admin') {
-      return { success: false, error: '仅管理员可审批' };
+    if (!caller || (caller.role !== 'master' && caller.role !== 'admin')) {
+      return { success: false, error: '仅师傅或管理员可审批' };
     }
 
     // 2. 定线校验（可为空，空表示稍后再录）

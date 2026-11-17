@@ -15,8 +15,8 @@
       <view class="apply-btn" bindtap="showApplyModal">
         <text>申请拜师</text>
       </view>
-      <view class="claim-btn" wx:if="{{canClaimAdmin}}" bindtap="claimAdmin">
-        <text>初始化管理员</text>
+      <view class="claim-btn" wx:if="{{canClaimMaster}}" bindtap="claimMaster">
+        <text>初始化师傅</text>
       </view>
     </view>
   </block>
@@ -25,7 +25,16 @@
   <block wx:else>
     <view class="welcome">
       <text class="welcome-text">欢迎，{{discipleInfo.nickname}}</text>
-      <text class="welcome-sub">{{isAdmin ? '⭐ 管理员' : '👤 徒弟'}}</text>
+      <text class="welcome-sub">{{isMaster ? '👑 师傅' : (isAdmin ? '⭐ 管理员' : '👤 徒弟')}}</text>
+    </view>
+
+    <!-- 师傅（主演） -->
+    <view class="master-card" wx:if="{{masterInfo}}">
+      <view class="master-left">
+        <text class="master-tag">👑 师傅</text>
+        <text class="master-name">{{masterInfo.nickname || '主演'}}</text>
+      </view>
+      <text class="master-game">{{masterInfo.gameName || '未填写游戏名'}}</text>
     </view>
 
     <!-- 统计卡 -->
@@ -41,7 +50,7 @@
     </view>
 
     <!-- 管理员入口 -->
-    <view class="admin-btn" wx:if="{{isAdmin}}" bindtap="toggleAdminPanel">
+    <view class="admin-btn" wx:if="{{canManage}}" bindtap="toggleAdminPanel">
       <text>⚙️ 管理</text>
       <view class="badge" wx:if="{{pendingApplications.length > 0}}">{{pendingApplications.length}}</view>
     </view>
@@ -140,7 +149,7 @@
         </view>
         <view class="detail-item">
           <text class="detail-label">身份</text>
-          <text class="detail-value {{selectedDisciple.role === 'admin' ? 'role-admin' : ''}}">{{selectedDisciple.role === 'admin' ? '⭐ 管理员' : '👤 徒弟'}}</text>
+          <text class="detail-value {{selectedDisciple.role === 'master' ? 'role-master' : (selectedDisciple.role === 'admin' ? 'role-admin' : '')}}">{{selectedDisciple.role === 'master' ? '👑 师傅' : (selectedDisciple.role === 'admin' ? '⭐ 管理员' : '👤 徒弟')}}</text>
         </view>
         <view class="detail-item">
           <text class="detail-label">游戏昵称</text>
@@ -164,8 +173,8 @@
         </view>
       </scroll-view>
 
-      <view class="modal-buttons" wx:if="{{isMyOwnProfile || isAdmin}}">
-        <view class="btn edit" bindtap="showEditModal">✏️ {{isAdmin ? '编辑资料 / 定线' : '编辑资料'}}</view>
+      <view class="modal-buttons" wx:if="{{isMyOwnProfile || canManage}}">
+        <view class="btn edit" bindtap="showEditModal">✏️ {{canManage ? '编辑资料 / 定线' : '编辑资料'}}</view>
         <view class="btn cancel" catchtap="closeDetail">关闭</view>
       </view>
       <view class="modal-buttons" wx:else>
@@ -198,7 +207,7 @@
         </view>
 
         <!-- 定线：仅管理员可改 -->
-        <view class="detail-item" wx:if="{{isAdmin}}">
+        <view class="detail-item" wx:if="{{canManage}}">
           <text class="detail-label">师傅定线</text>
           <picker mode="selector" range="{{lineOptions}}" value="{{editLineIndex}}" bindchange="onEditLineChange">
             <view class="picker-value">

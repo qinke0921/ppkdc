@@ -11,10 +11,13 @@ Page({
   data: {
     loading: true,
     isDisciple: false,
+    isMaster: false,
     isAdmin: false,
+    canManage: false,
     discipleInfo: null,
+    masterInfo: null,
     discipleCount: 0,
-    canClaimAdmin: false,
+    canClaimMaster: false,
 
     disciples: [],
     showDisciples: false,
@@ -114,10 +117,13 @@ Page({
       this.setData({
         loading: false,
         isDisciple: !!r.isDisciple,
-        isAdmin: !!(info && info.role === 'admin'),
+        isMaster: !!r.isMaster,
+        isAdmin: !!r.isAdmin,
+        canManage: !!r.canManage,
         discipleInfo: info,
+        masterInfo: r.master || null,
         discipleCount: r.discipleCount || 0,
-        canClaimAdmin: !!r.canClaimAdmin,
+        canClaimMaster: !!r.canClaimMaster,
         pendingApplications: this.decorateApplications(r.pendingApplications || [])
       });
     } catch (err) {
@@ -135,17 +141,17 @@ Page({
     });
   },
 
-  async claimAdmin() {
+  async claimMaster() {
     wx.showLoading({ title: '初始化中...', mask: true });
     try {
       const res = await wx.cloud.callFunction({
-        name: 'claimDiscipleAdmin',
+        name: 'claimDiscipleMaster',
         data: { nickname: '主演' }
       });
       const r = (res && res.result) || {};
       wx.hideLoading();
       if (r.success) {
-        wx.showToast({ title: r.message || '已设为管理员', icon: 'success' });
+        wx.showToast({ title: r.message || '已设为师傅', icon: 'success' });
         await this.loadMyStatus();
       } else {
         wx.showToast({ title: r.error || '初始化失败', icon: 'none' });
@@ -176,7 +182,11 @@ Page({
           d.formattedJoinedAt = this.formatTime(d.joinedAt);
           return d;
         });
-        this.setData({ disciples: list, discipleCount: r.total || list.length });
+        this.setData({
+          disciples: list,
+          discipleCount: r.total || list.length,
+          masterInfo: r.master || this.data.masterInfo
+        });
       }
     } catch (err) {
       console.error('加载徒弟名单失败', err);
@@ -388,8 +398,8 @@ Page({
       statement: f.statement.trim()
     };
 
-    // 定线仅管理员可改
-    if (this.data.isAdmin) {
+    // 定线仅师傅 / 管理员可改
+    if (this.data.canManage) {
       payload.masterLine = f.masterLine;
     }
 
@@ -424,7 +434,7 @@ Page({
         gameId: payload.gameId,
         statement: payload.statement
       };
-      if (this.data.isAdmin) {
+      if (this.data.canManage) {
         updated.masterLine = payload.masterLine;
       }
       this.setData({
