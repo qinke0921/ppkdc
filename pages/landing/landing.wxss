@@ -1,0 +1,130 @@
+/* pages/landing/landing.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #552583 0%, #3d1e63 100%);
+  padding: 60rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* 底部金色装饰线 */
+.container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.title {
+  font-size: 72rpx;
+  font-weight: bold;
+  color: #FDB927;
+  display: block;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  margin-top: 10rpx;
+}
+
+.intro {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 80rpx;
+  border: 1rpx solid rgba(253, 185, 39, 0.3);
+}
+
+.intro-text {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.9);
+  display: block;
+  text-align: center;
+  margin-bottom: 15rpx;
+}
+
+.intro-text.highlight {
+  color: #FDB927;
+  font-weight: bold;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(253, 185, 39, 0.3);
+}
+
+/* 广告语板块 */
+.ad-section {
+  background: linear-gradient(135deg, #fef9e7, #fde6b9);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(253, 185, 39, 0.2);
+  border: 1rpx solid #FDB927;
+}
+
+.ad-header {
+  border-bottom: 1rpx solid #f0f0f0;
+  padding-bottom: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.ad-label {
+  font-size: 24rpx;
+  color: #552583;
+  font-weight: 600;
+}
+
+.ad-content {
+  padding: 10rpx 0;
+}
+
+.ad-text {
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.ad-content.ad-empty .ad-text {
+  color: #CCC;
+  font-style: italic;
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.menu-item {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(85, 37, 131, 0.25);
+  border-left: 6rpx solid #FDB927;
+}
+
+.menu-icon {
+  font-size: 60rpx;
+}
+
+.menu-text {
+  font-size: 36rpx;
+  color: #333;
+  font-weight: 500;
+}

@@ -1,0 +1,481 @@
+<!--pages/weekly/weekly.wxml-->
+<view class="container">
+  <!-- 标题 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="title">📅 周图任务</text>
+      <text class="week-range">{{currentTask.weekStart || weekStart}} ~ {{currentTask.weekEnd || weekEnd}}</text>
+    </view>
+    <button class="share-btn" open-type="share">
+      <text>📤</text>
+    </button>
+  </view>
+
+  <!-- 无任务时显示 -->
+  <view wx:if="{{!currentTask}}" class="no-task">
+    <text class="no-task-text">暂无周图任务</text>
+    <view wx:if="{{isAdmin}}" class="create-btn" bindtap="showCreateModal">
+      <text>➕ 发布周图任务</text>
+    </view>
+  </view>
+
+  <!-- 历史任务标题 -->
+  <view wx:if="{{currentTask && currentTask.isPastWeek}}" class="history-tip">
+    <text>📅 历史任务 ({{currentTask.weekStart}} ~ {{currentTask.weekEnd}})</text>
+    <view wx:if="{{isAdmin}}" class="new-task-btn" bindtap="showCreateModal">
+      <text>➕ 发布新任务</text>
+    </view>
+  </view>
+
+  <!-- 历史任务完整显示 -->
+  <block wx:if="{{currentTask && currentTask.isPastWeek}}">
+    <!-- 任务信息卡片 (历史任务) -->
+    <view class="task-card">
+      <view class="task-map">
+        <text class="map-name">=={{currentTask.map}}==</text>
+      </view>
+      
+      <view class="task-times">
+        <view class="time-row">
+          <text class="gender-icon">👨🏻</text>
+          <text class="time-label">男生及格成绩：</text>
+          <text class="time-value">{{currentTask.maleTime}}</text>
+          <text class="edit-target-btn" bindtap="showEditTargetModal">✏️</text>
+        </view>
+        <view class="time-row">
+          <text class="gender-icon">👩🏻</text>
+          <text class="time-label">女生及格成绩：</text>
+          <text class="time-value">{{currentTask.femaleTime}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 管理员添加按钮和抽奖 (历史任务) -->
+    <view wx:if="{{isAdmin}}" class="admin-bar">
+      <view class="add-score-btn" bindtap="showAddModal">
+        <text>➕ 添加成绩</text>
+      </view>
+      <button class="lottery-btn" bindtap="startLottery">
+        <text>🎰 周图抽奖</text>
+      </button>
+    </view>
+
+    <!-- 男生成绩列表 (历史任务) -->
+    <view class="list-card">
+      <view class="list-header">
+        <text class="list-title">👨🏻 男生成绩</text>
+        <view class="copy-btn" bindtap="copyQualifiedList" id="copy-male" data-gender="male">
+          <text>📋 复制</text>
+        </view>
+      </view>
+      
+      <view class="player-list">
+        <view 
+          class="player-item {{item.isFastest ? 'fastest' : ''}}" 
+          wx:for="{{maleSubmissions}}" 
+          wx:key="_id"
+        >
+          <view class="player-info">
+            <view class="player-name-row">
+              <text class="player-name">{{item.gameName}}</text>
+              <text class="fail-tag" wx:if="{{item.passed === false}}">不及格</text>
+            </view>
+            <text class="player-score">{{item.score}}{{item.isFastest ? '🏆' : ''}}</text>
+          </view>
+          <view class="player-actions" wx:if="{{isAdmin}}">
+            <text class="edit-btn" bindtap="showEditModal" data-submission="{{item}}">✏️</text>
+            <text class="delete-btn" bindtap="deleteSubmission" data-submission="{{item}}">🗑️</text>
+          </view>
+        </view>
+        <text wx:if="{{maleSubmissions.length === 0}}" class="empty-hint">暂无记录</text>
+      </view>
+    </view>
+
+    <!-- 女生成绩列表 (历史任务) -->
+    <view class="list-card">
+      <view class="list-header">
+        <text class="list-title">👩🏻 女生成绩</text>
+        <view class="copy-btn" bindtap="copyQualifiedList" id="copy-female" data-gender="female">
+          <text>📋 复制</text>
+        </view>
+      </view>
+      
+      <view class="player-list">
+        <view 
+          class="player-item {{item.isFastest ? 'fastest' : ''}}" 
+          wx:for="{{femaleSubmissions}}" 
+          wx:key="_id"
+        >
+          <view class="player-info">
+            <view class="player-name-row">
+              <text class="player-name">{{item.gameName}}</text>
+              <text class="fail-tag" wx:if="{{item.passed === false}}">不及格</text>
+            </view>
+            <text class="player-score">{{item.score}}{{item.isFastest ? '👑' : ''}}</text>
+          </view>
+          <view class="player-actions" wx:if="{{isAdmin}}">
+            <text class="edit-btn" bindtap="showEditModal" data-submission="{{item}}">✏️</text>
+            <text class="delete-btn" bindtap="deleteSubmission" data-submission="{{item}}">🗑️</text>
+          </view>
+        </view>
+        <text wx:if="{{femaleSubmissions.length === 0}}" class="empty-hint">暂无记录</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 有任务时显示（包括本周任务和历史任务） -->
+  <block wx:if="{{currentTask && !currentTask.isPastWeek}}">
+    <!-- 任务信息卡片 (本周任务) -->
+    <!-- 任务信息卡片 -->
+    <view class="task-card">
+      <view class="task-map">
+        <text class="map-name">=={{currentTask.map}}==</text>
+      </view>
+      
+      <view class="task-times">
+        <view class="time-row">
+          <text class="gender-icon">👨🏻</text>
+          <text class="time-label">男生及格成绩：</text>
+          <text class="time-value">{{currentTask.maleTime}}</text>
+        </view>
+        <view class="time-row">
+          <text class="gender-icon">👩🏻</text>
+          <text class="time-label">女生及格成绩：</text>
+          <text class="time-value">{{currentTask.femaleTime}}</text>
+        </view>
+      </view>
+
+      <view class="rewards">
+        <text>随机抽取5名幸运儿：11.11🧧</text>
+        <text>男女最快者🏆：18.88🧧</text>
+      </view>
+      
+      <view class="tip">💡 周图请带群聊截图发给 double 大宝</view>
+      
+      <view class="copy-task-btn" bindtap="copyTaskText">
+        <text>📋 复制任务到粘贴板</text>
+      </view>
+      
+      <view class="copy-task-btn edit-target-btn-new" bindtap="showEditTargetModal">
+        <text>✏️ 修改任务目标</text>
+      </view>
+    </view>
+
+    <!-- 管理员添加按钮和抽奖 -->
+    <view wx:if="{{isAdmin}}" class="admin-bar">
+      <view class="add-score-btn" bindtap="showAddModal">
+        <text>➕ 添加成绩</text>
+      </view>
+      <button class="lottery-btn" bindtap="startLottery">
+        <text>🎰 周图抽奖</text>
+      </button>
+    </view>
+
+    <!-- 男生成绩列表 -->
+    <view class="list-card">
+      <view class="list-header">
+        <text class="list-title">👨🏻 男生成绩</text>
+        <view class="copy-btn" bindtap="copyQualifiedList" id="copy-male" data-gender="male">
+          <text>📋 复制</text>
+        </view>
+      </view>
+      
+      <view class="player-list">
+        <view 
+          class="player-item {{item.isFastest ? 'fastest' : ''}}" 
+          wx:for="{{maleSubmissions}}" 
+          wx:key="_id"
+        >
+          <view class="player-info">
+            <view class="player-name-row">
+              <text class="player-name">{{item.gameName}}</text>
+              <text class="fail-tag" wx:if="{{item.passed === false}}">不及格</text>
+            </view>
+            <text class="player-score">{{item.score}}{{item.isFastest ? '🏆' : ''}}</text>
+          </view>
+          <view class="player-actions" wx:if="{{isAdmin}}">
+            <text class="edit-btn" bindtap="showEditModal" data-submission="{{item}}">✏️</text>
+            <text class="delete-btn" bindtap="deleteSubmission" data-submission="{{item}}">🗑️</text>
+          </view>
+        </view>
+        <text wx:if="{{maleSubmissions.length === 0}}" class="empty-hint">暂无合格人员</text>
+      </view>
+    </view>
+
+    <!-- 女生成绩列表 -->
+    <view class="list-card">
+      <view class="list-header">
+        <text class="list-title">👩🏻 女生成绩</text>
+        <view class="copy-btn" bindtap="copyQualifiedList" id="copy-female" data-gender="female">
+          <text>📋 复制</text>
+        </view>
+      </view>
+      
+      <view class="player-list">
+        <view 
+          class="player-item {{item.isFastest ? 'fastest' : ''}}" 
+          wx:for="{{femaleSubmissions}}" 
+          wx:key="_id"
+        >
+          <view class="player-info">
+            <view class="player-name-row">
+              <text class="player-name">{{item.gameName}}</text>
+              <text class="fail-tag" wx:if="{{item.passed === false}}">不及格</text>
+            </view>
+            <text class="player-score">{{item.score}}{{item.isFastest ? '👑' : ''}}</text>
+          </view>
+          <view class="player-actions" wx:if="{{isAdmin}}">
+            <text class="edit-btn" bindtap="showEditModal" data-submission="{{item}}">✏️</text>
+            <text class="delete-btn" bindtap="deleteSubmission" data-submission="{{item}}">🗑️</text>
+          </view>
+        </view>
+        <text wx:if="{{femaleSubmissions.length === 0}}" class="empty-hint">暂无合格人员</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 抽奖弹窗（全局一层，本周/历史任务共用，避免历史任务点击抽奖无法展示） -->
+  <view class="modal-mask" wx:if="{{showLotteryModal}}" catchtap="hideLotteryModal">
+    <view class="modal lottery-modal" catchtap="stopPropagation">
+      <view class="modal-title">🎰 周图抽奖</view>
+      <text class="lottery-pool-hint" wx:if="{{lotteryPoolHint}}">{{lotteryPoolHint}}</text>
+
+      <view class="wheel-wrapper">
+        <view class="wheel-pointer-top" aria-hidden="true"></view>
+        <view class="wheel" animation="{{animationData}}">
+          <view class="wheel-bg" style="{{wheelBgStyle}}"></view>
+          <view class="names-layer" style="{{namesLayerStyle}}">
+            <view
+              class="wheel-label-spoke"
+              wx:for="{{lotteryWheelItems}}"
+              wx:key="_id"
+              style="transform: {{item.labelTransform}}"
+            >
+              <text class="name-on-wheel">{{item.gameName}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="wheel-hub" aria-hidden="true">
+          <text class="wheel-hub-icon">🎰</text>
+        </view>
+      </view>
+
+      <view class="lottery-result" wx:if="{{lotteryFinished && lotteryWinner}}">
+        <text class="winner-label">🎉 中奖</text>
+        <view class="winner-name">{{lotteryWinner.gameName}}</view>
+      </view>
+
+      <view class="lottery-empty" wx:if="{{lotteryFinished && !lotteryWinner}}">
+        <text>所有成员都已中奖，本轮结束！</text>
+      </view>
+
+      <view class="modal-buttons" wx:if="{{!isSpinning}}">
+        <view class="btn cancel" catchtap="hideLotteryModal">关闭</view>
+        <view class="btn confirm" bindtap="startLottery">{{lotteryHistory.length > 0 ? '再来一次' : '开始抽奖'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发布任务弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" catchtap="hideCreateModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📅 发布周图任务</view>
+      
+      <view class="form-item">
+        <text class="label">地图名称</text>
+        <input 
+          class="input" 
+          placeholder="请输入地图名称"
+          value="{{selectedMap}}"
+          data-field="selectedMap"
+          bindinput="onTimeInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">男生及格时间</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.51.00"
+          value="{{maleTime}}"
+          data-field="maleTime"
+          bindinput="onTimeInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">女生及格时间</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.54.00"
+          value="{{femaleTime}}"
+          data-field="femaleTime"
+          bindinput="onTimeInput"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" catchtap="hideCreateModal">取消</view>
+        <view class="btn confirm" catchtap="publishTask">发布任务</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加成绩弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" catchtap="hideAddModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">➕ 添加成绩</view>
+      
+      <!-- 管理员：选择成员下拉框 -->
+      <view class="form-item" wx:if="{{isAdmin}}">
+        <text class="label">选择成员 *</text>
+        <picker mode="selector" range="{{allMembers}}" range-key="gameName" bindchange="onMemberChange">
+          <view class="picker-value">
+            {{form.gameName || '请选择成员'}}
+          </view>
+        </picker>
+        <input 
+          class="input" 
+          style="margin-top: 10rpx"
+          placeholder="或手动输入名字"
+          value="{{form.gameName}}"
+          data-field="gameName"
+          bindinput="onFormInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">成绩</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.51.00"
+          value="{{form.score}}"
+          data-field="score"
+          bindinput="onFormInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">性别</text>
+        <radio-group bindchange="onGenderChange">
+          <label class="radio-label">
+            <radio value="male" checked="{{form.gender === 'male'}}" color="#1E90FF"/>
+            <text>男生</text>
+          </label>
+          <label class="radio-label">
+            <radio value="female" checked="{{form.gender === 'female'}}" color="#FF69B4"/>
+            <text>女生</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="form-item">
+        <text class="label">成绩评定</text>
+        <radio-group bindchange="onPassedChange">
+          <label class="radio-label">
+            <radio value="true" checked="{{form.passed !== false}}" color="#52c41a"/>
+            <text>及格</text>
+          </label>
+          <label class="radio-label">
+            <radio value="false" checked="{{form.passed === false}}" color="#ff3b30"/>
+            <text>不及格</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" catchtap="hideAddModal">取消</view>
+        <view class="btn confirm" catchtap="submitScore">提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑成绩弹窗 -->
+  <view class="modal-mask" wx:if="{{showEditModal}}" catchtap="hideEditModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">✏️ 编辑成绩</view>
+      
+      <!-- 管理员：选择成员下拉框 -->
+      <view class="form-item" wx:if="{{isAdmin}}">
+        <text class="label">选择成员 *</text>
+        <picker mode="selector" range="{{allMembers}}" range-key="gameName" bindchange="onMemberChange">
+          <view class="picker-value">
+            {{form.gameName || '请选择成员'}}
+          </view>
+        </picker>
+        <input 
+          class="input" 
+          style="margin-top: 10rpx"
+          placeholder="或手动输入名字"
+          value="{{form.gameName}}"
+          data-field="gameName"
+          bindinput="onFormInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">成绩</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.51.00"
+          value="{{form.score}}"
+          data-field="score"
+          bindinput="onFormInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">成绩评定</text>
+        <radio-group bindchange="onPassedChange">
+          <label class="radio-label">
+            <radio value="true" checked="{{form.passed !== false}}" color="#52c41a"/>
+            <text>及格</text>
+          </label>
+          <label class="radio-label">
+            <radio value="false" checked="{{form.passed === false}}" color="#ff3b30"/>
+            <text>不及格</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" catchtap="hideEditModal">取消</view>
+        <view class="btn confirm" catchtap="updateScore">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 修改目标成绩弹窗 -->
+  <view class="modal-mask" wx:if="{{showEditTargetModal}}" catchtap="hideEditTargetModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">✏️ 修改目标成绩</view>
+      
+      <view class="form-item">
+        <text class="label">男生及格时间</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.51.00"
+          value="{{editMaleTime}}"
+          data-field="editMaleTime"
+          bindinput="onTargetInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">女生及格时间</text>
+        <input 
+          class="input" 
+          placeholder="格式: 1.54.00"
+          value="{{editFemaleTime}}"
+          data-field="editFemaleTime"
+          bindinput="onTargetInput"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" catchtap="hideEditTargetModal">取消</view>
+        <view class="btn confirm" bindtap="saveTarget">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

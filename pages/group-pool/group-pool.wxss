@@ -1,0 +1,364 @@
+/* pages/group-pool/group-pool.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+page { background: #f5f5f5; }
+
+.container {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 头部 */
+.header {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  padding: 40rpx;
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FDB927;
+  display: block;
+}
+
+.desc {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10rpx;
+  display: block;
+}
+
+/* 操作按钮 */
+.action-btns {
+  display: flex;
+  padding: 20rpx;
+  gap: 20rpx;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 16rpx 24rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.btn.add {
+  background: #552583;
+  color: #fff;
+}
+
+.btn.reset {
+  background: #FF9F43;
+  color: #fff;
+}
+
+.btn.clear {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+/* 分组池列表 */
+.pools-section {
+  padding: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-left: 10rpx;
+}
+
+.pool-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.pool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.pool-name {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.pool-info {
+  font-size: 24rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.delete-btn {
+  color: #ff6b6b;
+  font-size: 28rpx;
+  padding: 8rpx;
+}
+
+.pool-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.member-tag {
+  padding: 8rpx 16rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #333;
+}
+
+.member-tag.used {
+  background: #e0e0e0;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 抽签按钮 */
+.draw-section {
+  padding: 20rpx;
+}
+
+.draw-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #FDB927;
+  text-align: center;
+  padding: 30rpx;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+/* 抽签结果 */
+.result-section {
+  padding: 20rpx;
+}
+
+.result-group {
+  margin-bottom: 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.group-title {
+  background: #552583;
+  color: #FDB927;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.result-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.result-pool {
+  font-size: 24rpx;
+}
+
+.copy-btn {
+  margin-top: 24rpx;
+  background: #FDB927;
+  color: #552583;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  width: 80%;
+  max-height: 80vh;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.input {
+  width: 100%;
+  padding: 16rpx 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.input.tall {
+  height: 80rpx;
+  line-height: 48rpx;
+}
+
+/* 计数器 */
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.counter-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.counter-btn.minus {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.counter-btn.plus {
+  background: #552583;
+  color: #fff;
+}
+
+.counter-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  min-width: 60rpx;
+  text-align: center;
+}
+
+.input.small {
+  width: 150rpx;
+}
+
+.textarea {
+  width: 100%;
+  padding: 16rpx 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  min-height: 120rpx;
+  box-sizing: border-box;
+}
+
+.color-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.color-option {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 24rpx;
+}
+
+.color-option.active {
+  box-shadow: 0 0 0 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.modal-buttons .btn {
+  flex: 1;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  text-align: center;
+}
+
+.modal-buttons .cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.modal-buttons .confirm {
+  background: #552583;
+  color: #fff;
+}

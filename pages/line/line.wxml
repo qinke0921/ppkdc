@@ -1,0 +1,128 @@
+<!--pages/line/line.wxml-->
+<view class="container">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <text class="title">🗺️ 分线查询</text>
+  </view>
+
+  <!-- 主内容区：左侧地图列表 + 右侧详情 -->
+  <view class="main-content">
+    <!-- 左侧：地图列表 -->
+    <view class="map-sidebar">
+      <view class="list-title">选择地图</view>
+      <view class="search-box">
+        <input 
+          class="search-input"
+          type="text"
+          placeholder="搜索地图..."
+          value="{{searchText}}"
+          bindinput="onSearchInput"
+        />
+      </view>
+      <scroll-view scroll-y="true" class="map-list" bindscroll="onMapScroll">
+        <block wx:if="{{filteredMapGroups.length > 0}}">
+          <block wx:for="{{filteredMapGroups}}" wx:key="difficulty">
+            <view class="diff-group">
+              <view class="diff-label {{item.difficulty}}">{{item.difficulty}}</view>
+              <view 
+                class="map-item {{selectedMap === map.name ? 'active' : ''}}"
+                wx:for="{{item.maps}}"
+                wx:key="name"
+                wx:for-item="map"
+                bindtap="selectMap"
+                data-map="{{map.name}}"
+              >{{map.name}}</view>
+            </view>
+          </block>
+        </block>
+      </scroll-view>
+    </view>
+
+    <!-- 右侧：详情 -->
+    <view class="detail-panel">
+      <scroll-view scroll-y="true" class="detail-scroll">
+      <block wx:if="{{selectedMap}}">
+        <view class="detail-header">
+          <text class="map-name">{{selectedMap}}</text>
+          <text class="diff-tag {{selectedDifficulty}}">{{selectedDifficulty}}</text>
+        </view>
+
+        <!-- 输入 -->
+        <view class="input-area">
+          <input 
+            class="time-input"
+            type="text"
+            placeholder="输入成绩 如: 1.51.00"
+            value="{{userTime}}"
+            bindinput="onTimeInput"
+          />
+          <view class="check-btn" bindtap="checkMyLine">查询</view>
+        </view>
+
+        <block wx:if="{{userLine}}">
+          <view class="result-area">
+            <text>你的分线：</text>
+            <text class="result {{userLineClass}}">{{userLine}}</text>
+          </view>
+        </block>
+
+        <!-- 分线表格 -->
+        <view class="line-table">
+          <view 
+            class="table-row {{userLine === item.level ? 'current' : ''}}"
+            wx:for="{{currentMapLines}}"
+            wx:key="level"
+          >
+            <text class="level {{item.level}}">{{item.level}}</text>
+            <text class="time">{{item.time}}</text>
+          </view>
+        </view>
+        
+        <!-- 底部占位，防止滑到底部被遮挡 -->
+        <view class="bottom-spacer"></view>
+      </block>
+
+      <block wx:if="{{!selectedMap}}">
+        <view class="empty-tip">请选择一张地图</view>
+      </block>
+      </scroll-view>
+
+      <!-- 固定在右下角的按钮 -->
+      <view class="history-btn-fixed" bindtap="showHistory">📋 查看我的历史记录</view>
+    </view>
+  </view>
+
+  <!-- 底部按钮已移除 -->
+
+  <!-- 历史记录弹窗 -->
+  <view class="modal-mask" wx:if="{{showHistoryModal}}" catchtap="closeHistory">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📋 我的分线 ({{historyRecords.length}}条)</view>
+      
+      <view class="overall" wx:if="{{overallLine}}">
+        <text>综合：</text>
+        <text class="overall-val {{overallLineClass}}">{{overallLine}}</text>
+      </view>
+
+      <scroll-view scroll-y="true" class="history-scroll">
+        <view 
+          class="history-item {{item.lineClass}}"
+          wx:for="{{historyRecords}}"
+          wx:key="_id"
+        >
+          <view class="item-info2">
+            <text class="item-map {{item.lineClass}}">{{item.map}}</text>
+            <text class="item-time">{{item.time}}</text>
+          </view>
+          <view class="item-info">
+            <text class="item-line {{item.lineClass}}">{{item.line}}</text>
+          </view>
+          <view class="del-btn" catchtap="deleteRecord" data-id="{{item._id}}" data-map="{{item.map}}">🗑️</view>
+        </view>
+        <text wx:if="{{historyRecords.length === 0}}" class="empty">暂无记录</text>
+      </scroll-view>
+
+      <view class="modal-close" catchtap="closeHistory">关闭</view>
+    </view>
+  </view>
+</view>

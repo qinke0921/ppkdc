@@ -1,0 +1,8 @@
+{
+  "name": "getOpenId",
+  "version": "1.0.0",
+  "permissions": {
+    "openapi": []
+  },
+  "env": "cloudbase-0ga9zc1ub244d4ba"
+}

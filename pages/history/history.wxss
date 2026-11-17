@@ -1,0 +1,34 @@
+/* pages/history/history.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.header {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  padding: 40rpx;
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FDB927;
+}
+
+.empty {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}

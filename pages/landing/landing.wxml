@@ -1,0 +1,41 @@
+<!--pages/landing/landing.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🏎️ PLAY.CLUB</text>
+    <text class="subtitle">车队运营小程序</text>
+  </view>
+
+  <view class="intro">
+    <text class="intro-text">由 绒毛兔 + openclaw 完成</text>
+    <text class="intro-text">车队功能仅限车队成员使用</text>
+    <text class="intro-text highlight">游客可用 - 分线/比赛记录功能</text>
+  </view>
+
+  <!-- 广告语板块 -->
+  <view class="ad-section">
+    <view class="ad-header">
+      <text class="ad-label">📢 广告位招租</text>
+    </view>
+    <view class="ad-content" wx:if="{{advertisement}}">
+      <text class="ad-text">{{advertisement}}</text>
+    </view>
+    <view class="ad-content ad-empty" wx:else>
+      <text class="ad-text">暂无广告</text>
+    </view>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goToTeam">
+      <text class="menu-icon">🚗</text>
+      <text class="menu-text">PLAY车队</text>
+    </view>
+    <view class="menu-item" bindtap="goToCompetition">
+      <text class="menu-icon">📊</text>
+      <text class="menu-text">比赛记录</text>
+    </view>
+    <view class="menu-item" bindtap="goToLine">
+      <text class="menu-icon">🗺️</text>
+      <text class="menu-text">分线查询</text>
+    </view>
+  </view>
+</view>

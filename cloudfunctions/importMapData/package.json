@@ -1,0 +1,9 @@
+{
+  "name": "importMapData",
+  "version": "1.0.0",
+  "description": "Import map data from CSV to cloud database",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

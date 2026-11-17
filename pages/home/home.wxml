@@ -1,0 +1,34 @@
+<!--pages/home/home.wxml-->
+<view class="container">
+  <!-- 顶部介绍 - 背景图片 -->
+  <image class="bg-image" src="images/WechatIMG29.png" mode="aspectFill"></image>
+  <view class="bg-overlay"></view>
+  
+  <view class="intro-section">
+    <view class="intro-header">
+      <text class="intro-title">PLAY.CLUB</text>
+    </view>
+    <view class="intro-content">
+      <text class="intro-desc">车队功能仅限车队成员使用</text>
+      <text class="intro-desc highlight">游客可用 - 分线/比赛记录功能</text>
+    </view>
+  </view>
+
+  <!-- 广告语板块 -->
+  <view class="ad-section" wx:if="{{advertisement}}">
+    <view class="ad-badge">💡</view>
+    <text class="ad-text">{{advertisement}}</text>
+  </view>
+
+  <!-- 功能说明 -->
+  <view class="feature-section">
+    <view class="feature-item" bindtap="goToCompetition">
+      <text class="feature-icon">📊</text>
+      <text class="feature-text">比赛记录</text>
+    </view>
+    <view class="feature-item" bindtap="goToLine">
+      <text class="feature-icon">🗺️</text>
+      <text class="feature-text">分线查询</text>
+    </view>
+  </view>
+</view>

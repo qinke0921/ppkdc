@@ -1,0 +1,168 @@
+<!--pages/activities/edit.wxml-->
+<view class="container edit-page">
+  <view class="form-card">
+    <view class="section-title">基本信息</view>
+
+    <view class="form-item">
+      <text class="label">活动名称 *</text>
+      <view class="field-box">
+        <input
+          class="input input-lg"
+          placeholder="请输入活动名称"
+          value="{{form.name}}"
+          data-field="name"
+          bindinput="onFormInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">开始时间 *</text>
+      <view class="field-stack">
+        <picker
+          class="field-picker"
+          mode="date"
+          value="{{form.startDate}}"
+          data-field="startDate"
+          bindchange="onDateChange"
+        >
+          <view class="picker-block">
+            <text class="picker-tag">日期</text>
+            <text class="picker-text">{{form.startDate || '点击选择日期'}}</text>
+          </view>
+        </picker>
+        <picker
+          class="field-picker"
+          mode="time"
+          value="{{form.startTime}}"
+          data-field="startTime"
+          bindchange="onTimeChange"
+        >
+          <view class="picker-block">
+            <text class="picker-tag">时刻</text>
+            <text class="picker-text">{{form.startTime || '点击选择时间'}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">结束时间 *</text>
+      <view class="field-stack">
+        <picker
+          class="field-picker"
+          mode="date"
+          value="{{form.endDate}}"
+          data-field="endDate"
+          bindchange="onDateChange"
+        >
+          <view class="picker-block">
+            <text class="picker-tag">日期</text>
+            <text class="picker-text">{{form.endDate || '点击选择日期'}}</text>
+          </view>
+        </picker>
+        <picker
+          class="field-picker"
+          mode="time"
+          value="{{form.endTime}}"
+          data-field="endTime"
+          bindchange="onTimeChange"
+        >
+          <view class="picker-block">
+            <text class="picker-tag">时刻</text>
+            <text class="picker-text">{{form.endTime || '点击选择时间'}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">活动说明</text>
+      <view class="field-box">
+        <textarea
+          class="textarea textarea-lg"
+          placeholder="活动规则、奖励说明等（可多行填写）"
+          value="{{form.description}}"
+          data-field="description"
+          bindinput="onFormInput"
+        />
+      </view>
+    </view>
+  </view>
+
+  <view class="form-card">
+    <view class="section-title">参与者奖金登记</view>
+    <view class="prize-item" wx:for="{{prizes}}" wx:key="index">
+      <view class="prize-item-main">
+        <text class="prize-item-name">{{item.gameName}}</text>
+        <text class="prize-item-note">💰 {{item.prizeNote}}</text>
+      </view>
+      <view class="prize-item-actions">
+        <text class="prize-edit" bindtap="showEditPrizeModal" data-index="{{index}}">编辑</text>
+        <text class="prize-del" bindtap="deletePrizeLocal" data-index="{{index}}">删除</text>
+      </view>
+    </view>
+    <view class="add-prize-btn" bindtap="showAddPrizeModal">➕ 添加奖金登记</view>
+  </view>
+
+  <view class="save-bar">
+    <view class="save-btn" bindtap="saveActivity">💾 保存活动</view>
+  </view>
+</view>
+
+<!-- 奖金登记弹窗 -->
+<view class="modal-mask" wx:if="{{showPrizeModal}}" bindtap="hidePrizeModal">
+  <view class="modal modal-prize" catchtap="stopPropagation">
+    <view class="modal-title">{{editingPrizeIndex >= 0 ? '编辑' : '添加'}}奖金登记</view>
+
+    <scroll-view scroll-y class="modal-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="form-item">
+        <text class="label">选择队员 *</text>
+        <view class="field-box">
+          <picker
+            class="field-picker"
+            mode="selector"
+            range="{{allMembers}}"
+            range-key="gameName"
+            bindchange="onPrizeMemberChange"
+          >
+            <view class="picker-block picker-block-single">
+              <text class="picker-text">{{prizeForm.gameName || '点击选择车队成员'}}</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">或手动输入名字</text>
+        <view class="field-box">
+          <input
+            class="input input-lg"
+            placeholder="未在列表中时可手动填写"
+            value="{{prizeForm.gameName}}"
+            data-field="gameName"
+            bindinput="onPrizeFormInput"
+          />
+        </view>
+      </view>
+
+      <view class="form-item form-item-last">
+        <text class="label">奖金说明 *</text>
+        <view class="field-box">
+          <input
+            class="input input-lg"
+            placeholder="例如：11.11 红包、18.88、冠军奖励"
+            value="{{prizeForm.prizeNote}}"
+            data-field="prizeNote"
+            bindinput="onPrizeFormInput"
+          />
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="modal-buttons">
+      <view class="btn cancel" bindtap="hidePrizeModal">取消</view>
+      <view class="btn confirm" bindtap="savePrizeLocal">确定</view>
+    </view>
+  </view>
+</view>

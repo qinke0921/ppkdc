@@ -1,0 +1,410 @@
+/* pages/line/line.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  padding: 30rpx;
+  text-align: center;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #fff;
+  display: block;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 10rpx;
+  display: block;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  height: calc(100vh - 200rpx);
+  overflow: hidden;
+}
+
+/* 左侧地图列表 */
+.map-list {
+  width: 30%;
+  background: #fff;
+  border-right: 1rpx solid #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-title {
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #666;
+  font-weight: bold;
+  border-bottom: 1rpx solid #eee;
+  background: #f9f9f9;
+}
+
+.map-scroll {
+  flex: 1;
+  height: 100%;
+}
+
+.difficulty-group {
+  margin-bottom: 10rpx;
+}
+
+.difficulty-label {
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.difficulty-label.R {
+  background: #FF6B6B;
+}
+
+.difficulty-label.L3 {
+  background: #4ECDC4;
+}
+
+.difficulty-label.L2 {
+  background: #45B7D1;
+}
+
+.difficulty-label.L1 {
+  background: #96CEB4;
+}
+
+.map-item {
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  color: #333;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.map-item.active {
+  background: #E8F4FF;
+  color: #1E90FF;
+  font-weight: bold;
+  border-left: 6rpx solid #1E90FF;
+}
+
+/* 右侧分线详情 */
+.line-detail {
+  flex: 1;
+  padding: 20rpx;
+  overflow-y: auto;
+}
+
+.map-info {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+  margin-bottom: 20rpx;
+}
+
+.map-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.map-difficulty {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  color: #fff;
+}
+
+.map-difficulty.R { background: #FF6B6B; }
+.map-difficulty.L3 { background: #4ECDC4; }
+.map-difficulty.L2 { background: #45B7D1; }
+.map-difficulty.L1 { background: #96CEB4; }
+
+/* 分线表格 */
+.line-table {
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.table-header {
+  display: flex;
+  background: #f5f5f5;
+  padding: 16rpx 0;
+}
+
+.table-header .th {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #666;
+}
+
+.table-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.table-row .td {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.table-row.highlight {
+  background: #FFF9E6;
+}
+
+.table-row.highlight .td {
+  color: #FF9800;
+  font-weight: bold;
+}
+
+/* 输入区域 */
+.input-section {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.input-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.input-row {
+  margin-bottom: 15rpx;
+}
+
+.time-input {
+  width: 100%;
+  height: 80rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 32rpx;
+}
+
+.input-hint {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.btn-check {
+  width: 100%;
+  height: 80rpx;
+  background: #1E90FF;
+  color: #fff;
+  border-radius: 8rpx;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+/* 查询结果 */
+.result-section {
+  text-align: center;
+  padding: 20rpx;
+}
+
+.result-badge {
+  display: inline-block;
+  padding: 16rpx 40rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10rpx;
+}
+
+.result-badge.国服记录 { background: linear-gradient(135deg, #FFD700, #FFA500); }
+.result-badge.顶尖职业 { background: linear-gradient(135deg, #FF6B6B, #EE5A5A); }
+.result-badge.职业 { background: linear-gradient(135deg, #9B59B6, #8E44AD); }
+.result-badge.强主 { background: linear-gradient(135deg, #3498DB, #2980B9); }
+.result-badge.主力 { background: linear-gradient(135deg, #1ABC9C, #16A085); }
+.result-badge.强一, .result-badge.一线 { background: linear-gradient(135deg, #2ECC71, #27AE60); }
+.result-badge.弱一 { background: linear-gradient(135deg, #A8E6CF, #88D8B0); }
+.result-badge.强二, .result-badge.二线 { background: linear-gradient(135deg, #F39C12, #E67E22); }
+.result-badge.弱二 { background: linear-gradient(135deg, #F5CBA7, #F0B27A); }
+.result-badge.强三, .result-badge.三线 { background: linear-gradient(135deg, #E74C3C, #C0392B); }
+.result-badge.娱乐 { background: linear-gradient(135deg, #95A5A6, #7F8C8D); }
+
+.result-desc {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.no-select {
+  text-align: center;
+  color: #999;
+  padding: 100rpx 0;
+  font-size: 28rpx;
+}
+
+/* 历史记录按钮 */
+.history-btn {
+  position: fixed;
+  bottom: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 20rpx 40rpx;
+  border-radius: 50rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.history-btn text {
+  font-size: 28rpx;
+  color: #1E90FF;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20rpx;
+  width: 80%;
+  max-height: 70vh;
+  padding: 30rpx;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.history-modal {
+  width: 85%;
+}
+
+/* 综合评价 */
+.overall-evaluation {
+  text-align: center;
+  padding: 20rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.eval-label {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.eval-value {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.eval-value.国服记录 { color: #FFD700; }
+.eval-value.顶尖职业 { color: #FF6B6B; }
+.eval-value.职业 { color: #9B59B6; }
+.eval-value.强主 { color: #3498DB; }
+.eval-value.主力 { color: #1ABC9C; }
+.eval-value.强一, .eval-value.一线 { color: #2ECC71; }
+.eval-value.强二, .eval-value.二线 { color: #F39C12; }
+.eval-value.强三, .eval-value.三线 { color: #E74C3C; }
+.eval-value.娱乐 { color: #95A5A6; }
+
+.history-list {
+  max-height: 50vh;
+}
+
+.history-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-map {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.history-detail {
+  display: flex;
+  gap: 20rpx;
+}
+
+.history-time {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.history-line {
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.history-line.国服记录 { color: #FFD700; }
+.history-line.顶尖职业 { color: #FF6B6B; }
+.history-line.职业 { color: #9B59B6; }
+.history-line.强主 { color: #3498DB; }
+.history-line.主力 { color: #1ABC9C; }
+.history-line.强一, .history-line.一线 { color: #2ECC71; }
+.history-line.强二, .history-line.二线 { color: #F39C12; }
+.history-line.强三, .history-line.三线 { color: #E74C3C; }
+.history-line.娱乐 { color: #95A5A6; }
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 40rpx 0;
+  font-size: 28rpx;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20rpx;
+}
+
+.modal-buttons .btn {
+  padding: 16rpx 60rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.modal-buttons .btn.primary {
+  background: #1E90FF;
+  color: #fff;
+}

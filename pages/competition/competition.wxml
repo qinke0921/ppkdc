@@ -1,0 +1,439 @@
+<!--pages/competition/competition.wxml-->
+<view class="container">
+  <!-- 比赛信息头部 -->
+  <view class="header">
+    <view class="title-row">
+      <view class="title">{{competition.name}}</view>
+      <button class="share-btn" open-type="share">📤 分享</button>
+    </view>
+    <view class="description-row" wx:if="{{competition.description || isCreator}}">
+      <view class="description" wx:if="{{competition.description}}">{{competition.description}}</view>
+      <view class="edit-desc-btn" bindtap="editDescription" wx:if="{{isCreator}}">✏️</view>
+    </view>
+    <view class="meta">
+      <text class="tag">{{competition.type === 'personal' ? '个人赛' : '团队赛'}}</text>
+      <text class="tag">{{competition.rule}}</text>
+      <text class="status {{competition.status}}">{{competition.status === 'ongoing' ? '进行中' : '已结束'}}</text>
+    </view>
+    <view class="target" wx:if="{{competition.targetScore}}">
+      目标分数：{{competition.targetScore}}分
+    </view>
+    <!-- 比赛进度 -->
+    <view class="progress-info" wx:if="{{competition.status === 'ongoing' && competition.rule}}">
+      <text wx:if="{{competition.rule === '千分赛'}}">📊 进度: {{totalScore}} / {{competition.targetScore}} 分</text>
+      <text wx:elif="{{competition.rule === '抢分赛' || competition.rule === '抢1赛'}}">📊 进度: {{maxScore}} / {{competition.targetScore}} 分</text>
+      <text wx:elif="{{competition.type === 'team'}}">📊 进度: 红队{{competition.scores['红队'] || 0}} vs 蓝队{{competition.scores['蓝队'] || 0}} / {{competition.targetScore}}</text>
+    </view>
+    <view class="time-info" wx:if="{{gameStarted}}" style="margin-top:20rpx;">
+      <text class="time-item">🕐 开始: {{startTimeStr}}</text>
+      <text class="time-item" wx:if="{{endTimeStr !== '-'}}">🏁 结束: {{endTimeStr}}</text>
+    </view>
+  </view>
+
+  <!-- 报名区域 - 比赛进行中或未开始时显示 -->
+  <view class="register-section" wx:if="{{competition.status === 'ongoing' || !competition.startTime}}">
+    <!-- 创建者：显示管理报名按钮 -->
+    <view wx:if="{{isCreator}}" class="register-box creator">
+      <view class="register-info" wx:if="{{registrations.length > 0}}">
+        <text>📝 当前有 {{registrations.length}} 人报名，{{pendingRegs.length}} 人待审核</text>
+      </view>
+      <view wx:if="{{registrations.length === 0}}" class="register-info">
+        <text>📝 暂没有人报名</text>
+      </view>
+      <view class="register-buttons">
+        <view class="register-btn" bindtap="showManageRegistrationModal">管理报名</view>
+        <!-- 创建者也可以自己报名来测试 -->
+        <view class="register-btn test" bindtap="showRegisterModal">🎫 报名参赛（测试）</view>
+      </view>
+    </view>
+    
+    <!-- 非创建者：显示报名按钮 -->
+    <view wx:elif="{{!isCreator}}" class="register-box">
+      <block wx:if="{{hasRegistered}}">
+        <view class="register-status-box">
+          <text wx:if="{{registrationStatus === 'pending'}}" class="register-status pending">⏳ 报名已提交，等待审核</text>
+          <text wx:elif="{{registrationStatus === 'approved'}}" class="register-status approved">✅ 你已被录取</text>
+          <text wx:elif="{{registrationStatus === 'rejected'}}" class="register-status rejected">❌ 抱歉，你未被录取</text>
+        </view>
+        <view class="register-btn cancel" bindtap="cancelRegistration" wx:if="{{registrationStatus === 'pending'}}">取消报名</view>
+      </block>
+      <block wx:else>
+        <view class="register-hint">还没有报名？</view>
+        <view class="register-btn" bindtap="showRegisterModal">📝 报名参赛</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 已录入选手 -->
+  <view class="players-section" wx:if="{{players.length > 0 || teamA.length > 0}}">
+    <view class="section-title">👥 参赛选手</view>
+    <view class="players-list">
+      <block wx:if="{{competition.type === 'team'}}">
+        <view class="team-group">
+          <text class="team-label">🔴 红队</text>
+          <view class="team-players">
+            <text class="player-tag red" wx:for="{{teamA}}" wx:key="index">{{item.name || item}}</text>
+          </view>
+        </view>
+        <view class="team-group">
+          <text class="team-label">🔵 蓝队</text>
+          <view class="team-players">
+            <text class="player-tag blue" wx:for="{{teamB}}" wx:key="index">{{item.name || item}}</text>
+          </view>
+        </view>
+        <view wx:if="{{teamA.length === 0}}">请先录入选手</view>
+      </block>
+      <block wx:else>
+        <text class="player-tag" wx:for="{{players}}" wx:key="index">{{item}}</text>
+      </block>
+    </view>
+  </view>
+  <view class="players-section" wx:else>
+    <view class="no-data">请先点击下方「👥 录入选手」添加参赛选手</view>
+  </view>
+
+  <!-- 实时排名 -->
+  <view class="ranking-section">
+    <view class="section-title">🏆 实时排名</view>
+    
+    <view class="ranking-list" wx:if="{{ranking && ranking.length > 0}}">
+      <view class="ranking-item header-row">
+        <text class="rank">排名</text>
+        <text class="name">玩家</text>
+        <text class="score">积分</text>
+      </view>
+      
+      <view class="ranking-item" wx:for="{{ranking}}" wx:key="name">
+        <text class="rank">#{{index + 1}}</text>
+        <text class="name">{{item.name}}</text>
+        <text class="score {{item.score >= 0 ? 'positive' : 'negative'}}">{{item.score}}</text>
+      </view>
+    </view>
+
+    <view class="no-data" wx:if="{{!ranking || ranking.length === 0}}">
+      暂无排名数据
+    </view>
+  </view>
+
+  <!-- 回合记录 -->
+  <view class="rounds-section">
+    <view class="section-title">📊 回合记录</view>
+    
+    <view wx:if="{{rounds.length === 0}}" class="no-data">
+      暂无回合记录
+    </view>
+
+    <view class="round-item" wx:for="{{rounds}}" wx:key="_id">
+      <view class="round-header" bindtap="toggleRound" data-id="{{item._id}}">
+        <view>
+          <text class="round-number">第 {{item.roundNumber}} 回合</text>
+          <text class="round-map" wx:if="{{item.mapName}}"> · {{item.mapName}}</text>
+        </view>
+        <text class="round-toggle">{{expandedRound === item._id ? '▼ 收起' : '▶ 展开'}}</text>
+      </view>
+      
+      <view class="round-results" wx:if="{{expandedRound === item._id}}">
+        <!-- 个人赛结果显示 -->
+        <block wx:if="{{item.type === 'personal'}}">
+          <view class="result-row header">
+            <text>排名</text>
+            <text>玩家</text>
+            <text>得分</text>
+          </view>
+          <view class="result-row" wx:for="{{item.results}}" wx:key="index" wx:for-item="player">
+            <text class="rank">{{player.rank}}</text>
+            <text class="name">{{player.name}}</text>
+            <text class="score {{player.score >= 0 ? 'positive' : 'negative'}}">{{player.score}}</text>
+          </view>
+        </block>
+        <!-- 团队赛结果显示 -->
+        <block wx:else>
+          <view class="team-result">
+            <text class="winner-badge {{item.winner === 'red' ? 'red' : 'blue'}}">
+              {{item.winner === 'red' ? '🔴 红队获胜' : '🔵 蓝队获胜'}}
+            </text>
+            <text class="map-name" wx:if="{{item.mapName}}">地图: {{item.mapName}}</text>
+            <!-- 如果有记录名次 -->
+            <view wx:if="{{item.teamResults && item.teamResults.length > 0}}">
+              <view class="result-row header">
+                <text>排名</text>
+                <text>玩家</text>
+              </view>
+              <view class="result-row" wx:for="{{item.teamResults}}" wx:key="index" wx:for-item="player">
+                <text class="rank">#{{index + 1}}</text>
+                <text class="name {{player.team === 'red' ? 'red' : 'blue'}}">{{player.name}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar" wx:if="{{competition.status === 'ongoing'}}">
+    <view wx:if="{{!gameStarted}}" class="btn start" bindtap="startGame">▶️ 开始比赛</view>
+    <view wx:if="{{gameStarted && players.length === 0}}" class="btn add" bindtap="showAddPlayersModal">👥 录入选手</view>
+    <view wx:if="{{players.length > 0}}" class="btn add" bindtap="showAddRoundModal">➕ 添加成绩</view>
+    <view class="btn finish" bindtap="finishCompetition">🏁 结束</view>
+  </view>
+
+  <!-- 录入选手弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddPlayersModal}}" bindtap="hideAddPlayersModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">录入参赛选手</view>
+      
+      <!-- 已批准的报名人列表（可点击添加） -->
+      <view class="registered-list" wx:if="{{registeredPlayers && registeredPlayers.length > 0}}">
+        <view class="hint">从报名人添加：</view>
+        <view class="registered-tags">
+          <view 
+            class="registered-tag" 
+            wx:for="{{registeredPlayers}}" 
+            wx:key="index"
+            bindtap="addPlayerFromRegistered"
+            data-name="{{item}}"
+          >+ {{item}}</view>
+        </view>
+      </view>
+      
+      <view class="hint" wx:if="{{competition.type === 'team'}}">
+        1-{{half}}为红队，{{half+1}}-{{half*2}}为蓝队
+      </view>
+      <view class="hint" wx:else>请输入本次比赛的选手名字（1-8人）</view>
+      
+      <view class="player-input" wx:for="{{newPlayers}}" wx:key="index">
+        <text class="player-num {{competition.type === 'team' && index < half ? 'red' : competition.type === 'team' ? 'blue' : ''}}">{{index + 1}}</text>
+        <input 
+          class="player-name"
+          placeholder="{{competition.type === 'team' && index < half ? '红队选手' : competition.type === 'team' ? '蓝队选手' : '选手名字'}}"
+          value="{{item.name}}"
+          data-index="{{index}}"
+          bindinput="onNewPlayerInput"
+        />
+        <input 
+          wx:if="{{competition.type === 'team'}}"
+          class="rank-input-small"
+          type="number"
+          placeholder="排名"
+          value="{{item.rank || ''}}"
+          data-index="{{index}}"
+          bindinput="onRankInput"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn-small" bindtap="hideAddPlayersModal">取消</view>
+        <view class="btn-small primary" bindtap="savePlayers">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加成绩弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddRoundModal}}" bindtap="hideAddRoundModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">添加成绩 - 第 {{rounds.length + 1}} 回合</view>
+      
+      <!-- 团队赛：选择哪队赢了 -->
+      <view wx:if="{{competition.type === 'team'}}">
+        <view class="form-item">
+          <text class="label">地图（选填）</text>
+          <input 
+            class="input" 
+            placeholder="如：城镇运河"
+            value="{{newRoundInfo.mapName}}"
+            bindinput="onMapInput"
+          />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">哪队赢了？</text>
+          <view class="team-select">
+            <view 
+              class="team-btn {{newRound.winner === 'red' ? 'active red' : ''}}"
+              bindtap="onWinnerSelect"
+              data-winner="red"
+            >
+              🔴 红队
+            </view>
+            <view 
+              class="team-btn {{newRound.winner === 'blue' ? 'active blue' : ''}}"
+              bindtap="onWinnerSelect"
+              data-winner="blue"
+            >
+              🔵 蓝队
+            </view>
+          </view>
+        </view>
+        
+        <!-- 名次选择（可选） -->
+        <view class="form-item">
+          <view class="rank-toggle" bindtap="toggleShowRanks">
+            <text>{{newRound.showRanks ? '▼ 收起名次' : '▶ 填写名次（可选）'}}</text>
+          </view>
+        </view>
+        
+        <!-- 名次选择列表 -->
+        <view wx:if="{{newRound.showRanks}}" class="rank-section">
+          <view class="hint" style="text-align: center; margin-bottom: 16rpx; color: #999; font-size: 24rpx;">
+            选择每个名次的选手（可选）
+          </view>
+          <view class="player-row header">
+            <text></text>
+            <text class="picker-label">选择选手</text>
+          </view>
+          <view class="player-row" wx:for="{{teamRankPlayers}}" wx:key="index">
+            <text class="player-rank">#{{index + 1}}</text>
+            <picker 
+              mode="selector" 
+              range="{{availablePlayers}}" 
+              range-key=""
+              bindchange="onTeamPlayerSelect"
+              data-index="{{index}}"
+              value="{{item.selectedIndex || 0}}"
+            >
+              <view class="player-picker">
+                {{item.name || '选择'}}
+              </view>
+            </picker>
+          </view>
+        </view>
+        
+        <view class="team-preview">
+          <view class="teamA">
+            <text class="team-title">🔴 红队</text>
+            <text class="players">{{teamAStr}}</text>
+          </view>
+          <view class="teamB">
+            <text class="team-title">🔵 蓝队</text>
+            <text class="players">{{teamBStr}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 个人赛：选择选手（自动按顺序排名） -->
+      <view wx:if="{{competition.type === 'personal'}}">
+        <view class="form-item">
+          <text class="label">地图（选填）</text>
+          <input 
+            class="input" 
+            placeholder="如：城镇运河"
+            value="{{newRoundInfo.mapName}}"
+            bindinput="onMapInput"
+          />
+        </view>
+
+        <!-- 选手选择（按排名顺序） -->
+        <view class="player-row header">
+          <text></text>
+          <text class="picker-label">选择选手</text>
+        </view>
+        <view class="player-row" wx:for="{{editingPlayers}}" wx:key="rank">
+          <text class="player-rank">#{{index + 1}}</text>
+          <picker 
+            mode="selector" 
+            range="{{availablePlayers}}" 
+            range-key=""
+            bindchange="onPlayerSelect"
+            data-index="{{index}}"
+            value="{{item.selectedIndex || 0}}"
+          >
+            <view class="player-picker">
+              {{item.name || '选择'}}
+            </view>
+          </picker>
+          
+        </view>
+      </view>
+
+      <view class="modal-buttons">
+        
+        <view class="btn-small" bindtap="hideAddRoundModal">取消</view>
+        <view class="btn-small primary" bindtap="addManualResult">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 报名弹窗 -->
+  <view class="modal-mask" wx:if="{{showRegisterModal}}" bindtap="hideRegisterModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📝 报名参赛</view>
+      <view class="hint">请输入你的名字</view>
+      
+      <view class="form-item">
+        <input 
+          class="input" 
+          placeholder="请输入名字"
+          value="{{newRegisterName}}"
+          bindinput="onRegisterNameInput"
+          maxlength="20"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn-small" bindtap="hideRegisterModal">取消</view>
+        <view class="btn-small primary" bindtap="submitRegistration">提交报名</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理报名弹窗 -->
+  <view class="modal-mask" wx:if="{{showManageRegistrationModal}}" bindtap="hideManageRegistrationModal">
+    <view class="modal" catchtap="stopPropagation" style="max-height: 80vh;">
+      <view class="modal-title">👥 管理报名</view>
+      <view class="hint">点击选手名字可修改，点击下方按钮录取或拒绝</view>
+      
+      <scroll-view scroll-y="true" class="registration-list">
+        <block wx:if="{{registrations.length === 0}}">
+          <view class="no-data">暂没有人报名</view>
+        </block>
+        <block wx:else>
+          <!-- 待审核 -->
+          <view class="reg-group" wx:if="{{pendingRegs.length > 0}}">
+            <view class="reg-group-title">⏳ 待审核</view>
+            <view class="reg-item" wx:for="{{pendingRegs}}" wx:key="_id">
+              <view class="reg-info">
+                <text class="reg-name" bindtap="editRegistrationName" data-id="{{item._id}}" data-name="{{item.name}}">{{item.name}}</text>
+                <text class="reg-time">{{item.createdAt}}</text>
+              </view>
+              <view class="reg-actions">
+                <view class="btn-tiny success" bindtap="approveRegistration" data-id="{{item._id}}" data-name="{{item.name}}">录取</view>
+                <view class="btn-tiny danger" bindtap="rejectRegistration" data-id="{{item._id}}" data-name="{{item.name}}">拒绝</view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 已录取 -->
+          <view class="reg-group" wx:if="{{approvedRegs.length > 0}}">
+            <view class="reg-group-title">✅ 已录取</view>
+            <view class="reg-item" wx:for="{{approvedRegs}}" wx:key="_id">
+              <view class="reg-info">
+                <text class="reg-name approved">{{item.name}}</text>
+              </view>
+              <view class="reg-actions">
+                <view class="btn-tiny" bindtap="useRegistration" data-id="{{item._id}}" data-name="{{item.name}}">添加</view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 已拒绝 -->
+          <view class="reg-group" wx:if="{{rejectedRegs.length > 0}}">
+            <view class="reg-group-title">❌ 已拒绝</view>
+            <view class="reg-item" wx:for="{{rejectedRegs}}" wx:key="_id">
+              <view class="reg-info">
+                <text class="reg-name rejected">{{item.name}}</text>
+              </view>
+              <view class="reg-actions">
+                <view class="btn-tiny success" bindtap="approveRegistration" data-id="{{item._id}}" data-name="{{item.name}}">重新录取</view>
+              </view>
+            </view>
+          </view>
+        </block>
+      </scroll-view>
+
+      <view class="modal-buttons">
+        <view class="btn-small primary" bindtap="hideManageRegistrationModal">关闭</view>
+      </view>
+    </view>
+  </view>
+</view>

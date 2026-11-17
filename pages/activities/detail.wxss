@@ -1,0 +1,71 @@
+@import './common.wxss';
+
+.detail-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.detail-card-top .detail-name {
+  flex: 1;
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.share-btn {
+  flex-shrink: 0;
+  background: rgba(85, 37, 131, 0.1);
+  border: 2rpx solid rgba(85, 37, 131, 0.35);
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #552583;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.share-btn::after {
+  border: none;
+}
+
+.expand-header-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.prize-total-summary {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #552583;
+}
+
+.prize-total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+  background: linear-gradient(135deg, #f3eef8 0%, #fef9e7 100%);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba(85, 37, 131, 0.15);
+}
+
+.prize-total-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.prize-total-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #552583;
+}
+
+.expand-section-prizes .expand-header {
+  align-items: flex-start;
+}

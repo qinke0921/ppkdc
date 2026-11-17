@@ -1,0 +1,468 @@
+/* 车队活动共用样式 - 湖人紫金主题 */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  background: linear-gradient(135deg, #552583 0%, #3d1e63 100%);
+  padding: 36rpx 30rpx;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FDB927;
+}
+
+.subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 8rpx;
+}
+
+.admin-bar {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #FDB927, #f5a623);
+  color: #552583;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.activity-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.activity-card:active {
+  opacity: 0.92;
+}
+
+.card-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.card-time {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.card-desc {
+  font-size: 26rpx;
+  color: #999;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #552583;
+}
+
+.card-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.action-btn {
+  font-size: 26rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+}
+
+.action-edit {
+  color: #552583;
+  background: #f3eef8;
+}
+
+.action-delete {
+  color: #ff3b30;
+  background: #fff1f0;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.status-tag {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-left: 12rpx;
+  vertical-align: middle;
+}
+
+.status-upcoming {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-ongoing {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-ended {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* 详情页 */
+.detail-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.detail-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.detail-row {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+
+.detail-desc {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+  white-space: pre-wrap;
+}
+
+.participate-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 24rpx;
+}
+
+.participate-btn.joined {
+  background: #e8e8e8;
+  color: #666;
+}
+
+.participate-btn.disabled-btn {
+  background: #ccc;
+  color: #fff;
+}
+
+.expand-section {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.expand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.expand-arrow {
+  color: #999;
+  font-size: 26rpx;
+}
+
+.expand-body {
+  padding: 0 28rpx 28rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.member-row,
+.prize-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+  font-size: 28rpx;
+}
+
+.member-row:last-child,
+.prize-row:last-child {
+  border-bottom: none;
+}
+
+.prize-amount {
+  color: #FDB927;
+  font-weight: bold;
+  background: #552583;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+}
+
+.empty-inline {
+  color: #999;
+  font-size: 26rpx;
+  padding: 16rpx 0;
+}
+
+.admin-detail-bar {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.btn-outline {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #552583;
+  color: #552583;
+}
+
+.btn-danger-outline {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #ff3b30;
+  color: #ff3b30;
+}
+
+/* 编辑页 */
+.form-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.form-item {
+  margin-bottom: 28rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.input,
+.textarea,
+.picker-value {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+}
+
+.textarea {
+  min-height: 160rpx;
+}
+
+.picker-value {
+  color: #333;
+}
+
+.datetime-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.datetime-row .picker-value {
+  flex: 1;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.prize-item {
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.prize-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.prize-item-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.prize-item-actions text {
+  font-size: 26rpx;
+  margin-left: 20rpx;
+}
+
+.prize-edit {
+  color: #552583;
+}
+
+.prize-del {
+  color: #ff3b30;
+}
+
+.add-prize-btn {
+  text-align: center;
+  padding: 24rpx;
+  border: 2rpx dashed #552583;
+  border-radius: 12rpx;
+  color: #552583;
+  font-size: 28rpx;
+  margin-top: 12rpx;
+}
+
+.save-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 85%;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 28rpx;
+  color: #333;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 28rpx;
+}
+
+.modal-buttons .btn {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.btn.cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn.confirm {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+}

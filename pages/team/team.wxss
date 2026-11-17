@@ -1,0 +1,472 @@
+/* pages/team/team.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 非成员 */
+.non-member-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 150rpx;
+}
+
+.lock-icon { font-size: 120rpx; margin-bottom: 30rpx; }
+.lock-title { font-size: 48rpx; font-weight: bold; color: #333; margin-bottom: 20rpx; }
+.lock-desc { font-size: 28rpx; color: #999; margin-bottom: 60rpx; }
+
+.apply-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  padding: 25rpx 80rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 16rpx rgba(85, 37, 131, 0.35);
+}
+
+/* 车队头部 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #552583 0%, #6b3483 25%, #552583 50%, #3d1e63 75%, #2a1550 100%);
+  padding: 30rpx;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.team-name { font-size: 40rpx; font-weight: bold; color: #FDB927; }
+
+/* 成员区域 */
+.member-section { padding-top: 30rpx; }
+
+.welcome {
+  background: linear-gradient(135deg, #552583 0%, #6b3483 25%, #552583 50%, #3d1e63 75%, #2a1550 100%);
+  padding: 40rpx;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.welcome::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.welcome-text { color: #fff; font-size: 36rpx; font-weight: bold; }
+
+/* 功能模块 */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin: 30rpx 0;
+}
+
+.feature-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(85, 37, 131, 0.3);
+}
+
+.feature-btn text { color: #fff; font-size: 28rpx; font-weight: 500; }
+.feature-btn.disabled { background: linear-gradient(135deg, #999, #666); box-shadow: none; }
+.feature-btn.disabled text { color: #ccc; }
+
+/* 管理员按钮 */
+.admin-btn {
+  background: linear-gradient(135deg, #FDB927, #f5a623);
+  color: #fff;
+  padding: 30rpx;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4rpx 12rpx rgba(253, 185, 39, 0.35);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.badge {
+  background: #ff3b30;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: bold;
+  min-width: 36rpx;
+  height: 36rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
+}
+
+/* 成员卡片 */
+.member-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08);
+  border-left: 5rpx solid #FDB927;
+}
+
+.member-info { flex: 1; }
+.member-name { 
+  font-size: 28rpx; 
+  color: #999; 
+  margin-top: 4rpx;
+}
+
+.member-game { 
+  font-size: 32rpx; 
+  font-weight: bold; 
+  color: #333; 
+}
+.member-line { font-size: 26rpx; color: #552583; margin-top: 5rpx; font-weight: 600; }
+
+/* 车队成员列表 */
+.members-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.members-header text { font-size: 30rpx; color: #333; }
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 0;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  border-top: 6rpx solid #FDB927;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 30rpx 24rpx;
+  background: #f8f9fa;
+  color: #552583;
+  position: relative;
+}
+
+.modal-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+  border-radius: 2rpx;
+}
+
+.form-item { margin-bottom: 30rpx; padding: 0 30rpx; }
+
+.form-item .label {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  display: block;
+  font-weight: 600;
+}
+
+.form-item .input {
+  border: 2rpx solid #d4b8e8;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  background: #fafafa;
+}
+
+/* 分线颜色 */
+.gf-record { color: #FFD700 !important; }
+.top-pro { color: #FF6B00 !important; }
+.pro { color: #FF1493 !important; }
+.strong-host { color: #FF69B4 !important; }
+.main { color: #FF4500 !important; }
+.strong-one { color: #552583 !important; }
+.tier1 { color: #7B5EA7 !important; }
+.weak-one { color: #9B7FC7 !important; }
+.strong-two { color: #32CD32 !important; }
+.tier2 { color: #3CB371 !important; }
+.weak-two { color: #2E8B57 !important; }
+.strong-three { color: #DAA520 !important; }
+.tier3 { color: #B8860B !important; }
+.fun { color: #888888 !important; }
+
+/* 分线记录弹窗 */
+.line-modal {
+  width: 92%;
+  max-height: 88vh;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 0;
+  overflow: hidden;
+  border-top: 6rpx solid #FDB927;
+}
+
+.line-modal .modal-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #552583;
+  padding: 30rpx 24rpx;
+  background: #f8f9fa;
+}
+
+.overall-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  margin: 0;
+}
+
+.overall-line text { font-size: 30rpx; color: #fff; font-weight: 600; }
+.overall-line .overall-val {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #552583;
+  background: #fff;
+  padding: 10rpx 24rpx;
+  border-radius: 12rpx;
+}
+
+.line-scroll { max-height: 60vh; padding: 0 24rpx; }
+
+.line-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background: #fff;
+}
+
+.line-item:hover { background: #f8f9fa; }
+
+.line-map { flex: 1; font-size: 26rpx; color: #333; }
+.line-time { font-size: 24rpx; color: #666; min-width: 120rpx; text-align: center; }
+.line-level {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+}
+
+.line-modal .modal-close {
+  display: block;
+  padding: 24rpx;
+  text-align: center;
+  color: #666;
+  font-size: 28rpx;
+  background: #f8f9fa;
+  border-top: 1rpx solid #eee;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin: 30rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.btn {
+  flex: 1;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.btn.cancel { background: #f5f5f5; color: #666; }
+.btn.confirm { background: linear-gradient(135deg, #552583, #3d1e63); color: #fff; }
+.btn.edit { background: linear-gradient(135deg, #FDB927, #f5a623); color: #fff; }
+
+.overall { display: flex; align-items: center; justify-content: center; padding: 20rpx; background: #f3e8ff; border-radius: 12rpx; margin: 24rpx 30rpx 20rpx; border: 1rpx solid #d4b8e8; }
+.overall text:first-child { font-size: 28rpx; color: #666; }
+.overall-val { font-size: 32rpx; font-weight: bold; color: #552583; margin-left: 12rpx; }
+.item-line { font-size: 28rpx; font-weight: bold; color: #552583; margin-right: 12rpx; }
+.modal-close { text-align: center; padding: 20rpx; background: #f5f5f5; border-radius: 12rpx; margin: 20rpx 30rpx; color: #666; }
+/* ===== 成员详情弹窗加强 ===== */
+.detail-content {
+  height: 50vh;
+  overflow-y: auto;
+}
+
+.detail-item {
+  padding: 28rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.detail-item:last-of-type {
+  border-bottom: none;
+}
+
+.detail-item:last-child {
+  margin-bottom: 24rpx;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 14rpx;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 36rpx;
+  color: #333;
+  display: block;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.detail-value.no-data {
+  color: #bbb;
+  font-size: 32rpx;
+}
+
+.detail-value.role {
+  color: #552583;
+  font-weight: bold;
+}
+
+/* 申请弹窗列表 */
+.app-list {
+  max-height: 55vh;
+  padding: 0 30rpx;
+}
+
+.app-item {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.app-item:last-child {
+  border-bottom: none;
+}
+
+.app-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.app-game {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+/* ===== 编辑弹窗输入框 ===== */
+.edit-input {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #d4b8e8;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 16rpx 20rpx;
+  border: 2rpx solid #d4b8e8;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+/* 离队相关 */
+.left-header {
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-bottom: 1rpx solid #eee;
+}
+
+.left-card {
+  opacity: 0.6;
+  background: #f9f9f9;
+}
+
+.btn.danger {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.modal-buttons .btn.danger {
+  background: #ff4d4f;
+  border: none;
+}

@@ -1,0 +1,126 @@
+<!--pages/group-pool/group-pool.wxml-->
+<view class="container">
+  <!-- 头部说明 -->
+  <view class="header">
+    <text class="title">🔀 按分组池分组</text>
+    <text class="desc">创建分组池，设置抽取人数，抽签分组</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-btns">
+    <view class="btn add" bindtap="showAddModal">➕ 添加分组池</view>
+    <view class="btn reset" bindtap="resetDraw">🔄 重置抽签</view>
+    <view class="btn clear" bindtap="resetAll">🗑️ 清空全部</view>
+  </view>
+
+  <!-- 分组池列表 -->
+  <view class="pools-section" wx:if="{{pools.length > 0}}">
+    <view class="section-title">分组池</view>
+    <block wx:for="{{pools}}" wx:key="id">
+      <view class="pool-card" style="border-left: 8rpx solid {{item.color}}">
+        <view class="pool-header">
+          <view class="pool-name" style="color: {{item.color}}">{{item.name}}</view>
+          <view class="pool-info">
+            <text>共{{item.totalCount}}人，抽{{item.drawCount}}人</text>
+            <text class="delete-btn" bindtap="deletePool" data-id="{{item.id}}">✕</text>
+          </view>
+        </view>
+        <view class="pool-members">
+          <block wx:for="{{item.members}}" wx:for-item="m" wx:key="index">
+            <text class="member-tag {{m.used ? 'used' : ''}}" style="{{m.used ? 'background:' + item.color + '30; color:' + item.color + '; text-decoration:line-through;' : ''}}">{{m.name}}</text>
+          </block>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{pools.length === 0}}">
+    <text>暂无分组池，点击上方"添加分组池"开始</text>
+  </view>
+
+  <!-- 抽签按钮 -->
+  <view class="draw-section" wx:if="{{pools.length > 0}}">
+    <view class="draw-btn" bindtap="doDraw">🎲 执行抽签</view>
+  </view>
+
+  <!-- 抽签结果 -->
+  <view class="result-section" wx:if="{{allDrawResults.length > 0}}">
+    <view class="section-title">分组结果（共{{allDrawResults.length}}组）</view>
+    <block wx:for="{{allDrawResults}}" wx:key="id">
+      <view class="result-group">
+        <view class="group-title">第{{index + 1}}组</view>
+        <view class="result-list">
+          <block wx:for="{{item.results}}" wx:key="index">
+            <view class="result-item" style="background: {{item.poolColor}}20; border-left: 6rpx solid {{item.poolColor}}">
+              <text class="result-name">{{item.name}}</text>
+              <text class="result-pool" style="color: {{item.poolColor}}">{{item.poolName}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+    <view class="copy-btn" bindtap="copyResult">📋 一键复制全部结果</view>
+  </view>
+
+  <!-- 添加分组池弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">添加分组池</view>
+      
+      <!-- 分组池名称 -->
+      <view class="form-item">
+        <text class="label">分组池名称</text>
+        <input 
+          class="input tall" 
+          placeholder="如：强主/主力"
+          data-field="name"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 颜色选择 -->
+      <view class="form-item">
+        <text class="label">颜色</text>
+        <view class="color-list">
+          <block wx:for="{{colorOptions}}" wx:key="value">
+            <view 
+              class="color-option {{newPool.color === item.value ? 'active' : ''}}"
+              style="background: {{item.value}}"
+              bindtap="onColorSelect"
+              data-color="{{item.value}}"
+            >
+              <text wx:if="{{newPool.color === item.value}}">✓</text>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 抽签人数 -->
+      <view class="form-item">
+        <text class="label">抽签时抽取人数</text>
+        <view class="counter">
+          <view class="counter-btn minus" bindtap="onCountMinus">-</view>
+          <view class="counter-value">{{newPool.drawCount}}</view>
+          <view class="counter-btn plus" bindtap="onCountPlus">+</view>
+        </view>
+      </view>
+
+      <!-- 成员列表 -->
+      <view class="form-item">
+        <text class="label">添加成员（用空格隔开）</text>
+        <textarea 
+          class="textarea" 
+          placeholder="如：成员1 成员2 成员3 成员4"
+          data-field="members"
+          bindinput="onInput"
+        ></textarea>
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideAddModal">取消</view>
+        <view class="btn confirm" bindtap="addPool">添加</view>
+      </view>
+    </view>
+  </view>
+</view>

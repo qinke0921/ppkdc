@@ -1,0 +1,284 @@
+<!--pages/exchange/exchange.wxml-->
+<view class="container">
+  <!-- 标题 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="title">📅 今日交流</text>
+      <text class="date">{{exchanges[0].date || getTodayDate()}}</text>
+    </view>
+    <view class="header-right">
+      <view class="history-btn" bindtap="showHistoryModal">
+        <text>📜</text>
+      </view>
+      <view class="copy-btn" bindtap="copyExchangeInfo">
+        <text>📋</text>
+      </view>
+      <button class="share-btn" open-type="share">
+        <text>📤</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-tabs">
+    <view class="filter-tab {{filterTab === 'all' ? 'active' : ''}}" bindtap="onFilterTabChange" data-tab="all">全部</view>
+    <view class="filter-tab {{filterTab === 'mine' ? 'active' : ''}}" bindtap="onFilterTabChange" data-tab="mine">我的报名</view>
+  </view>
+
+  <!-- 时间段列表 - 始终显示 -->
+  <block wx:for="{{timeSlots}}" wx:key="*this">
+    <view class="time-section">
+      <view class="time-header">
+        <text class="time-title">{{item}}</text>
+        <view class="add-btn" bindtap="showCreateModal" data-timeslot="{{item}}">
+          <text>+ 添加场次</text>
+        </view>
+      </view>
+
+      <!-- 有场次时显示 -->
+      <block wx:if="{{groupedExchanges[item].length > 0}}">
+        <!-- 场次卡片 -->
+        <view class="exchange-list">
+          <block wx:for="{{groupedExchanges[item]}}" wx:key="_id" wx:for-item="exchange">
+            <!-- 简要信息（始终显示） -->
+            <view class="exchange-card {{expandedExchanges[exchange._id] ? 'expanded' : ''}}" data-id="{{exchange._id}}">
+              <view class="exchange-summary">
+                <text class="match-type">{{exchange.matchType}}</text>
+                <text class="status">{{exchange.status}}</text>
+                <text class="count">{{exchange.mainCount}}/4 + {{exchange.reserveCount}}/1</text>
+                <view class="missing-count" wx:if="{{exchange.mainCount < 4}}">缺{{4 - exchange.mainCount}}人</view>
+                <!-- 我的报名标记 -->
+                <view class="my-register-tag" wx:if="{{exchange.hasMyRegister}}">✅ 已报</view>
+                <!-- 展开/收起按钮 -->
+                <view class="expand-btn" bindtap="toggleExchangeDetail" data-id="{{exchange._id}}" wx:if="{{!expandedExchanges[exchange._id]}}">▶ 展开</view>
+                <view class="expand-btn expanded" bindtap="toggleExchangeDetail" data-id="{{exchange._id}}" wx:else>▼ 收起</view>
+              </view>
+              
+              <!-- 备注（始终显示） -->
+              <view class="remark" wx:if="{{exchange.remark}}">
+                <text>备注: {{exchange.remark}}</text>
+              </view>
+              
+              <!-- 详细报名信息（点击展开后显示） -->
+              <view class="exchange-detail" wx:if="{{expandedExchanges[exchange._id]}}">
+                <!-- 管理按钮（管理员） -->
+                <view class="exchange-actions" wx:if="{{isAdmin}}">
+                  <text class="manage-btn" bindtap="showManageModal" data-exchange="{{exchange}}">⚙️ 管理</text>
+                  <text class="delete-btn" wx:if="{{exchange.totalCount === 0}}" bindtap="deleteExchange" data-exchange="{{exchange}}">🗑️ 删除</text>
+                </view>
+
+                <!-- 主力列表 -->
+                <view class="player-section">
+                  <text class="section-label">主力:</text>
+                  <view class="player-tags">
+                    <view class="player-tag" wx:for="{{exchange.registrations}}" wx:key="_id" wx:if="{{!item.isReserve}}">
+                      <view class="player-name-row">
+                        <text>{{item.gameName}}</text>
+                        <view class="cancel-icon" wx:if="{{isAdmin || item.memberOpenid === myOpenId || item._openid === myOpenId}}" bindtap="cancelRegister" data-id="{{item._id}}" data-name="{{item.gameName}}" data-openid="{{item.memberOpenid || item._openid}}">✕</view>
+                      </view>
+                      <text class="player-line" wx:if="{{item.overallLine}}">{{item.overallLine}}</text>
+                    </view>
+                    <text class="empty-hint placeholder" wx:if="{{exchange.mainCount === 0}}">暂无</text>
+                  </view>
+                </view>
+
+                <!-- 替补列表 -->
+                <view class="player-section">
+                  <text class="section-label">替补:</text>
+                  <view class="player-tags">
+                    <view class="player-tag reserve" wx:for="{{exchange.registrations}}" wx:key="_id" wx:if="{{item.isReserve}}">
+                      <view class="player-name-row">
+                        <text>{{item.gameName}}</text>
+                        <view class="cancel-icon" wx:if="{{isAdmin || item.memberOpenid === myOpenId || item._openid === myOpenId}}" bindtap="cancelRegister" data-id="{{item._id}}" data-name="{{item.gameName}}" data-openid="{{item.memberOpenid || item._openid}}">✕</view>
+                      </view>
+                      <text class="player-line" wx:if="{{item.overallLine}}">{{item.overallLine}}</text>
+                    </view>
+                    <text class="empty-hint placeholder reserve" wx:if="{{exchange.reserveCount === 0}}">暂无</text>
+                  </view>
+                </view>
+
+                <!-- 报名按钮 -->
+                <view class="register-btn" bindtap="showRegisterModal" data-id="{{exchange._id}}">
+                  <text>{{exchange.totalCount > 0 ? '我要报名' : '创建并报名'}}</text>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </block>
+
+      <!-- 没有场次时显示提示 -->
+      <view class="empty-hint" wx:else>
+        <text>暂无场次，点击上方添加</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 创建场次弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" bindtap="hideCreateModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">➕ 创建场次</view>
+      
+      <view class="form-item">
+        <text class="label">时间段</text>
+        <text class="value">{{selectedTimeSlot}}</text>
+      </view>
+
+      <view class="form-item">
+        <text class="label">选择分线</text>
+        <view class="type-grid">
+          <view 
+            class="type-item {{item === selectedMatchType ? 'active' : ''}}"
+            wx:for="{{matchTypes}}"
+            wx:key="*this"
+            bindtap="onMatchTypeSelect"
+            data-type="{{item}}"
+          >
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideCreateModal">取消</view>
+        <view class="btn confirm" bindtap="confirmCreate">创建</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 报名弹窗 -->
+  <view class="modal-mask" wx:if="{{showRegisterModal}}" bindtap="hideRegisterModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📝 报名交流</view>
+      
+      <!-- 管理员：选择成员下拉框 -->
+      <view class="form-item" wx:if="{{isAdmin}}">
+        <text class="label">选择成员 *</text>
+        <picker mode="selector" range="{{allMembers}}" range-key="gameName" bindchange="onMemberChange">
+          <view class="picker-value">
+            {{registerForm.gameName || '请选择成员'}}
+          </view>
+        </picker>
+        <input 
+          class="input" 
+          style="margin-top: 10rpx"
+          placeholder="或手动输入名字"
+          value="{{registerForm.gameName}}"
+          data-field="gameName"
+          bindinput="onRegisterInput"
+        />
+      </view>
+      
+      <!-- 普通成员：显示自己的昵称 -->
+      <view class="form-item" wx:else>
+        <text class="label">游戏昵称</text>
+        <text class="value">{{memberInfo.gameName || '未设置昵称'}}</text>
+      </view>
+
+      <view class="form-item">
+        <checkbox-group bindchange="onReserveChange">
+          <label class="checkbox-label">
+            <checkbox value="reserve" checked="{{registerForm.isReserve}}" color="#552583"/>
+            <text>报替补</text>
+          </label>
+        </checkbox-group>
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideRegisterModal">取消</view>
+        <view class="btn confirm" bindtap="submitRegister">提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理弹窗 -->
+  <view class="modal-mask" wx:if="{{showManageModal}}" bindtap="hideManageModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">⚙️ 管理交流</view>
+      
+      <view class="form-item">
+        <text class="label">状态</text>
+        <picker mode="selector" range="{{statusOptions}}" bindchange="onStatusChange">
+          <view class="picker-value">
+            {{manageForm.status}}
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">备注</text>
+        <textarea 
+          class="textarea" 
+          placeholder="请输入备注"
+          value="{{manageForm.remark}}"
+          data-field="remark"
+          bindinput="onManageInput"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideManageModal">取消</view>
+        <view class="btn confirm" bindtap="saveManage">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录弹窗 -->
+  <view class="modal-mask" wx:if="{{showHistoryModal}}" bindtap="hideHistoryModal">
+    <view class="modal history-modal" catchtap="stopPropagation">
+      <view class="modal-title">📜 一周交流历史</view>
+      
+      <!-- 状态统计 -->
+      <view class="history-stats">
+        <view class="stat-item waiting">
+          <text class="stat-num">{{historyStats['待报名'] || 0}}</text>
+          <text class="stat-label">待报名</text>
+        </view>
+        <view class="stat-item booking">
+          <text class="stat-num">{{historyStats['预约中'] || 0}}</text>
+          <text class="stat-label">预约中</text>
+        </view>
+        <view class="stat-item success">
+          <text class="stat-num">{{historyStats['约成功'] || 0}}</text>
+          <text class="stat-label">约成功</text>
+        </view>
+        <view class="stat-item win">
+          <text class="stat-num">{{historyStats['赢'] || 0}}</text>
+          <text class="stat-label">赢</text>
+        </view>
+        <view class="stat-item lose">
+          <text class="stat-num">{{historyStats['输'] || 0}}</text>
+          <text class="stat-label">输</text>
+        </view>
+      </view>
+      
+      <!-- 历史列表 -->
+      <scroll-view class="history-list" scroll-y>
+        <block wx:for="{{historyData}}" wx:key="_id">
+          <view class="history-item">
+            <view class="history-header">
+              <text class="history-date">{{item.date}}</text>
+              <text class="history-time">{{item.timeSlot}}</text>
+              <text class="history-type">{{item.matchType}}</text>
+              <text class="history-status status-{{item.status}}">{{item.status}}</text>
+            </view>
+            <view class="history-members">
+              <text wx:if="{{item.membersDisplay}}">{{item.membersDisplay}}</text>
+              <text wx:else class="no-member">暂无</text>
+            </view>
+            <view class="history-remark" wx:if="{{item.remark}}">
+              <text>备注: {{item.remark}}</text>
+            </view>
+          </view>
+        </block>
+        <view class="history-empty" wx:if="{{historyData.length === 0}}">
+          <text>暂无历史记录</text>
+        </view>
+      </scroll-view>
+      
+      <view class="modal-buttons">
+        <view class="btn confirm" bindtap="hideHistoryModal">关闭</view>
+      </view>
+    </view>
+  </view>
+</view>

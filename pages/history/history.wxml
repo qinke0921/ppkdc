@@ -1,0 +1,10 @@
+<!--pages/history/history.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">📚 历史记录</text>
+  </view>
+  
+  <view class="empty">
+    <text>暂无历史记录</text>
+  </view>
+</view>

@@ -1,0 +1,374 @@
+/* pages/index/index.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+page { background: #f5f5f5; }
+
+.container { padding: 0; }
+
+/* Tab 切换 */
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 30rpx;
+  color: #666;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #552583;
+  font-weight: bold;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 4rpx;
+  background: #552583;
+  border-radius: 2rpx;
+}
+
+/* 工具栏 */
+.tools-section {
+  padding: 20rpx;
+}
+
+.tool-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.tool-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.tool-info {
+  flex: 1;
+}
+
+.tool-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.tool-desc {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.tool-arrow {
+  font-size: 40rpx;
+  color: #ccc;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.doc-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #552583 0%, #6b3483 25%, #552583 50%, #3d1e63 75%, #2a1550 100%);
+  color: #fff;
+  padding: 20rpx 30rpx;
+  border-radius: 12rpx;
+  margin: 0 30rpx 30rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.doc-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.header .title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #552583;
+}
+
+.header .subtitle {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 创建按钮 */
+.create-btn {
+  background: linear-gradient(135deg, #FDB927, #f5a623);
+  color: #fff;
+  text-align: center;
+  padding: 24rpx 0;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(253, 185, 39, 0.35);
+}
+
+/* 搜索 */
+.search-section { margin-bottom: 20rpx; }
+
+.search-bar {
+  display: flex;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 20rpx;
+  border: 1rpx solid #eee;
+}
+
+.search-input { flex: 1; font-size: 28rpx; }
+
+/* 筛选 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  flex-wrap: wrap;
+}
+
+.filter-label { font-size: 24rpx; color: #666; }
+
+.filter-btn {
+  padding: 10rpx 18rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #666;
+  border: 1rpx solid #eee;
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  border-color: #552583;
+}
+
+/* 比赛列表 */
+.competition-list { margin-bottom: 20rpx; }
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.section-title .count { font-size: 24rpx; color: #999; }
+
+.load-more {
+  text-align: center;
+  padding: 20rpx;
+  color: #552583;
+  font-size: 26rpx;
+}
+
+.competition-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08);
+  border-left: 5rpx solid #FDB927;
+}
+
+.competition-info { flex: 1; }
+.competition-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.competition-meta {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+}
+
+.competition-status {
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.competition-status.ongoing {
+  background: linear-gradient(135deg, #fef9e7, #fde6b9);
+  color: #b8860b;
+  border: 1rpx solid #FDB927;
+}
+
+.competition-status.finished {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* Modal */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #fff;
+  width: 85%;
+  max-height: 80vh;
+  border-radius: 24rpx;
+  padding: 0;
+  overflow: hidden;
+  border-top: 6rpx solid #FDB927;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 30rpx 24rpx;
+  background: #f8f9fa;
+  border-bottom: none;
+  color: #552583;
+  position: relative;
+}
+
+.modal-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+  border-radius: 2rpx;
+}
+
+.form-item { margin-bottom: 24rpx; padding: 0 30rpx; }
+
+.form-item .label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  font-weight: 600;
+}
+
+.form-item .input {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 16rpx;
+  border: 2rpx solid #d4b8e8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 0 30rpx;
+}
+
+.radio {
+  padding: 12rpx 24rpx;
+  border: 2rpx solid #eee;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.radio.active {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  border-color: #FDB927;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 16rpx;
+  margin: 30rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.modal-buttons .btn {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.modal-buttons .cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.modal-buttons .confirm {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(85, 37, 131, 0.3);
+}

@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="content">
+    <!-- <image class="logo" src="/images/WechatIMG29.jpg" mode="aspectFit"></image> -->
+    
+    <view class="title">跑跑卡丁车记分助手</view>
+    
+    <view class="desc">
+      本小程序由<text class="highlight">play.绒毛兔</text>+<text class="highlight">openclaw</text>费时一天完成。
+    </view>
+    
+    <view class="desc">
+      纯用爱发电，如有修改意见，请抖音找：<text class="highlight">跑跑菜毛</text>
+    </view>
+    
+    <view class="desc">
+      本小程序还在测试阶段，后续会完善更多功能，以及拍照识别的功能。
+    </view>
+    
+    <view class="version">Version 1.0.0</view>
+  </view>
+</view>

@@ -1,0 +1,297 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'score' ? 'active' : ''}}" bindtap="switchTab" data-tab="score">
+      📊 比赛分数记录
+    </view>
+    <view class="tab-item {{activeTab === 'tools' ? 'active' : ''}}" bindtap="switchTab" data-tab="tools">
+      🔧 比赛工具栏
+    </view>
+  </view>
+
+  <!-- 比赛分数记录 内容 -->
+  <block wx:if="{{activeTab === 'score'}}">
+
+  <!-- 顶部标题 -->
+  <view class="header">
+    <!-- <image class="logo" src="/images/WechatIMG29.jpg" mode="aspectFit"></image> -->
+    <text class="title">🏎️ 跑跑卡丁车记分助手</text>
+    <text class="subtitle">创作：跑跑菜毛-绒毛兔+openclaw</text>
+  </view>
+
+  <!-- 腾讯云文档链接 -->
+  <view class="doc-link" bindtap="openTencentDoc">
+    <text>📄 腾讯云文档记录</text>
+  </view>
+
+  <!-- 搜索和筛选 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <input 
+        class="search-input" 
+        placeholder="搜索比赛名称"
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+    <view class="filter-bar">
+      <view class="filter-label">类型:</view>
+      <view 
+        class="filter-btn {{filterType === 'all' ? 'active' : ''}}"
+        bindtap="onFilterTypeChange"
+        data-type="all"
+      >全部</view>
+      <view 
+        class="filter-btn {{filterType === 'personal' ? 'active' : ''}}"
+        bindtap="onFilterTypeChange"
+        data-type="personal"
+      >个人赛</view>
+      <view 
+        class="filter-btn {{filterType === 'team' ? 'active' : ''}}"
+        bindtap="onFilterTypeChange"
+        data-type="team"
+      >团队赛</view>
+    </view>
+    <view class="filter-bar">
+      <view class="filter-label">状态:</view>
+      <view 
+        class="filter-btn {{filterStatus === 'all' ? 'active' : ''}}"
+        bindtap="onFilterStatusChange"
+        data-status="all"
+      >全部</view>
+      <view 
+        class="filter-btn {{filterStatus === 'ongoing' ? 'active' : ''}}"
+        bindtap="onFilterStatusChange"
+        data-status="ongoing"
+      >进行中</view>
+      <view 
+        class="filter-btn {{filterStatus === 'finished' ? 'active' : ''}}"
+        bindtap="onFilterStatusChange"
+        data-status="finished"
+      >已结束</view>
+    </view>
+    <view class="filter-bar">
+      <view class="filter-label">规则:</view>
+      <view 
+        class="filter-btn {{filterRule === 'all' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="all"
+      >全部</view>
+      <view 
+        class="filter-btn {{filterRule === '千分赛' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="千分赛"
+      >千分赛</view>
+      <view 
+        class="filter-btn {{filterRule === '抢分赛' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="抢分赛"
+      >抢分赛</view>
+      <view 
+        class="filter-btn {{filterRule === '抢1赛' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="抢1赛"
+      >抢1赛</view>
+      <view 
+        class="filter-btn {{filterRule === '1v1' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="1v1"
+      >1v1</view>
+      <view 
+        class="filter-btn {{filterRule === '2v2' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="2v2"
+      >2v2</view>
+      <view 
+        class="filter-btn {{filterRule === '3v3' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="3v3"
+      >3v3</view>
+      <view 
+        class="filter-btn {{filterRule === '4v4' ? 'active' : ''}}"
+        bindtap="onFilterRuleChange"
+        data-rule="4v4"
+      >4v4</view>
+    </view>
+  </view>
+
+  <!-- 创建比赛按钮 -->
+  <view class="create-btn" bindtap="showCreateModal">
+    <text>+ 创建比赛</text>
+  </view>
+
+  <!-- 比赛列表 -->
+  <view class="competition-list">
+    <view class="section-title">
+      <text>我的比赛</text>
+      <text class="count">{{displayedCompetitions.length}}{{hasMore ? '+' : ''}} / {{filteredCompetitions.length}}</text>
+    </view>
+
+    <view wx:if="{{displayedCompetitions.length === 0}}" class="empty">
+      <text>暂无比赛</text>
+    </view>
+
+    <view 
+      wx:for="{{displayedCompetitions}}" 
+      wx:key="_id" 
+      class="competition-item"
+      bindtap="goToCompetition"
+      data-id="{{item._id}}"
+    >
+      <view class="competition-info">
+        <text class="competition-name">{{item.name}}</text>
+        <text class="competition-meta">
+          {{item.type === 'personal' ? '个人赛' : '团队赛'}} · {{item.rule}}
+        </text>
+      </view>
+      <view class="competition-status {{item.status}}">
+        <text>{{item.status === 'ongoing' ? '进行中' : '已结束'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多/收起 -->
+  <view class="load-more" wx:if="{{hasMore}}" bindtap="loadMore">
+    <text>点击加载更多</text>
+  </view>
+  <view class="load-more" wx:if="{{currentPage > 1}}" bindtap="resetPage">
+    <text>收起 / 回到首页</text>
+  </view>
+  </block>
+
+  <!-- 创建弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" bindtap="hideCreateModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">创建新比赛</view>
+      
+      <view class="form-item">
+        <text class="label">比赛名称</text>
+        <input 
+          class="input" 
+          placeholder="请输入比赛名称"
+          data-field="name"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">比赛描述（选填）</text>
+        <input 
+          class="input" 
+          placeholder="请输入比赛描述"
+          data-field="description"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">比赛类型</text>
+        <view class="radio-group">
+          <view 
+            class="radio {{newCompetition.type === 'personal' ? 'active' : ''}}"
+            data-field="type"
+            data-value="personal"
+            bindtap="onTypeSelect"
+          >个人赛</view>
+          <view 
+            class="radio {{newCompetition.type === 'team' ? 'active' : ''}}"
+            data-field="type"
+            data-value="team"
+            bindtap="onTypeSelect"
+          >团队赛</view>
+        </view>
+      </view>
+
+      <!-- 个人赛规则选择 -->
+      <view class="form-item" wx:if="{{newCompetition.type === 'personal'}}">
+        <text class="label">比赛规则</text>
+        <view class="radio-group">
+          <view 
+            class="radio {{newCompetition.rule === '千分赛' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="千分赛"
+            bindtap="onTypeSelect"
+          >千分赛</view>
+          <view 
+            class="radio {{newCompetition.rule === '抢分赛' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="抢分赛"
+            bindtap="onTypeSelect"
+          >抢分赛</view>
+          <view 
+            class="radio {{newCompetition.rule === '抢1赛' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="抢1赛"
+            bindtap="onTypeSelect"
+          >抢1赛</view>
+        </view>
+      </view>
+
+      <!-- 团队赛规则选择 -->
+      <view class="form-item" wx:if="{{newCompetition.type === 'team'}}">
+        <text class="label">比赛规则</text>
+        <view class="radio-group">
+          <view 
+            class="radio {{newCompetition.rule === '1v1' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="1v1"
+            bindtap="onTypeSelect"
+          >1v1</view>
+          <view 
+            class="radio {{newCompetition.rule === '2v2' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="2v2"
+            bindtap="onTypeSelect"
+          >2v2</view>
+          <view 
+            class="radio {{newCompetition.rule === '3v3' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="3v3"
+            bindtap="onTypeSelect"
+          >3v3</view>
+          <view 
+            class="radio {{newCompetition.rule === '4v4' ? 'active' : ''}}"
+            data-field="rule"
+            data-value="4v4"
+            bindtap="onTypeSelect"
+          >4v4</view>
+        </view>
+      </view>
+
+      <!-- 目标分数 -->
+      <view class="form-item">
+        <text class="label">目标分数</text>
+        <input 
+          class="input" 
+          type="number"
+          placeholder="千分赛填1000，抢分赛填50/100/120"
+          value="{{newCompetition.targetScore}}"
+          data-field="targetScore"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideCreateModal">取消</view>
+        <view class="btn confirm" bindtap="createCompetition">创建</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 比赛工具栏 内容 -->
+  <block wx:if="{{activeTab === 'tools'}}">
+    <view class="tools-section">
+      <view class="tool-item" bindtap="goToGroupPool">
+        <view class="tool-icon">🔀</view>
+        <view class="tool-info">
+          <text class="tool-name">按分组池分组</text>
+          <text class="tool-desc">将选手按分组池进行分配</text>
+        </view>
+        <view class="tool-arrow">›</view>
+      </view>
+      <!-- 后续更多工具... -->
+    </view>
+  </block>
+</view>
+

@@ -1,0 +1,75 @@
+<!--pages/activities/detail.wxml-->
+<view class="container" wx:if="{{activity}}">
+  <view class="detail-card">
+    <view class="detail-card-top">
+      <view class="detail-name">
+        {{activity.name}}
+        <text class="status-tag {{activity.statusCls}}">{{activity.statusText}}</text>
+      </view>
+      <button class="share-btn" open-type="share">
+        <text>📤 分享</text>
+      </button>
+    </view>
+    <view class="detail-row">📅 开始：{{activity.startTime}}</view>
+    <view class="detail-row">📅 结束：{{activity.endTime}}</view>
+    <view class="detail-desc" wx:if="{{activity.description}}">{{activity.description}}</view>
+    <view class="detail-desc empty-inline" wx:else>暂无活动说明</view>
+  </view>
+
+  <view class="admin-detail-bar" wx:if="{{isAdmin}}">
+    <view class="btn-outline" bindtap="goToEdit">✏️ 编辑活动</view>
+    <view class="btn-danger-outline" bindtap="deleteActivity">🗑️ 删除</view>
+  </view>
+
+  <view
+    class="participate-btn {{hasJoined ? 'joined' : ''}} {{activity.statusText === '已结束' && !hasJoined ? 'disabled-btn' : ''}}"
+    bindtap="onParticipateTap"
+  >
+    <text wx:if="{{hasJoined}}">✅ 已报名（点击取消）</text>
+    <text wx:elif="{{activity.statusText === '已结束'}}">活动已结束</text>
+    <text wx:else>🙋 一键报名参与</text>
+  </view>
+
+  <view class="expand-section">
+    <view class="expand-header" bindtap="toggleParticipants">
+      <text>👥 参与人员 ({{participants.length}})</text>
+      <text class="expand-arrow">{{showParticipants ? '▼ 收起' : '▶ 展开'}}</text>
+    </view>
+    <view class="expand-body" wx:if="{{showParticipants}}">
+      <block wx:if="{{participants.length > 0}}">
+        <view class="member-row" wx:for="{{participants}}" wx:key="_id">
+          <text>{{item.gameName || item.nickname || '未知'}}</text>
+          <text class="empty-inline" wx:if="{{item.nickname && item.gameName}}">{{item.nickname}}</text>
+        </view>
+      </block>
+      <text wx:else class="empty-inline">暂无报名</text>
+    </view>
+  </view>
+
+  <view class="expand-section expand-section-prizes">
+    <view class="expand-header" bindtap="togglePrizes">
+      <view class="expand-header-left">
+        <text>💰 参与者奖金登记 ({{prizes.length}})</text>
+        <text class="prize-total-summary" wx:if="{{prizes.length > 0}}">奖金合计 ¥{{prizeTotalText}}</text>
+      </view>
+      <text class="expand-arrow">{{showPrizes ? '▼ 收起' : '▶ 展开'}}</text>
+    </view>
+    <view class="expand-body" wx:if="{{showPrizes}}">
+      <block wx:if="{{prizes.length > 0}}">
+        <view class="prize-total-bar">
+          <text class="prize-total-label">奖金总额</text>
+          <text class="prize-total-value">¥{{prizeTotalText}}</text>
+        </view>
+        <view class="prize-row" wx:for="{{prizes}}" wx:key="_id">
+          <text>{{item.gameName}}</text>
+          <text class="prize-amount">{{item.prizeNote}}</text>
+        </view>
+      </block>
+      <text wx:else class="empty-inline">暂无奖金登记</text>
+    </view>
+  </view>
+</view>
+
+<view class="container" wx:elif="{{loading}}">
+  <view class="empty">加载中...</view>
+</view>

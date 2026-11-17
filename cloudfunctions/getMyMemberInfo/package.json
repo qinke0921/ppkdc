@@ -1,0 +1,9 @@
+{
+  "name": "getMyMemberInfo",
+  "version": "1.0.0",
+  "description": "获取当前用户的成员信息",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

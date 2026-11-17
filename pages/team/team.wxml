@@ -1,0 +1,229 @@
+<!--pages/team/team.wxml-->
+<view class="container">
+  <!-- 非成员 -->
+  <block wx:if="{{!isMember}}">
+    <view class="non-member-section">
+      <view class="lock-icon">🔒</view>
+      <text class="lock-title">车队专区</text>
+      <text class="lock-desc">加入 PLAY车队后即可查看</text>
+      <view class="apply-btn" bindtap="showApplyModal">
+        <text>申请入队</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 成员列表 -->
+  <block wx:else>
+    <view class="member-section">
+      <view class="welcome">
+        <text class="welcome-text">欢迎回来，{{memberInfo.nickname}}</text>
+      </view>
+
+      <!-- 功能模块 -->
+      <view class="feature-grid">
+        <view class="feature-btn" bindtap="goToFeature" data-feature="今日交流">
+          <text>💬 今日交流</text>
+        </view>
+        <view class="feature-btn" bindtap="goToFeature" data-feature="周图任务">
+          <text>📅 周图任务</text>
+        </view>
+        <view class="feature-btn" bindtap="goToFeature" data-feature="车队活动">
+          <text>🏆 车队活动</text>
+        </view>
+        <view class="feature-btn disabled" catchtap="goToFeature" data-feature="车队赞助">
+          <text>💰 车队赞助</text>
+        </view>
+      </view>
+
+      <block wx:if="{{isAdmin}}">
+        <view class="admin-btn" bindtap="toggleAdminPanel">
+          <text>⚙️ 管理</text>
+          <view class="badge" wx:if="{{pendingApplications.length > 0}}">{{pendingApplications.length}}</view>
+        </view>
+      </block>
+
+      <!-- 车队成员 -->
+      <view class="members-header" bindtap="toggleMembers">
+        <text>👥 车队成员 ({{memberCount}}人)</text>
+        <text>{{showMembers ? '▲' : '▼'}}</text>
+      </view>
+
+      <view class="member-list" wx:if="{{showMembers}}">
+        <view class="member-card" wx:for="{{members}}" wx:key="_id" bindtap="viewMemberDetail" data-member="{{item}}">
+          <view class="member-info">
+            <text class="member-game">{{item.gameName}}</text>
+            <text class="member-name">{{item.nickname}}</text>
+          </view>
+          <view class="member-line" wx:if="{{item.overallLine}}">
+            <text>{{item.overallLine}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 已离队成员 - 独立下拉框 -->
+      <view class="left-header" bindtap="toggleLeftMembers">
+        <text>🔸 已离队 ({{leftMembers.length}}人)</text>
+        <text>{{showLeftMembers ? '▲' : '▼'}}</text>
+      </view>
+
+      <view class="member-list left-list" wx:if="{{showLeftMembers}}">
+        <view class="member-card left-card" wx:for="{{leftMembers}}" wx:key="_id" bindtap="viewMemberDetail" data-member="{{item}}">
+          <view class="member-info">
+            <text class="member-game">{{item.gameName}}</text>
+            <text class="member-name">{{item.nickname}}</text>
+          </view>
+        </view>
+        <text class="empty-hint" wx:if="{{leftMembers.length === 0}}">暂无</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 申请弹窗 -->
+  <view class="modal-mask" wx:if="{{showApplyModal}}" bindtap="hideApplyModal">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📝 申请入队</view>
+      <view class="form-item">
+        <text class="label">昵称</text>
+        <input class="input" placeholder="请输入昵称" value="{{applyForm.nickname}}" data-field="nickname" bindinput="onInput"/>
+      </view>
+      <view class="form-item">
+        <text class="label">游戏昵称</text>
+        <input class="input" placeholder="游戏id/名字" value="{{applyForm.gameName}}" data-field="gameName" bindinput="onInput"/>
+      </view>
+      <view class="form-item">
+        <text class="label">游戏ID</text>
+        <input class="input" placeholder="请输入游戏ID" value="{{applyForm.gameId}}" data-field="gameId" bindinput="onInput"/>
+      </view>
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="hideApplyModal">取消</view>
+        <view class="btn confirm" bindtap="submitApplication">提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员面板 -->
+  <view class="modal-mask" wx:if="{{showAdminPanel}}" bindtap="toggleAdminPanel">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">⚙️ 待审批 ({{pendingApplications.length}})</view>
+      <scroll-view scroll-y="true" class="app-list">
+        <view class="app-item" wx:for="{{pendingApplications}}" wx:key="_id">
+          <text class="app-name">{{item.nickname}}</text>
+          <text class="app-game">游戏: {{item.gameName}} | ID: {{item.gameId}}</text>
+          <view class="modal-buttons">
+            <view class="btn confirm" catchtap="approveApplication" data-id="{{item._id}}">批准</view>
+            <view class="btn cancel" catchtap="rejectApplication" data-id="{{item._id}}">拒绝</view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="modal-close" catchtap="toggleAdminPanel">关闭</view>
+    </view>
+  </view>
+
+  <!-- 成员详情弹窗 -->
+  <view class="modal-mask" wx:if="{{showMemberDetail}}" bindtap="closeMemberDetail">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">👤 成员详情</view>
+      <scroll-view scroll-y="true" class="detail-content" style="height:50vh;">
+        <view class="detail-item">
+          <text class="detail-label">昵称</text>
+          <text class="detail-value">{{selectedMember.nickname}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">身份</text>
+          <text class="detail-value {{selectedMember.role === 'admin' ? 'role' : ''}}">{{selectedMember.role === 'admin' ? '⭐ 管理员' : '👤 成员'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏昵称</text>
+          <text class="detail-value">{{selectedMember.gameName}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">游戏ID</text>
+          <text class="detail-value">{{selectedMember.gameId}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">个人宣言</text>
+          <text class="detail-value {{selectedMember.statement ? '' : 'no-data'}}">{{selectedMember.statement || '暂未填写'}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">入队时间</text>
+          <text class="detail-value">{{selectedMember.formattedJoinedAt}}</text>
+        </view>
+      </scroll-view>
+      <!-- 自己的资料 -->
+      <view class="modal-buttons" wx:if="{{isMyOwnProfile && selectedMember.status !== 'left'}}">
+        <view class="btn edit" bindtap="showEditModal">✏️ 编辑资料</view>
+        <view class="btn cancel" catchtap="closeMemberDetail">关闭</view>
+      </view>
+      <!-- 已离队成员查看自己的 -->
+      <view class="modal-buttons" wx:elif="{{isMyOwnProfile && selectedMember.status === 'left'}}">
+        <view class="btn cancel" catchtap="closeMemberDetail">关闭</view>
+      </view>
+      <!-- 管理员查看普通成员 -->
+      <view class="modal-buttons" wx:elif="{{isAdmin && selectedMember.status !== 'left'}}">
+        <view class="btn confirm" bindtap="viewMemberLineRecords">📊 查看分线</view>
+        <view class="btn danger" bindtap="removeMember" data-member="{{selectedMember}}">🚪 离队</view>
+        <view class="btn cancel" catchtap="closeMemberDetail">关闭</view>
+      </view>
+      <!-- 管理员查看离队成员 -->
+      <view class="modal-buttons" wx:elif="{{isAdmin && selectedMember.status === 'left'}}">
+        <view class="btn confirm" bindtap="restoreMember" data-member="{{selectedMember}}">♻️ 恢复</view>
+        <view class="btn cancel" catchtap="closeMemberDetail">关闭</view>
+      </view>
+      <!-- 普通成员查看他人 -->
+      <view class="modal-buttons" wx:else>
+        <view class="btn cancel" catchtap="closeMemberDetail">关闭</view>
+      </view>
+    </view>
+  </view>
+</view>
+  <!-- 成员分线记录弹窗 -->
+  <view class="modal-mask" wx:if="{{showMemberLineModal}}" catchtap="closeMemberLineModal">
+    <view class="modal line-modal" catchtap="stopPropagation">
+      <view class="modal-title">📋 {{selectedMember.gameName}} 的分线 ({{memberLineRecords.length}}条)</view>
+      
+      <view class="overall-line" wx:if="{{memberOverallLine}}">
+        <text>综合：</text>
+        <text class="overall-val">{{memberOverallLine}}</text>
+      </view>
+
+      <scroll-view scroll-y="true" class="line-scroll">
+        <view class="line-item" wx:for="{{memberLineRecords}}" wx:key="_id">
+          <view class="line-map">{{item.map}}</view>
+          <view class="line-time">{{item.time}}</view>
+          <view class="line-level">{{item.line}}</view>
+        </view>
+        <text wx:if="{{memberLineRecords.length === 0}}" class="empty">暂无记录</text>
+      </scroll-view>
+
+      <view class="modal-close" catchtap="closeMemberLineModal">关闭</view>
+  </view>
+</view>
+
+<!-- 编辑资料弹窗 -->
+<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEditModal">
+  <view class="modal" catchtap="stopPropagation">
+    <view class="modal-title">✏️ 编辑资料</view>
+    <scroll-view scroll-y="true" class="detail-content" style="height:50vh;">
+      <view class="detail-item">
+        <text class="detail-label">昵称</text>
+        <input class="edit-input" placeholder="请输入昵称" value="{{editForm.nickname}}" data-field="nickname" bindinput="onEditInput"/>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">游戏昵称</text>
+        <input class="edit-input" placeholder="游戏id/名字" value="{{editForm.gameName}}" data-field="gameName" bindinput="onEditInput"/>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">游戏ID</text>
+        <input class="edit-input" placeholder="请输入游戏ID" value="{{editForm.gameId}}" data-field="gameId" bindinput="onEditInput"/>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">个人宣言</text>
+        <textarea class="edit-textarea" placeholder="介绍一下自己吧" value="{{editForm.statement}}" data-field="statement" bindinput="onEditInput"/>
+      </view>
+    </scroll-view>
+    <view class="modal-buttons">
+      <view class="btn cancel" bindtap="hideEditModal">取消</view>
+      <view class="btn confirm" bindtap="saveEdit">保存</view>
+    </view>
+  </view>
+</view>

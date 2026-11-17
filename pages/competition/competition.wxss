@@ -1,0 +1,345 @@
+/* pages/competition/competition.wxss */
+/* 湖人紫金主题：#552583 紫色  #FDB927 金色 */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 140rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, #552583 0%, #6b3483 25%, #552583 50%, #3d1e63 75%, #2a1550 100%);
+  padding: 40rpx;
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.title-row { display: flex; align-items: center; justify-content: space-between; }
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FDB927;
+  flex: 1;
+}
+
+.share-btn {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  background: rgba(253, 185, 39, 0.25);
+  color: #FDB927;
+  border-radius: 8rpx;
+}
+
+.description { margin-top: 16rpx; font-size: 28rpx; color: rgba(255,255,255,0.85); padding: 16rpx; }
+
+.meta { display: flex; gap: 16rpx; margin-top: 16rpx; }
+
+.tag {
+  background: rgba(255,255,255,0.2);
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.9);
+}
+
+.status { padding: 8rpx 16rpx; border-radius: 8rpx; font-size: 24rpx; font-weight: 600; }
+
+.status.ongoing { background: #FDB927; color: #fff; }
+.status.finished { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+
+.progress-info {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #FDB927;
+  font-weight: bold;
+}
+
+.time-info { padding: 16rpx 0; display: flex; gap: 30rpx; font-size: 26rpx; color: rgba(255,255,255,0.7); }
+
+/* 选手列表 */
+.players-section {
+  padding: 30rpx;
+  background: #fff;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08);
+}
+
+.section-title { font-size: 32rpx; font-weight: 600; margin-bottom: 20rpx; color: #552583; }
+
+.players-list { display: flex; flex-wrap: wrap; gap: 16rpx; }
+
+.player-tag {
+  background: #f3e8ff;
+  color: #552583;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 28rpx;
+  margin: 8rpx;
+  display: inline-block;
+  border: 1rpx solid #d4b8e8;
+}
+
+.player-tag.red { background: #FFF1F0; color: #FF4D4F; border-color: #FFCCC7; }
+.player-tag.blue { background: #E6F7FF; color: #1890FF; border-color: #BAE7FF; }
+
+.ranking-section, .rounds-section { padding: 30rpx; }
+
+.ranking-list { background: #fff; border-radius: 16rpx; overflow: hidden; box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08); }
+
+.ranking-item {
+  display: flex;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  align-items: center;
+}
+
+.ranking-item.header-row { background: #f9f9f9; font-weight: 600; font-size: 28rpx; color: #666; }
+
+.ranking-item .rank { width: 100rpx; font-weight: bold; }
+.ranking-item:nth-child(2) .rank { color: #FDB927; }
+.ranking-item:nth-child(3) .rank { color: #C0C0C0; }
+.ranking-item:nth-child(4) .rank { color: #CD7F32; }
+
+.ranking-item .name { flex: 1; }
+.ranking-item .score { width: 120rpx; text-align: right; font-weight: 600; }
+.score.positive { color: #52C41A; }
+.score.negative { color: #FF4D4F; }
+
+.no-data { text-align: center; padding: 60rpx; color: #999; background: #fff; border-radius: 16rpx; }
+
+/* 回合记录 */
+.round-item { background: #fff; border-radius: 16rpx; margin-bottom: 20rpx; overflow: hidden; box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08); }
+
+.round-header { background: #f9f9f9; padding: 20rpx 24rpx; display: flex; justify-content: space-between; align-items: center; }
+.round-number { font-weight: 600; color: #552583; }
+.round-map { color: #666; font-size: 26rpx; }
+.round-toggle { color: #FDB927; font-size: 26rpx; }
+
+.round-results { padding: 0 24rpx 20rpx; }
+.result-row { display: flex; padding: 12rpx 0; border-bottom: 1rpx solid #f5f5f5; }
+.result-row.header { font-weight: 600; color: #666; font-size: 26rpx; }
+.result-row text { flex: 1; text-align: center; }
+.result-row text:first-child { flex: 0 0 100rpx; text-align: left; }
+.result-row text:last-child { flex: 0 0 100rpx; text-align: right; }
+
+/* 底部按钮 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 12rpx;
+  padding: 16rpx 20rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(85, 37, 131, 0.1);
+}
+
+.bottom-bar .btn {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 12rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.bottom-bar .btn.add { background: linear-gradient(135deg, #552583, #3d1e63); color: #fff; }
+.bottom-bar .btn.start { background: #52C41A; color: #fff; }
+.bottom-bar .btn.finish { background: linear-gradient(135deg, #FDB927, #f5a623); color: #fff; }
+
+/* Modal */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #fff;
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 24rpx;
+  padding: 0;
+  overflow: hidden;
+  border-top: 6rpx solid #FDB927;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 30rpx 24rpx;
+  background: #f8f9fa;
+  color: #552583;
+  position: relative;
+}
+
+.modal-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, #FDB927, transparent);
+}
+
+.hint { text-align: center; color: #999; font-size: 26rpx; margin-bottom: 30rpx; }
+
+.form-item { margin-bottom: 24rpx; padding: 0 30rpx; }
+.form-item .label { display: block; font-size: 28rpx; color: #666; margin-bottom: 10rpx; font-weight: 600; }
+.form-item .input {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  border: 2rpx solid #d4b8e8;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+
+.player-row.header { background: #f9f9f9; padding: 16rpx 0; margin-bottom: 16rpx; }
+
+.picker-label, .rank-label, .finish-label { font-size: 24rpx; color: #999; text-align: center; }
+
+.team-select { display: flex; gap: 20rpx; margin-top: 16rpx; }
+.team-btn {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+}
+
+.team-btn.active.red { border-color: #FF4D4F; background: #FFF1F0; }
+.team-btn.active.blue { border-color: #1890FF; background: #E6F7FF; }
+
+.team-preview { display: flex; gap: 20rpx; margin-top: 30rpx; padding: 20rpx; background: #f9f9f9; border-radius: 12rpx; }
+.teamA, .teamB { flex: 1; }
+.team-title { font-weight: bold; font-size: 28rpx; display: block; margin-bottom: 10rpx; }
+
+.registered-list { margin-bottom: 20rpx; padding: 16rpx; background: #f3e8ff; border-radius: 8rpx; }
+.registered-list .hint { font-size: 24rpx; color: #552583; margin-bottom: 8rpx; }
+
+.registered-tag {
+  padding: 8rpx 16rpx;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.player-name { flex: 1; border: 2rpx solid #d4b8e8; border-radius: 12rpx; padding: 16rpx; font-size: 26rpx; background: #fafafa; }
+.player-picker { flex: 1; border: 2rpx solid #d4b8e8; border-radius: 12rpx; padding: 16rpx; font-size: 26rpx; background: #fff; text-align: center; }
+
+.player-row .player-rank { width: 50rpx; text-align: center; color: #552583; font-weight: bold; font-size: 28rpx; }
+
+.modal-buttons { display: flex; gap: 16rpx; margin: 30rpx; padding-top: 20rpx; border-top: 1rpx solid #eee; }
+
+.btn-small { flex: 1; text-align: center; padding: 20rpx; border-radius: 12rpx; font-size: 28rpx; background: #f5f5f5; color: #666; font-weight: bold; }
+.btn-small.primary { background: linear-gradient(135deg, #552583, #3d1e63); color: #fff; }
+
+.rank-toggle {
+  text-align: center;
+  padding: 16rpx;
+  color: #552583;
+  font-size: 28rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+}
+
+.rank-section { margin-top: 20rpx; padding: 20rpx; background: #f9f9f9; border-radius: 12rpx; }
+
+.winner-badge { display: inline-block; padding: 8rpx 24rpx; border-radius: 8rpx; font-size: 28rpx; font-weight: bold; margin-bottom: 16rpx; }
+.winner-badge.red { background: #FFF1F0; color: #FF4D4F; }
+.winner-badge.blue { background: #E6F7FF; color: #1890FF; }
+
+.result-row .name.red { color: #FF4D4F; }
+.result-row .name.blue { color: #1890FF; }
+
+/* 报名区域 */
+.register-section { padding: 0 30rpx 20rpx; }
+
+.register-box {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2rpx 12rpx rgba(85, 37, 131, 0.08);
+  border-left: 5rpx solid #FDB927;
+}
+
+.register-box.creator { background: #fef9e7; border-left-color: #FDB927; }
+
+.register-info { flex: 1; }
+.register-info text { display: block; font-size: 28rpx; }
+.register-hint { font-size: 26rpx; color: #999; }
+
+.register-status { font-size: 28rpx; font-weight: bold; }
+.register-status.pending { color: #FAAD14; }
+.register-status.approved { color: #52C41A; }
+.register-status.rejected { color: #FF4D4F; }
+
+.register-btn {
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  color: #fff;
+  padding: 16rpx 32rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(85, 37, 131, 0.3);
+}
+
+.register-btn.cancel { background: #ff4d4f; }
+.register-btn.test { background: #52c41a; margin-top: 16rpx; }
+
+/* 管理报名弹窗 */
+.registration-list { max-height: 60vh; }
+.reg-group { margin-bottom: 20rpx; }
+.reg-group-title { font-size: 26rpx; color: #666; font-weight: bold; padding: 12rpx 0; border-bottom: 1rpx solid #eee; margin-bottom: 12rpx; }
+
+.reg-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx;
+  background: #f9f9f9;
+  border-radius: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.reg-info { flex: 1; }
+.reg-name { font-size: 30rpx; font-weight: bold; display: block; }
+.reg-name.approved { color: #52C41A; }
+.reg-name.rejected { color: #999; }
+.reg-time { font-size: 22rpx; color: #999; }
+
+.reg-actions { display: flex; gap: 12rpx; }
+
+.btn-tiny { padding: 8rpx 20rpx; border-radius: 6rpx; font-size: 24rpx; background: #f5f5f5; color: #666; }
+.btn-tiny.success { background: #52C41A; color: #fff; }
+.btn-tiny.danger { background: #FF4D4F; color: #fff; }

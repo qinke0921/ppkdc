@@ -1,0 +1,16 @@
+{
+  "desc": "今日交流场次配置",
+  "schema_version": "1.0",
+  "validate_rules": [],
+  "indexes": [
+    {
+      "name": "date_timeSlot_matchType",
+      "unique": true,
+      "field": [
+        "+date",
+        "+timeSlot",
+        "+matchType"
+      ]
+    }
+  ]
+}
