@@ -1,0 +1,22 @@
+<!--pages/disciples/history/history.wxml-->
+<view class="page">
+  <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <view class="card" wx:for="{{list}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
+      <view class="top">
+        <text class="map">{{item.mapName}}</text>
+        <text class="status {{item.status}}">{{item.statusText}}</text>
+      </view>
+      <view class="meta">
+        <text class="range">{{item.rangeText}}</text>
+        <text class="best">{{item.bestText || '无记录'}}</text>
+      </view>
+      <view class="sub">目标 {{item.targetLevel}} {{item.targetText || '未设'}} · {{item.recordCount}} 条记录</view>
+    </view>
+
+    <view class="empty-box" wx:if="{{list.length === 0}}">
+      <text>还没有已结算的任务</text>
+    </view>
+  </block>
+</view>

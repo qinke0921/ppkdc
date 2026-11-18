@@ -1,0 +1,77 @@
+/* pages/disciples/history/history.wxss */
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24rpx 30rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.loading-box {
+  padding-top: 160rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.card {
+  padding: 26rpx 28rpx;
+  margin-bottom: 16rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.map {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.status {
+  padding: 4rpx 16rpx;
+  font-size: 22rpx;
+  border-radius: 16rpx;
+}
+
+.status.over { color: #7a5200; background: rgba(253, 185, 39, 0.25); }
+.status.passed { color: #2e7d32; background: rgba(46, 125, 50, 0.1); }
+.status.missed { color: #c0392b; background: rgba(192, 57, 43, 0.1); }
+.status.absent { color: #888; background: #f2f2f2; }
+.status.no_target { color: #888; background: #f2f2f2; }
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.range {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.best {
+  font-size: 28rpx;
+  color: #552583;
+  font-weight: 600;
+}
+
+.sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+.empty-box {
+  padding: 100rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #bbb;
+}

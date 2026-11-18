@@ -209,3 +209,34 @@
   color: #c4bfd0;
   line-height: 1.7;
 }
+
+.entry + .entry {
+  margin-top: 16rpx;
+}
+
+.task-actions {
+  display: flex;
+  margin-top: 18rpx;
+}
+
+.task-actions .task-btn + .task-btn {
+  margin-left: 16rpx;
+}
+
+.task-btn {
+  flex: 1;
+  height: 68rpx;
+  line-height: 68rpx;
+  text-align: center;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  border-radius: 12rpx;
+}
+
+.task-btn.ghost {
+  color: #552583;
+  background: #fff;
+  border: 2rpx solid rgba(85, 37, 131, 0.2);
+}

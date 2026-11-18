@@ -1,0 +1,28 @@
+<!--pages/disciples/admin/history/history.wxml-->
+<view class="page">
+  <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <view class="card" wx:for="{{list}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
+      <view class="top">
+        <text class="map">{{item.mapName}}</text>
+        <text class="badge {{item.inProgress ? 'live' : (item.status === 'closed' ? 'done' : 'draft')}}">{{item.inProgress ? '进行中' : (item.status === 'closed' ? '已结算' : '草稿')}}</text>
+      </view>
+      <text class="range">{{item.rangeText}}</text>
+
+      <view class="summary" wx:if="{{item.summary}}">
+        <text class="s over">超线 {{item.summary.over}}</text>
+        <text class="s passed">达标 {{item.summary.passed}}</text>
+        <text class="s missed">未达标 {{item.summary.missed}}</text>
+        <text class="s absent">逃课 {{item.summary.absent}}</text>
+      </view>
+      <view class="summary" wx:else>
+        <text class="s muted">尚未结算</text>
+      </view>
+    </view>
+
+    <view class="empty-box" wx:if="{{list.length === 0}}">
+      <text>还没有任务</text>
+    </view>
+  </block>
+</view>

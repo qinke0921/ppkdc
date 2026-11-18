@@ -51,7 +51,11 @@
           <text class="task-map">{{item.mapName}}</text>
           <text class="task-days">剩 {{item.daysLeft}} 天</text>
         </view>
-        <text class="task-progress">已录 {{item.recordedCount || 0}} / {{item.memberCount || 0}} 人</text>
+        <text class="task-progress">{{item.rangeText}} · 目标 {{item.targetLevel}} {{item.targetText || ''}}</text>
+        <view class="task-actions">
+          <view class="task-btn" catchtap="goScores" data-id="{{item.taskId}}">代录成绩</view>
+          <view class="task-btn ghost" catchtap="goTask" data-id="{{item.taskId}}">查看榜单</view>
+        </view>
       </view>
 
       <view class="empty-box" wx:if="{{activeTasks.length === 0}}">
@@ -61,6 +65,24 @@
 
     <!-- 其它入口 -->
     <view class="section">
+      <view class="entry" bindtap="goPublish">
+        <text class="entry-icon">➕</text>
+        <view class="entry-body">
+          <text class="entry-text">发布新任务</text>
+          <text class="entry-sub">选图带出 7 档分线，自定义起止时间</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+
+      <view class="entry" bindtap="goHistory">
+        <text class="entry-icon">📊</text>
+        <view class="entry-body">
+          <text class="entry-text">历史记录</text>
+          <text class="entry-sub">所有任务与四态统计</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+
       <view class="entry" bindtap="goMembers">
         <text class="entry-icon">👥</text>
         <view class="entry-body">
@@ -69,10 +91,6 @@
         </view>
         <text class="arrow">›</text>
       </view>
-    </view>
-
-    <view class="coming-soon">
-      <text>任务发布、批量录入、历史记录将在任务系统上线后开放</text>
     </view>
   </block>
 

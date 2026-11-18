@@ -30,11 +30,52 @@ const LINE_ALIAS = {
   '娱乐': '娱乐'
 };
 
+const TASK_LINES = ['国服记录', '强主', '主力', '一线', '二线', '三线', '娱乐'];
 function normalizeLine(raw) {
   if (!raw) return { effective: '娱乐', source: 'default' };
   const mapped = LINE_ALIAS[raw];
   if (mapped) return { effective: mapped, source: 'set' };
   return { effective: '娱乐', source: 'default' };
+}
+
+const STATUS_TEXT = {
+  over: '超线完成',
+  passed: '达标',
+  missed: '未达标',
+  absent: '逃课',
+  no_target: '无法判定',
+  pending: '进行中'
+};
+
+function pad2(n) {
+  return n < 10 ? '0' + n : String(n);
+}
+
+function formatMs(ms) {
+  if (ms === null || ms === undefined || isNaN(ms)) return '';
+  const totalCs = Math.round(ms / 10);
+  const min = Math.floor(totalCs / 6000);
+  const sec = Math.floor((totalCs % 6000) / 100);
+  const cs = totalCs % 100;
+  return min + ':' + pad2(sec) + '.' + pad2(cs);
+}
+
+// 四态判定：快一档为超线，国服记录是天花板
+function judge(bestMs, lineTable, memberLine) {
+  const idx = TASK_LINES.indexOf(normalizeLine(memberLine).effective);
+  const table = {};
+  (lineTable || []).forEach((r) => { table[r.level] = r.ms === undefined ? null : r.ms; });
+
+  const targetLevel = TASK_LINES[idx];
+  const targetMs = table[targetLevel] === undefined ? null : table[targetLevel];
+  const overLevel = idx > 0 ? TASK_LINES[idx - 1] : null;
+  const overMs = overLevel && table[overLevel] !== undefined ? table[overLevel] : null;
+
+  if (bestMs === null || bestMs === undefined) return { status: 'absent', targetLevel, targetMs, overLevel, overMs };
+  if (targetMs === null) return { status: 'no_target', targetLevel, targetMs, overLevel, overMs };
+  if (overMs !== null && bestMs <= overMs) return { status: 'over', targetLevel, targetMs, overLevel, overMs };
+  if (bestMs <= targetMs) return { status: 'passed', targetLevel, targetMs, overLevel, overMs };
+  return { status: 'missed', targetLevel, targetMs, overLevel, overMs };
 }
 
 // 集合不存在时（云开发错误码 -502005）给出可操作的提示，而不是抛出英文技术错误
@@ -118,6 +159,64 @@ exports.main = async () => {
       }));
     }
 
+    // 进行中任务摘要：首页直接可见
+    let activeTasks = [];
+    try {
+      if (disciple) {
+        const now = Date.now();
+        const taskRes = await db.collection('disciple_tasks')
+          .where({ status: 'published', startAt: _.lte(now), endAt: _.gte(now) })
+          .orderBy('endAt', 'asc')
+          .limit(10)
+          .get();
+
+        const tasks = taskRes.data || [];
+        if (tasks.length > 0) {
+          const ids = tasks.map((t) => t._id);
+          const recRes = await db.collection('disciple_task_records')
+            .where({ _openid: OPENID, taskId: _.in(ids) })
+            .limit(100)
+            .get();
+
+          const byTask = {};
+          (recRes.data || []).forEach((r) => {
+            if (!byTask[r.taskId]) byTask[r.taskId] = [];
+            byTask[r.taskId].push(r);
+          });
+
+          activeTasks = tasks.map((t) => {
+            const list = byTask[t._id] || [];
+            const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
+            const best = list.filter((r) => r.scoreMs === bestMs)[0];
+            const j = judge(bestMs, t.lineTable, disciple.masterLineRaw);
+            const status = bestMs === null ? 'pending' : j.status;
+
+            return {
+              taskId: t._id,
+              title: t.title || t.mapName,
+              mapName: t.mapName,
+              startAt: t.startAt,
+              endAt: t.endAt,
+              daysLeft: Math.max(0, Math.ceil((t.endAt - now) / 86400000)),
+              targetLevel: j.targetLevel,
+              targetText: formatMs(j.targetMs),
+              targetMissing: j.targetMs === null,
+              overLevel: j.overLevel,
+              overText: formatMs(j.overMs),
+              bestText: best ? best.scoreText : '',
+              bestMs,
+              status,
+              statusText: STATUS_TEXT[status] || '',
+              recordCount: list.length
+            };
+          });
+        }
+      }
+    } catch (err) {
+      // 任务集合还没建时不影响首页其它信息
+      activeTasks = [];
+    }
+
     return {
       success: true,
       openid: OPENID,
@@ -130,7 +229,7 @@ exports.main = async () => {
       discipleCount: countRes.total,
       hasMaster: !!master,
       canClaimMaster: !master,
-      activeTasks: [],
+      activeTasks,
       pendingApplications
     };
   } catch (err) {

@@ -1,0 +1,97 @@
+<!--pages/disciples/task/task.wxml-->
+<view class="page">
+  <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <!-- 头部 -->
+    <view class="hero">
+      <view class="hero-top">
+        <text class="hero-map">{{task.mapName}}</text>
+        <text class="hero-badge">{{settled ? '已结算' : '剩 ' + daysLeft + ' 天'}}</text>
+      </view>
+      <text class="hero-range">{{dateRange}}</text>
+    </view>
+
+    <!-- 我的概览 -->
+    <view class="card">
+      <view class="row">
+        <text class="k">我的定线</text>
+        <text class="v line">{{me.line}}{{me.lineSource === 'default' ? '（未定线，按娱乐）' : ''}}</text>
+      </view>
+      <view class="row">
+        <text class="k">及格目标</text>
+        <text class="v strong">{{me.targetLevel}} {{me.targetText || '未设该档'}}</text>
+      </view>
+      <view class="row">
+        <text class="k">超线线</text>
+        <text class="v">{{me.overLevel || '—'}} {{me.overText || ''}}</text>
+      </view>
+      <view class="row">
+        <text class="k">当前最佳</text>
+        <text class="v">{{me.bestText || '—'}}</text>
+      </view>
+      <view class="row">
+        <text class="k">判定</text>
+        <text class="v status {{me.status}}">{{me.statusText}}</text>
+      </view>
+    </view>
+
+    <!-- 分线表 -->
+    <view class="section-title">分线表</view>
+    <view class="card">
+      <view class="line-row {{item.level === me.targetLevel ? 'is-target' : ''}}" wx:for="{{task.lineTable}}" wx:key="level">
+        <text class="line-level">{{item.level}}</text>
+        <text class="line-time">{{item.timeText || '未设'}}</text>
+        <text class="line-tag" wx:if="{{item.level === me.targetLevel}}">我的目标</text>
+        <text class="line-tag over" wx:elif="{{item.level === me.overLevel}}">超线</text>
+      </view>
+    </view>
+
+    <!-- 曲线 -->
+    <view class="section-title">进步曲线</view>
+    <view class="card chart-card">
+      <view class="chart-wrap" wx:if="{{myRecords.length >= 2}}">
+        <canvas type="2d" id="curve" class="curve"></canvas>
+        <view class="legend">
+          <text class="legend-item"><text class="legend-dot target"></text>目标线</text>
+          <text class="legend-item"><text class="legend-dot line"></text>我的成绩</text>
+        </view>
+      </view>
+      <view class="chart-empty" wx:else>
+        <text>{{myRecords.length === 0 ? '还没有成绩记录' : '至少 2 条记录才能画曲线'}}</text>
+      </view>
+    </view>
+
+    <!-- 我的记录 -->
+    <view class="section-title">我的记录 ({{myRecords.length}})</view>
+    <view class="card">
+      <view class="rec-row" wx:for="{{myRecords}}" wx:key="recordedAt">
+        <text class="rec-date">{{item.recordDate || '未注日期'}}</text>
+        <text class="rec-score">{{item.scoreText}}</text>
+      </view>
+      <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，成绩由师傅或管理员录入</text></view>
+    </view>
+
+    <!-- 榜单 -->
+    <view class="section-title" bindtap="toggleBoard">
+      <text>全员榜单 ({{board.length}})</text>
+      <text class="toggle-hint">{{boardOpen ? '收起 ▲' : '展开 ▼'}}</text>
+    </view>
+    <view class="card" wx:if="{{boardOpen}}">
+      <view class="board-row" wx:for="{{board}}" wx:key="openid" bindtap="goMember" data-id="{{item.id}}">
+        <view class="board-who">
+          <text class="board-name">{{item.gameName}}</text>
+          <text class="board-line">{{item.line}}</text>
+        </view>
+        <text class="board-best">{{item.bestText || '—'}}</text>
+        <text class="board-status {{item.status}}">{{item.statusText}}</text>
+      </view>
+    </view>
+
+    <!-- 管理操作 -->
+    <view class="actions" wx:if="{{canManage}}">
+      <view class="btn ghost" bindtap="goScores">代录成绩</view>
+      <view class="btn confirm" wx:if="{{!settled}}" bindtap="closeTask">结束并结算</view>
+    </view>
+  </block>
+</view>

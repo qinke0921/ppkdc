@@ -1,0 +1,9 @@
+{
+  "name": "getAdminHistory",
+  "version": "1.0.0",
+  "description": "主演徒弟：全部任务历史",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

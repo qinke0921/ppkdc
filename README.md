@@ -116,6 +116,10 @@ npm install
 | `updateDiscipleInfo` | 主演徒弟：改资料；定线由师傅或管理员录入 |
 | `claimDiscipleMaster` | 主演徒弟：**一次性**初始化师傅，已有 master 后永久失效 |
 | `migrateTeamMembers` | 主演徒弟：从车队 `members` 批量迁移（**无鉴权，用完即删**，默认预览不写库） |
+| `publishDiscipleTask` / `closeDiscipleTask` | 主演徒弟：发布/编辑任务、结算并生成判定快照 |
+| `getScoreSheet` / `saveTaskScores` | 主演徒弟：按日批量录入成绩（有日期覆盖 / 无日期追加） |
+| `getDiscipleTaskDetail` | 主演徒弟：任务详情、我的目标、全员榜单 |
+| `getDiscipleTaskHistory` / `getAdminHistory` | 主演徒弟：个人历史 / 全部任务历史 |
 
 ## 数据库集合
 
@@ -137,6 +141,9 @@ npm install
 | `team_activity_prizes` | 活动奖品 |
 | `disciples` | 主演徒弟：徒弟档案（含 `masterLine` 师傅定线） |
 | `discipleApplications` | 主演徒弟：拜师申请 |
+| `disciple_tasks` | 主演徒弟任务：地图绑定、7 档分线、起止时间 |
+| `disciple_task_records` | 主演徒弟任务：成绩记录（管理代录） |
+| `disciple_task_results` | 主演徒弟任务：结算后的判定快照 |
 
 ## 主演徒弟模块
 

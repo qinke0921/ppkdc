@@ -1,0 +1,57 @@
+// pages/disciples/admin/history/history.js
+// 全部任务历史：按结束时间倒序，带四态统计
+function fmtRange(startAt, endAt) {
+  const s = new Date(startAt || 0);
+  const e = new Date(endAt || 0);
+  const pad = (n) => (n < 10 ? '0' + n : String(n));
+  return pad(s.getMonth() + 1) + '.' + pad(s.getDate()) + ' - ' + pad(e.getMonth() + 1) + '.' + pad(e.getDate());
+}
+
+Page({
+  data: {
+    loading: true,
+    list: []
+  },
+
+  onLoad() {
+    this.load();
+  },
+
+  onShow() {
+    if (this._loaded) {
+      this.load(true);
+    }
+    this._loaded = true;
+  },
+
+  async load(silent) {
+    if (!silent) this.setData({ loading: true });
+
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getAdminHistory' });
+      const r = (res && res.result) || {};
+
+      if (!r.success) {
+        this.setData({ loading: false });
+        wx.showToast({ title: r.error || '加载失败', icon: 'none' });
+        return;
+      }
+
+      const list = (r.list || []).map((t) => {
+        t.rangeText = fmtRange(t.startAt, t.endAt);
+        return t;
+      });
+
+      this.setData({ loading: false, list });
+    } catch (err) {
+      console.error('加载全部历史失败', err);
+      this.setData({ loading: false });
+      wx.showToast({ title: '加载失败，请检查云函数', icon: 'none' });
+    }
+  },
+
+  goTask(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({ url: '/pages/disciples/task?id=' + id });
+  }
+});

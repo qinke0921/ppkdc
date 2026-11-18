@@ -1,0 +1,41 @@
+<!--pages/disciples/admin/scores/scores.wxml-->
+<view class="page">
+  <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <view class="head">
+      <text class="head-map">{{task.mapName || '任务'}}</text>
+      <text class="head-stats">已录 {{stats.filled}} / {{stats.total}} 人</text>
+    </view>
+
+    <view class="bar">
+      <picker mode="date" value="{{date || '2026-01-01'}}" bindchange="onDateChange">
+        <view class="date-btn">
+          <text>{{date || '不指定日期'}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+      <view class="clear-btn" wx:if="{{date}}" bindtap="clearDate">清空日期</view>
+    </view>
+
+    <view class="bar">
+      <input class="search-input" placeholder="搜索名字" value="{{keyword}}" bindinput="onSearch"/>
+      <view class="toggle {{onlyEmpty ? 'on' : ''}}" bindtap="toggleEmpty">只看未录</view>
+    </view>
+
+    <view class="list">
+      <view class="row" wx:for="{{visible}}" wx:key="openid">
+        <view class="who">
+          <text class="who-game">{{item.gameName}}</text>
+          <text class="who-line">{{item.line}}</text>
+        </view>
+        <input class="score-input" placeholder="—" value="{{item.editValue}}" data-openid="{{item.openid}}" bindinput="onScoreInput"/>
+      </view>
+      <view class="empty-box" wx:if="{{visible.length === 0}}"><text>没有匹配的成员</text></view>
+    </view>
+
+    <view class="footer">
+      <view class="save-btn {{saving ? 'disabled' : ''}}" bindtap="save">批量保存</view>
+    </view>
+  </block>
+</view>

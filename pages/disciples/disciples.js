@@ -166,6 +166,10 @@ Page({
     wx.navigateTo({ url: '/pages/disciples/admin/admin' });
   },
 
+  goHistory() {
+    wx.navigateTo({ url: '/pages/disciples/history/history' });
+  },
+
   goTask(e) {
     const id = e.currentTarget.dataset.id;
     if (!id) {

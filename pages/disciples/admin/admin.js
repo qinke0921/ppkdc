@@ -2,6 +2,13 @@
 // 管理中心：待审批 + 进行中任务（任务系统上线后填充）
 const util = require('../../../utils/disciple');
 
+function fmtRange(startAt, endAt) {
+  const s = new Date(startAt || 0);
+  const e = new Date(endAt || 0);
+  const pad = (n) => (n < 10 ? '0' + n : String(n));
+  return pad(s.getMonth() + 1) + '.' + pad(s.getDate()) + ' - ' + pad(e.getMonth() + 1) + '.' + pad(e.getDate());
+}
+
 Page({
   data: {
     loading: true,
@@ -58,7 +65,10 @@ Page({
         canManage: true,
         isMaster: !!r.isMaster,
         pendingApplications: pending,
-        activeTasks: r.activeTasks || []
+        activeTasks: (r.activeTasks || []).map((t) => {
+          t.rangeText = fmtRange(t.startAt, t.endAt);
+          return t;
+        })
       });
     } catch (err) {
       console.error('加载管理中心失败', err);
@@ -127,5 +137,25 @@ Page({
 
   goMembers() {
     wx.navigateTo({ url: '/pages/disciples/members' });
+  },
+
+  goPublish() {
+    wx.navigateTo({ url: '/pages/disciples/admin/publish/publish' });
+  },
+
+  goHistory() {
+    wx.navigateTo({ url: '/pages/disciples/admin/history/history' });
+  },
+
+  goScores(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    wx.navigateTo({ url: '/pages/disciples/admin/scores/scores?taskId=' + id });
+  },
+
+  goTask(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    wx.navigateTo({ url: '/pages/disciples/task?id=' + id });
   }
 });

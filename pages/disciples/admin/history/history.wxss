@@ -1,0 +1,75 @@
+/* pages/disciples/admin/history/history.wxss */
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24rpx 30rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.loading-box {
+  padding-top: 160rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.card {
+  padding: 26rpx 28rpx;
+  margin-bottom: 16rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.map {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.badge {
+  padding: 4rpx 16rpx;
+  font-size: 21rpx;
+  border-radius: 16rpx;
+}
+
+.badge.live { color: #2980b9; background: rgba(41, 128, 185, 0.1); }
+.badge.done { color: #2e7d32; background: rgba(46, 125, 50, 0.1); }
+.badge.draft { color: #888; background: #f2f2f2; }
+
+.range {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  color: #999;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 14rpx;
+}
+
+.s {
+  margin-right: 22rpx;
+  font-size: 22rpx;
+}
+
+.s.over { color: #b8860b; }
+.s.passed { color: #2e7d32; }
+.s.missed { color: #c0392b; }
+.s.absent { color: #888; }
+.s.muted { color: #bbb; }
+
+.empty-box {
+  padding: 100rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #bbb;
+}
