@@ -36,9 +36,12 @@
       </view>
     </view>
 
-    <!-- 分线表 -->
-    <view class="section-title">分线表</view>
-    <view class="card">
+    <!-- 分线表（默认收起） -->
+    <view class="section-title" bindtap="toggleLineTable">
+      <text>分线表</text>
+      <text class="toggle-hint">{{showLineTable ? '收起 ▲' : '展开 ▼'}}</text>
+    </view>
+    <view class="card" wx:if="{{showLineTable}}">
       <view class="line-row {{item.level === me.targetLevel ? 'is-target' : ''}}" wx:for="{{task.lineTable}}" wx:key="level">
         <text class="line-level">{{item.level}}</text>
         <text class="line-time">{{item.timeText || '未设'}}</text>
@@ -62,9 +65,12 @@
       </view>
     </view>
 
-    <!-- 我的记录 -->
-    <view class="section-title">我的记录 ({{myRecords.length}})</view>
-    <view class="card">
+    <!-- 我的记录（默认收起） -->
+    <view class="section-title" bindtap="toggleRecords">
+      <text>我的记录 ({{myRecords.length}})</text>
+      <text class="toggle-hint">{{showRecords ? '收起 ▲' : '展开 ▼'}}</text>
+    </view>
+    <view class="card" wx:if="{{showRecords}}">
       <view class="rec-row" wx:for="{{myRecords}}" wx:key="recordedAt">
         <text class="rec-date">{{item.recordDate || '未注日期'}}</text>
         <text class="rec-score">{{item.scoreText}}</text>

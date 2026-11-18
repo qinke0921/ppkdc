@@ -33,7 +33,9 @@ Page({
     canManage: false,
     dateRange: '',
     daysLeft: 0,
-    boardOpen: true,   // 榜单默认展开，避免「看不见别人成绩」
+    boardOpen: true,      // 榜单默认展开
+    showLineTable: false, // 分线表默认收起
+    showRecords: false,   // 我的记录默认收起
 
     // 某人成绩弹层
     showMember: false,
@@ -202,6 +204,16 @@ Page({
           }
         });
       });
+  },
+
+  /* ---------------- 折叠区 ---------------- */
+
+  toggleLineTable() {
+    this.setData({ showLineTable: !this.data.showLineTable });
+  },
+
+  toggleRecords() {
+    this.setData({ showRecords: !this.data.showRecords });
   },
 
   /* ---------------- 榜单 ---------------- */
