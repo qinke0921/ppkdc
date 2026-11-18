@@ -40,18 +40,9 @@
   color: #999;
 }
 
-.sort-btn {
-  display: flex;
-  align-items: center;
-  padding: 10rpx 22rpx;
-  font-size: 24rpx;
-  color: #552583;
-  background: rgba(85, 37, 131, 0.08);
-  border-radius: 24rpx;
-}
-
-.sort-arrow {
-  margin-left: 8rpx;
+.list-hint {
+  font-size: 22rpx;
+  color: #bbb;
 }
 
 .loading-box {
@@ -61,18 +52,63 @@
   color: #999;
 }
 
-.member-list {
+/* 分组 */
+.group-list {
   margin: 0 30rpx;
+}
+
+.group {
+  margin-bottom: 16rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 28rpx;
+}
+
+.group-left {
+  display: flex;
+  align-items: baseline;
+}
+
+.group-level {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.group-count {
+  margin-left: 14rpx;
+  font-size: 23rpx;
+  color: #999;
+}
+
+.group-arrow {
+  font-size: 23rpx;
+  color: #552583;
+}
+
+.group-body {
+  border-top: 2rpx solid #f7f7f7;
+  padding: 0 28rpx;
 }
 
 .member-card {
   display: flex;
   align-items: center;
-  padding: 26rpx 28rpx;
-  margin-bottom: 16rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  justify-content: space-between;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid #f7f7f7;
+}
+
+.member-card:last-child {
+  border-bottom: none;
 }
 
 .member-info {
@@ -82,35 +118,19 @@
 }
 
 .member-game {
-  font-size: 30rpx;
-  font-weight: 600;
+  font-size: 28rpx;
+  font-weight: 500;
   color: #333;
 }
 
 .member-name {
-  margin-top: 6rpx;
-  font-size: 24rpx;
+  margin-top: 4rpx;
+  font-size: 23rpx;
   color: #999;
 }
 
-.line-badge {
-  padding: 8rpx 20rpx;
-  margin-right: 12rpx;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #552583;
-  background: rgba(85, 37, 131, 0.08);
-  border-radius: 24rpx;
-}
-
-.line-badge.empty {
-  color: #bbb;
-  background: #f2f2f2;
-  font-weight: normal;
-}
-
 .arrow {
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #ccc;
 }
 

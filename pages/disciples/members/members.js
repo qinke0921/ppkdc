@@ -1,23 +1,25 @@
 // pages/disciples/members/members.js
-// 徒弟名单：搜索 + 排序，点名片进成员详情页
+// 徒弟名单：按分线档位分组，默认收起，点开才展开该档成员
 const util = require('../../../utils/disciple');
+
+// 展示顺序：从强到弱，未定线单独放最后
+const GROUPS = ['强主', '主力', '一线', '二线', '三线', '娱乐', '未定线'];
 
 Page({
   data: {
     loading: true,
-    all: [],
-    list: [],
+    total: 0,
     keyword: '',
-    sortBy: 'line', // line | name
-    total: 0
+    groups: []
   },
 
   onLoad() {
+    this._openState = {};   // 记录每个档位的展开状态，刷新后保持
+    this._all = [];
     this.load();
   },
 
   onShow() {
-    // 从成员详情页返回时静默刷新，避免定线/资料改了列表还是旧的
     if (this._loaded) {
       this.load(true);
     }
@@ -28,6 +30,7 @@ Page({
     if (!silent) {
       wx.showLoading({ title: '加载中...', mask: true });
     }
+
     try {
       const res = await wx.cloud.callFunction({ name: 'getAllDisciples' });
       const r = (res && res.result) || {};
@@ -38,14 +41,13 @@ Page({
         return;
       }
 
-      const all = (r.disciples || []).map((d) => {
-        d.rank = util.lineRank(d.masterLine);
+      this._all = (r.disciples || []).map((d) => {
         d.formattedJoinedAt = util.formatTime(d.joinedAt);
         return d;
       });
 
-      this.setData({ all, total: r.total || all.length, loading: false });
-      this.applyFilter();
+      this.setData({ loading: false, total: r.total || this._all.length });
+      this.buildGroups();
     } catch (err) {
       console.error('加载徒弟名单失败', err);
       this.setData({ loading: false });
@@ -57,39 +59,46 @@ Page({
     }
   },
 
-  applyFilter() {
+  buildGroups() {
     const kw = String(this.data.keyword || '').trim().toLowerCase();
-    let list = this.data.all.slice();
+    const buckets = {};
+    GROUPS.forEach((g) => { buckets[g] = []; });
 
-    if (kw) {
-      list = list.filter((m) => {
-        const hay = (m.gameName + ' ' + m.nickname + ' ' + (m.gameId || '')).toLowerCase();
-        return hay.indexOf(kw) >= 0;
-      });
-    }
+    this._all.forEach((m) => {
+      const level = (m.masterLine && GROUPS.indexOf(m.masterLine) >= 0) ? m.masterLine : '未定线';
 
-    if (this.data.sortBy === 'line') {
-      list.sort((a, b) => (a.rank - b.rank) || String(a.gameName).localeCompare(String(b.gameName)));
-    } else {
-      list.sort((a, b) => String(a.gameName).localeCompare(String(b.gameName)));
-    }
+      if (kw) {
+        const hay = ((m.gameName || '') + ' ' + (m.nickname || '') + ' ' + (m.gameId || '')).toLowerCase();
+        if (hay.indexOf(kw) < 0) return;
+      }
 
-    this.setData({ list });
+      buckets[level].push(m);
+    });
+
+    const groups = GROUPS
+      .map((level) => {
+        const members = buckets[level].sort((a, b) => String(a.gameName).localeCompare(String(b.gameName)));
+        // 有搜索词时自动展开命中结果，否则按记忆的展开状态
+        const open = kw ? members.length > 0 : this._openState[level] === true;
+        return { level, members, count: members.length, open };
+      })
+      .filter((g) => g.count > 0);
+
+    this.setData({ groups });
   },
 
   onSearch(e) {
-    this.setData({ keyword: e.detail.value });
-    this.applyFilter();
+    this.setData({ keyword: e.detail.value }, () => this.buildGroups());
   },
 
   clearSearch() {
-    this.setData({ keyword: '' });
-    this.applyFilter();
+    this.setData({ keyword: '' }, () => this.buildGroups());
   },
 
-  toggleSort() {
-    this.setData({ sortBy: this.data.sortBy === 'line' ? 'name' : 'line' });
-    this.applyFilter();
+  toggleGroup(e) {
+    const level = e.currentTarget.dataset.level;
+    this._openState[level] = !this._openState[level];
+    this.buildGroups();
   },
 
   goMember(e) {
