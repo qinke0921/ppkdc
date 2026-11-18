@@ -11,6 +11,32 @@ cloud.init();
 const db = cloud.database();
 const _ = db.command;
 
+// 主演徒弟定线只有 6 档；车队的 overallLine 是 14 档，读取时按「就慢不就快」收敛
+const DISCIPLE_LINES = ['强主', '主力', '一线', '二线', '三线', '娱乐'];
+const LINE_ALIAS = {
+  '国服记录': '强主',
+  '顶尖职业': '强主',
+  '职业': '强主',
+  '强主': '强主',
+  '主力': '主力',
+  '强一': '一线',
+  '一线': '一线',
+  '弱一': '二线',
+  '强二': '二线',
+  '二线': '二线',
+  '弱二': '三线',
+  '强三': '三线',
+  '三线': '三线',
+  '娱乐': '娱乐'
+};
+
+function normalizeLine(raw) {
+  if (!raw) return { effective: '娱乐', source: 'default' };
+  const mapped = LINE_ALIAS[raw];
+  if (mapped) return { effective: mapped, source: 'set' };
+  return { effective: '娱乐', source: 'default' };
+}
+
 // 集合不存在时（云开发错误码 -502005）给出可操作的提示，而不是抛出英文技术错误
 function isMissingCollection(err) {
   const code = err && err.errCode;
@@ -32,6 +58,7 @@ exports.main = async () => {
       .get();
 
     const raw = myRes.data[0] || null;
+    const lineInfo = raw ? normalizeLine(raw.masterLine) : null;
     const disciple = raw ? {
       _id: raw._id,
       _openid: raw._openid,
@@ -39,7 +66,9 @@ exports.main = async () => {
       gameName: raw.gameName || '',
       gameId: raw.gameId || '',
       statement: raw.statement || '',
-      masterLine: raw.masterLine || '',
+      masterLine: lineInfo.effective,
+      masterLineRaw: raw.masterLine || '',
+      lineSource: lineInfo.source,
       role: raw.role || 'member',
       joinedAt: raw.joinedAt || null
     } : null;
@@ -101,6 +130,7 @@ exports.main = async () => {
       discipleCount: countRes.total,
       hasMaster: !!master,
       canClaimMaster: !master,
+      activeTasks: [],
       pendingApplications
     };
   } catch (err) {

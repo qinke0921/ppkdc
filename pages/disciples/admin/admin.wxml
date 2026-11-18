@@ -1,0 +1,79 @@
+<!--pages/disciples/admin/admin.wxml-->
+<view class="page">
+
+  <view class="loading-box" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 待审批 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">📋 待审批</text>
+        <text class="section-count">{{pendingApplications.length}} 人</text>
+      </view>
+
+      <view class="app-card" wx:for="{{pendingApplications}}" wx:key="_id">
+        <view class="app-top">
+          <text class="app-name">{{item.nickname}}</text>
+          <text class="app-date">{{item.formattedCreatedAt}}</text>
+        </view>
+        <text class="app-game">游戏: {{item.gameName}} · ID: {{item.gameId}}</text>
+        <text class="app-statement" wx:if="{{item.statement}}">“{{item.statement}}”</text>
+
+        <picker mode="selector" range="{{lineOptions}}" data-index="{{index}}" bindchange="onApproveLineChange">
+          <view class="line-pick">
+            <text>{{item.pickedLine ? '定线：' + item.pickedLine : '选择定线（可留空，稍后再录）'}}</text>
+            <text class="picker-arrow">▾</text>
+          </view>
+        </picker>
+
+        <view class="app-actions">
+          <view class="btn reject" catchtap="reject" data-id="{{item._id}}">拒绝</view>
+          <view class="btn approve" catchtap="approve" data-id="{{item._id}}" data-index="{{index}}">批准</view>
+        </view>
+      </view>
+
+      <view class="empty-box" wx:if="{{pendingApplications.length === 0}}">
+        <text>暂无待审批申请</text>
+      </view>
+    </view>
+
+    <!-- 进行中任务 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">📅 进行中任务</text>
+        <text class="section-count" wx:if="{{activeTasks.length > 0}}">{{activeTasks.length}} 个</text>
+      </view>
+
+      <view class="task-card" wx:for="{{activeTasks}}" wx:key="taskId">
+        <view class="task-top">
+          <text class="task-map">{{item.mapName}}</text>
+          <text class="task-days">剩 {{item.daysLeft}} 天</text>
+        </view>
+        <text class="task-progress">已录 {{item.recordedCount || 0}} / {{item.memberCount || 0}} 人</text>
+      </view>
+
+      <view class="empty-box" wx:if="{{activeTasks.length === 0}}">
+        <text>暂无进行中的任务</text>
+      </view>
+    </view>
+
+    <!-- 其它入口 -->
+    <view class="section">
+      <view class="entry" bindtap="goMembers">
+        <text class="entry-icon">👥</text>
+        <view class="entry-body">
+          <text class="entry-text">徒弟名单</text>
+          <text class="entry-sub">查看成员、修改资料与定线</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <view class="coming-soon">
+      <text>任务发布、批量录入、历史记录将在任务系统上线后开放</text>
+    </view>
+  </block>
+
+</view>

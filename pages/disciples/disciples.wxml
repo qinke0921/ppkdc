@@ -1,4 +1,5 @@
 <!--pages/disciples/disciples.wxml-->
+<!-- 首页只做概览与入口，具体功能进独立页面 -->
 <view class="container">
 
   <!-- 朋友圈单页模式：无登录态，只做静态介绍 -->
@@ -15,11 +16,12 @@
     <text>加载中...</text>
   </view>
 
+  <!-- 非徒弟 -->
   <block wx:elif="{{!isDisciple}}">
     <view class="lock-section">
       <view class="lock-icon">🥋</view>
       <text class="lock-title">主演徒弟</text>
-      <text class="lock-desc">提交拜师申请，通过后即可查看徒弟名单</text>
+      <text class="lock-desc">提交拜师申请，通过后即可查看徒弟名单与作业任务</text>
       <view class="apply-btn" bindtap="showApplyModal">
         <text>申请拜师</text>
       </view>
@@ -32,67 +34,78 @@
     </view>
   </block>
 
-  <!-- 徒弟专区 -->
+  <!-- 徒弟专区：概览 -->
   <block wx:else>
-    <view class="welcome">
-      <text class="welcome-text">欢迎，{{discipleInfo.nickname}}</text>
-      <text class="welcome-sub">{{isMaster ? '👑 师傅' : (isAdmin ? '⭐ 管理员' : '👤 徒弟')}}</text>
-    </view>
-
-    <!-- 师傅（主演） -->
+    <!-- 师傅 -->
     <view class="master-card" wx:if="{{masterInfo}}">
       <view class="master-left">
         <text class="master-tag">👑 师傅</text>
         <text class="master-name">{{masterInfo.nickname || '主演'}}</text>
       </view>
-      <text class="master-game">{{masterInfo.gameName || '未填写游戏名'}}</text>
+      <text class="master-game">{{masterInfo.gameName || ''}}</text>
     </view>
 
-    <!-- 统计卡 -->
-    <view class="stat-row">
-      <view class="stat-card">
-        <text class="stat-num">{{discipleCount}}</text>
-        <text class="stat-label">徒弟人数</text>
+    <!-- 我的定线 -->
+    <view class="line-card">
+      <view class="line-main">
+        <text class="line-label">我的定线</text>
+        <text class="line-value">{{discipleInfo.masterLine}}</text>
+        <text class="line-hint" wx:if="{{discipleInfo.lineSource === 'default'}}">未定线，按娱乐档计算</text>
       </view>
-      <view class="stat-card">
-        <text class="stat-num line-num">{{discipleInfo.masterLine || '—'}}</text>
-        <text class="stat-label">我的师傅定线</text>
+      <view class="role-badge {{isMaster ? 'is-master' : (isAdmin ? 'is-admin' : '')}}">
+        <text>{{isMaster ? '👑 师傅' : (isAdmin ? '⭐ 管理员' : '👤 徒弟')}}</text>
       </view>
     </view>
 
-    <!-- 分享入口 -->
+    <!-- 进行中任务 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">📅 进行中</text>
+        <text class="section-count" wx:if="{{activeTasks.length > 0}}">{{activeTasks.length}} 个任务</text>
+      </view>
+
+      <view class="task-card" wx:for="{{activeTasks}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
+        <view class="task-top">
+          <text class="task-map">{{item.mapName}}</text>
+          <text class="task-days">剩 {{item.daysLeft}} 天</text>
+        </view>
+        <view class="task-row">
+          <text class="task-k">我的目标</text>
+          <text class="task-v strong">{{item.targetLevel}} {{item.targetText}}</text>
+        </view>
+        <view class="task-row">
+          <text class="task-k">当前最佳</text>
+          <text class="task-v">{{item.bestText || '—'}}</text>
+        </view>
+        <view class="task-row">
+          <text class="task-k">预计判定</text>
+          <text class="task-v">{{item.statusText || '暂无记录'}}</text>
+        </view>
+      </view>
+
+      <view class="empty-box" wx:if="{{activeTasks.length === 0}}">
+        <text>暂无进行中的任务</text>
+      </view>
+    </view>
+
+    <!-- 功能入口 -->
+    <view class="entry-grid">
+      <view class="entry" bindtap="goMembers">
+        <text class="entry-icon">👥</text>
+        <text class="entry-text">徒弟名单</text>
+        <text class="entry-sub">{{discipleCount}} 人</text>
+      </view>
+      <view class="entry" wx:if="{{canManage}}" bindtap="goAdmin">
+        <text class="entry-icon">⚙️</text>
+        <text class="entry-text">管理中心</text>
+        <text class="entry-sub">审批 · 任务</text>
+      </view>
+    </view>
+
     <view class="share-row">
       <button class="share-btn" open-type="share">
         <text>🔗 分享给好友</text>
       </button>
-    </view>
-
-    <!-- 管理员入口 -->
-    <view class="admin-btn" wx:if="{{canManage}}" bindtap="toggleAdminPanel">
-      <text>⚙️ 管理</text>
-      <view class="badge" wx:if="{{pendingApplications.length > 0}}">{{pendingApplications.length}}</view>
-    </view>
-
-    <!-- 徒弟名单 -->
-    <view class="members-header" bindtap="toggleDisciples">
-      <text>👥 徒弟名单 ({{discipleCount}}人)</text>
-      <text>{{showDisciples ? '▲' : '▼'}}</text>
-    </view>
-
-    <view class="member-list" wx:if="{{showDisciples}}">
-      <view class="member-card" wx:for="{{disciples}}" wx:key="_id" bindtap="viewDetail" data-item="{{item}}">
-        <view class="member-info">
-          <text class="member-game">{{item.gameName}}</text>
-          <text class="member-name">{{item.nickname}}</text>
-        </view>
-        <view class="line-badge" wx:if="{{item.masterLine}}">
-          <text>{{item.masterLine}}</text>
-        </view>
-        <view class="line-badge empty" wx:else>
-          <text>未定线</text>
-        </view>
-      </view>
-      <text class="empty-hint" wx:if="{{disciples.length === 0}}">暂无徒弟</text>
     </view>
   </block>
 
@@ -119,180 +132,6 @@
       <view class="modal-buttons">
         <view class="btn cancel" bindtap="hideApplyModal">取消</view>
         <view class="btn confirm" bindtap="submitApplication">提交申请</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 管理员审批面板 -->
-  <view class="modal-mask" wx:if="{{showAdminPanel}}" bindtap="toggleAdminPanel">
-    <view class="modal" catchtap="stopPropagation">
-      <view class="modal-title">⚙️ 待审批 ({{pendingApplications.length}})</view>
-
-      <scroll-view scroll-y="true" class="app-list">
-        <view class="app-item" wx:for="{{pendingApplications}}" wx:key="_id">
-          <text class="app-name">{{item.nickname}}</text>
-          <text class="app-game">游戏: {{item.gameName}} | ID: {{item.gameId}}</text>
-          <text class="app-statement" wx:if="{{item.statement}}">“{{item.statement}}”</text>
-          <text class="app-date">申请时间: {{item.formattedCreatedAt}}</text>
-
-          <picker mode="selector" range="{{lineOptions}}" data-index="{{index}}" bindchange="onApproveLineChange">
-            <view class="line-pick">
-              <text>{{item.pickedLine ? '定线：' + item.pickedLine : '点击选择定线（可留空，稍后再录）'}}</text>
-              <text class="picker-arrow">▾</text>
-            </view>
-          </picker>
-
-          <view class="modal-buttons">
-            <view class="btn confirm" catchtap="approveApplication" data-id="{{item._id}}" data-index="{{index}}">批准</view>
-            <view class="btn cancel" catchtap="rejectApplication" data-id="{{item._id}}">拒绝</view>
-          </view>
-        </view>
-
-        <view class="empty-hint" wx:if="{{pendingApplications.length === 0}}">暂无待审批申请</view>
-      </scroll-view>
-
-      <view class="import-btn" catchtap="openImportModal">📥 从车队批量导入</view>
-
-      <view class="modal-close" catchtap="toggleAdminPanel">关闭</view>
-    </view>
-  </view>
-
-  <!-- 徒弟详情 -->
-  <view class="modal-mask" wx:if="{{showDetail}}" bindtap="closeDetail">
-    <view class="modal" catchtap="stopPropagation">
-      <view class="modal-title">👤 徒弟详情</view>
-
-      <scroll-view scroll-y="true" class="detail-content">
-        <view class="detail-item">
-          <text class="detail-label">昵称</text>
-          <text class="detail-value">{{selectedDisciple.nickname}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">身份</text>
-          <text class="detail-value {{selectedDisciple.role === 'master' ? 'role-master' : (selectedDisciple.role === 'admin' ? 'role-admin' : '')}}">{{selectedDisciple.role === 'master' ? '👑 师傅' : (selectedDisciple.role === 'admin' ? '⭐ 管理员' : '👤 徒弟')}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">游戏昵称</text>
-          <text class="detail-value">{{selectedDisciple.gameName}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">游戏ID</text>
-          <text class="detail-value {{selectedDisciple.gameId ? '' : 'no-data'}}">{{selectedDisciple.gameId || '暂未填写'}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">师傅定线</text>
-          <text class="detail-value line-value {{selectedDisciple.masterLine ? '' : 'no-data'}}">{{selectedDisciple.masterLine || '暂未定线'}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">个人宣言</text>
-          <text class="detail-value {{selectedDisciple.statement ? '' : 'no-data'}}">{{selectedDisciple.statement || '暂未填写'}}</text>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">拜师时间</text>
-          <text class="detail-value">{{selectedDisciple.formattedJoinedAt}}</text>
-        </view>
-      </scroll-view>
-
-      <view class="modal-buttons" wx:if="{{isMyOwnProfile || canManage}}">
-        <view class="btn edit" bindtap="showEditModal">✏️ {{canManage ? '编辑资料 / 定线' : '编辑资料'}}</view>
-        <view class="btn cancel" catchtap="closeDetail">关闭</view>
-      </view>
-      <view class="modal-buttons" wx:else>
-        <view class="btn cancel" catchtap="closeDetail">关闭</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 编辑资料 -->
-  <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEditModal">
-    <view class="modal" catchtap="stopPropagation">
-      <view class="modal-title">✏️ 编辑资料</view>
-
-      <scroll-view scroll-y="true" class="detail-content">
-        <view class="detail-item">
-          <text class="detail-label">昵称</text>
-          <input class="edit-input" placeholder="请输入昵称" value="{{editForm.nickname}}" data-field="nickname" bindinput="onEditInput"/>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">游戏昵称</text>
-          <input class="edit-input" placeholder="游戏内名字" value="{{editForm.gameName}}" data-field="gameName" bindinput="onEditInput"/>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">游戏ID</text>
-          <input class="edit-input" placeholder="请输入游戏ID" value="{{editForm.gameId}}" data-field="gameId" bindinput="onEditInput"/>
-        </view>
-        <view class="detail-item">
-          <text class="detail-label">个人宣言</text>
-          <textarea class="edit-textarea" placeholder="介绍一下自己" value="{{editForm.statement}}" data-field="statement" bindinput="onEditInput"/>
-        </view>
-
-        <!-- 定线：仅管理员可改 -->
-        <view class="detail-item" wx:if="{{canManage}}">
-          <text class="detail-label">师傅定线</text>
-          <picker mode="selector" range="{{lineOptions}}" value="{{editLineIndex}}" bindchange="onEditLineChange">
-            <view class="picker-value">
-              <text>{{editForm.masterLine || '点击选择定线'}}</text>
-              <text class="picker-arrow">▾</text>
-            </view>
-          </picker>
-        </view>
-        <view class="detail-item" wx:else>
-          <text class="detail-label">师傅定线</text>
-          <text class="detail-value line-value {{editForm.masterLine ? '' : 'no-data'}}">{{editForm.masterLine || '暂未定线'}}</text>
-        </view>
-      </scroll-view>
-
-      <view class="modal-buttons">
-        <view class="btn cancel" bindtap="hideEditModal">取消</view>
-        <view class="btn confirm" bindtap="saveEdit">保存</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 从车队批量导入 -->
-  <view class="modal-mask" wx:if="{{showImportModal}}" bindtap="closeImportModal">
-    <view class="modal" catchtap="stopPropagation">
-      <view class="modal-title">📥 从车队批量导入</view>
-
-      <scroll-view scroll-y="true" class="detail-content">
-        <view class="form-item">
-          <text class="label">车队成员 _id（换行或逗号分隔，最多 500 个）</text>
-          <textarea class="textarea import-textarea" placeholder="粘贴 members 集合里的 _id" value="{{importText}}" bindinput="onImportInput"/>
-        </view>
-
-        <view class="detail-item">
-          <text class="detail-label">用综合分线做定线</text>
-          <switch checked="{{useOverallLine}}" color="#552583" bindchange="onUseOverallLineChange"/>
-        </view>
-
-        <view class="detail-item">
-          <text class="detail-label">统一定线</text>
-          <picker mode="selector" range="{{lineOptionsWithEmpty}}" value="{{importLineIndex}}" bindchange="onImportLineChange">
-            <view class="picker-value">
-              <text>{{importLineIndex === 0 ? '不指定' : lineOptionsWithEmpty[importLineIndex]}}</text>
-              <text class="picker-arrow">▾</text>
-            </view>
-          </picker>
-        </view>
-
-        <view class="import-result" wx:if="{{importResult}}">
-          <text class="result-line {{importResult.dryRun ? 'is-preview' : 'is-done'}}">{{importResult.dryRun ? '预览结果（未写入）' : '导入完成'}}</text>
-          <text class="result-line">输入 {{importResult.summary.input}} · 匹配 {{importResult.summary.matched}}</text>
-          <text class="result-line">新增 {{importResult.summary.created}} · 已存在 {{importResult.summary.skippedExisting}} · 未找到 {{importResult.summary.notFound}}</text>
-          <text class="result-line" wx:if="{{importResult.summary.skippedNotApproved > 0}}">跳过非在队 {{importResult.summary.skippedNotApproved}}</text>
-          <text class="result-line" wx:if="{{importResult.summary.failed > 0}}">失败 {{importResult.summary.failed}}</text>
-
-          <view class="result-list">
-            <text class="result-item" wx:for="{{importResult.created}}" wx:key="memberId">{{item.gameName || item.nickname || item.memberId}}{{item.masterLine ? ' · ' + item.masterLine : ''}}</text>
-            <text class="result-item miss" wx:for="{{importResult.notFound}}" wx:key="memberId">{{item.memberId}}（未找到）</text>
-          </view>
-        </view>
-      </scroll-view>
-
-      <view class="modal-buttons">
-        <view class="btn cancel" bindtap="closeImportModal">关闭</view>
-        <view class="btn edit" bindtap="runImport" data-dry="1">预览</view>
-        <view class="btn confirm" bindtap="runImport" data-dry="0">导入</view>
       </view>
     </view>
   </view>

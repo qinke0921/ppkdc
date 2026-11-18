@@ -100,7 +100,8 @@
 ```js
 {
   title: '第47期 · 幽暗峡谷',
-  mapName, mapId, difficulty,
+  mapId,                             // = map_data._id，唯一稳定标识
+  mapName, difficulty,               // 发布时的展示快照
   server: '国服',                    // 预留台服扩展
   lineTable: [                       // 固定 7 行，按快→慢排序
     { level: '国服记录', timeText: '1:24.35', ms: 84350 },
@@ -151,6 +152,16 @@
 ```
 
 任务结算（`status: closed`）时生成。之后改成绩只重算当事人这一条，保证历史稳定。
+
+### 4.4 地图标识
+
+任务必须用 **`mapId = map_data._id`** 绑定地图，`mapName` 仅作展示快照。
+
+原因：`line_records` 目前**只存地图名称字符串**（没有 mapId），地名一改关联就断——项目里存在 `fixMapNames` 这类修补函数就是这个问题的证据。任务从一开始就用 id，避免重蹈覆辙。
+
+后续统一（不在本次范围）：
+- 给 `line_records` 回填 `mapId`，与 `map_data._id` 对齐
+- 修正 `fixMapNames` 的思路：改名只需改 `map_data`，不再批量修引用
 
 ## 5. 权限
 

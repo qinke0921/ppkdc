@@ -14,7 +14,31 @@ cloud.init();
 const db = cloud.database();
 const _ = db.command;
 
-const LINE_LEVELS = ['国服记录', '顶尖职业', '职业', '强主', '主力', '强一', '一线', '弱一', '强二', '二线', '弱二', '强三', '三线', '娱乐'];
+// 主演徒弟定线只有 6 档；车队的 overallLine 是 14 档，读取时按「就慢不就快」收敛
+const DISCIPLE_LINES = ['强主', '主力', '一线', '二线', '三线', '娱乐'];
+const LINE_ALIAS = {
+  '国服记录': '强主',
+  '顶尖职业': '强主',
+  '职业': '强主',
+  '强主': '强主',
+  '主力': '主力',
+  '强一': '一线',
+  '一线': '一线',
+  '弱一': '二线',
+  '强二': '二线',
+  '二线': '二线',
+  '弱二': '三线',
+  '强三': '三线',
+  '三线': '三线',
+  '娱乐': '娱乐'
+};
+
+function normalizeLine(raw) {
+  if (!raw) return { effective: '娱乐', source: 'default' };
+  const mapped = LINE_ALIAS[raw];
+  if (mapped) return { effective: mapped, source: 'set' };
+  return { effective: '娱乐', source: 'default' };
+}
 const MAX_IDS = 500;
 const CHUNK = 100;
 
@@ -46,8 +70,11 @@ exports.main = async (event) => {
     const keepJoinedAt = payload.keepJoinedAt !== false;
     let masterLine = payload.masterLine || '';
 
-    if (masterLine && LINE_LEVELS.indexOf(masterLine) === -1) {
+    if (masterLine && !LINE_ALIAS[masterLine]) {
       return { success: false, error: '定线档位不合法：' + masterLine };
+    }
+    if (masterLine) {
+      masterLine = normalizeLine(masterLine).effective;
     }
     if (memberIds.length === 0 && openids.length === 0) {
       return { success: false, error: '请提供 memberIds（members._id）或 openids' };
@@ -118,8 +145,8 @@ exports.main = async (event) => {
 
       // 定线：统一指定优先，其次用队员综合分线
       let line = masterLine;
-      if (!line && useOverallLine && m.overallLine && LINE_LEVELS.indexOf(m.overallLine) >= 0) {
-        line = m.overallLine;
+      if (!line && useOverallLine && m.overallLine && LINE_ALIAS[m.overallLine]) {
+        line = normalizeLine(m.overallLine).effective;
       }
 
       const doc = {

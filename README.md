@@ -15,7 +15,7 @@
 | 比赛详情 | `pages/competition` | 逐局录入名次，按规则实时累计积分并判定胜负 |
 | 分线查询 | `pages/line` | 地图分线成绩查询，TabBar 之一 |
 | PLAY 车队 | `pages/team` | 成员列表、入队申请审批、成员状态管理，TabBar 之一 |
-| 主演徒弟 | `pages/disciples` | 徒弟名单、拜师申请审批、师傅定线，TabBar 之一 |
+| 主演徒弟 | `pages/disciples` `members` `member` `admin/admin` | 概览与入口；名单 / 详情 / 管理中心为独立页面，TabBar 之一 |
 | 车队主页 | `pages/home` | 车队概览与快捷入口 |
 | 分组池 | `pages/group-pool` | 按颜色/分组管理队员，支持抽签分组 |
 | 今日交流 | `pages/exchange` | 日常交流/约跑登记与名单管理 |
@@ -156,7 +156,7 @@ npm install
 ```
 disciples
   _openid, nickname, gameName, gameId, statement,
-  masterLine   # 师傅定线，手动录入，取值见分线等级体系
+  masterLine   # 师傅定线，6 档：强主/主力/一线/二线/三线/娱乐（国服记录仅用于任务超线判定）
   status       # approved（本模块无离队状态）
   role         # master | admin | member
   joinedAt, createdAt, createdBy, updatedAt

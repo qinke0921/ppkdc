@@ -1,0 +1,78 @@
+<!--pages/disciples/member/member.wxml-->
+<view class="page">
+
+  <view class="loading-box" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <view class="profile-card">
+      <text class="profile-game">{{member.gameName}}</text>
+      <text class="profile-name">{{member.nickname}}</text>
+      <view class="line-badge {{member.masterLine ? '' : 'empty'}}">{{member.masterLine || '未定线'}}</view>
+    </view>
+
+    <!-- 只读 -->
+    <view class="card" wx:if="{{!editing}}">
+      <view class="row">
+        <text class="k">身份</text>
+        <text class="v">{{member.role === 'master' ? '👑 师傅' : (member.role === 'admin' ? '⭐ 管理员' : '👤 徒弟')}}</text>
+      </view>
+      <view class="row">
+        <text class="k">游戏ID</text>
+        <text class="v {{member.gameId ? '' : 'muted'}}">{{member.gameId || '暂未填写'}}</text>
+      </view>
+      <view class="row">
+        <text class="k">个人宣言</text>
+        <text class="v {{member.statement ? '' : 'muted'}}">{{member.statement || '暂未填写'}}</text>
+      </view>
+      <view class="row">
+        <text class="k">拜师时间</text>
+        <text class="v">{{member.formattedJoinedAt}}</text>
+      </view>
+    </view>
+
+    <!-- 编辑 -->
+    <view class="card" wx:else>
+      <view class="row">
+        <text class="k">昵称</text>
+        <input class="edit-input" placeholder="请输入昵称" value="{{form.nickname}}" data-field="nickname" bindinput="onInput"/>
+      </view>
+      <view class="row">
+        <text class="k">游戏昵称</text>
+        <input class="edit-input" placeholder="游戏内名字" value="{{form.gameName}}" data-field="gameName" bindinput="onInput"/>
+      </view>
+      <view class="row">
+        <text class="k">游戏ID</text>
+        <input class="edit-input" placeholder="请输入游戏ID" value="{{form.gameId}}" data-field="gameId" bindinput="onInput"/>
+      </view>
+      <view class="row">
+        <text class="k">个人宣言</text>
+        <input class="edit-input" placeholder="介绍一下自己" value="{{form.statement}}" data-field="statement" bindinput="onInput"/>
+      </view>
+      <view class="row" wx:if="{{canManage}}">
+        <text class="k">师傅定线</text>
+        <picker mode="selector" range="{{lineOptions}}" value="{{lineIndex}}" bindchange="onLineChange">
+          <view class="picker-value">
+            <text>{{form.masterLine || '点击选择'}}</text>
+            <text class="picker-arrow">▾</text>
+          </view>
+        </picker>
+      </view>
+      <view class="row" wx:else>
+        <text class="k">师傅定线</text>
+        <text class="v">{{form.masterLine || '未定线'}}</text>
+      </view>
+    </view>
+
+    <view class="actions" wx:if="{{!editing}}">
+      <view class="btn edit" wx:if="{{isSelf || canManage}}" bindtap="startEdit">✏️ 编辑资料{{canManage ? ' / 定线' : ''}}</view>
+    </view>
+
+    <view class="actions" wx:else>
+      <view class="btn cancel" bindtap="cancelEdit">取消</view>
+      <view class="btn confirm {{saving ? 'disabled' : ''}}" bindtap="save">保存</view>
+    </view>
+  </block>
+
+</view>

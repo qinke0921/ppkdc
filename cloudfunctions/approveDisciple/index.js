@@ -5,7 +5,31 @@ cloud.init();
 
 const db = cloud.database();
 
-const LINE_LEVELS = ['国服记录', '顶尖职业', '职业', '强主', '主力', '强一', '一线', '弱一', '强二', '二线', '弱二', '强三', '三线', '娱乐'];
+// 主演徒弟定线只有 6 档；车队的 overallLine 是 14 档，读取时按「就慢不就快」收敛
+const DISCIPLE_LINES = ['强主', '主力', '一线', '二线', '三线', '娱乐'];
+const LINE_ALIAS = {
+  '国服记录': '强主',
+  '顶尖职业': '强主',
+  '职业': '强主',
+  '强主': '强主',
+  '主力': '主力',
+  '强一': '一线',
+  '一线': '一线',
+  '弱一': '二线',
+  '强二': '二线',
+  '二线': '二线',
+  '弱二': '三线',
+  '强三': '三线',
+  '三线': '三线',
+  '娱乐': '娱乐'
+};
+
+function normalizeLine(raw) {
+  if (!raw) return { effective: '娱乐', source: 'default' };
+  const mapped = LINE_ALIAS[raw];
+  if (mapped) return { effective: mapped, source: 'set' };
+  return { effective: '娱乐', source: 'default' };
+}
 
 async function getCaller(openid) {
   const res = await db.collection('disciples').where({ _openid: openid }).get();
@@ -34,13 +58,13 @@ exports.main = async (event) => {
       return { success: false, error: '仅师傅或管理员可审批' };
     }
 
-    // 2. 定线校验（可为空，空表示稍后再录）
+    // 2. 定线校验（可为空，空表示稍后再录；14 档旧值会收敛到 6 档）
     let line = '';
     if (masterLine) {
-      if (LINE_LEVELS.indexOf(masterLine) === -1) {
-        return { success: false, error: '定线档位不合法' };
+      if (!LINE_ALIAS[masterLine]) {
+        return { success: false, error: '定线档位不合法：' + masterLine };
       }
-      line = masterLine;
+      line = normalizeLine(masterLine).effective;
     }
 
     // 3. 读取申请

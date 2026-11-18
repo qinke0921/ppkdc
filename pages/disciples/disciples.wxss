@@ -1,5 +1,5 @@
 /* pages/disciples/disciples.wxss */
-/* 主演徒弟模块 —— 独立配色（紫金），与车队的蓝色区分开 */
+/* 主演徒弟首页 —— 紫金主题，只做概览与入口 */
 
 page {
   background: #f5f5f5;
@@ -19,7 +19,7 @@ page {
   font-size: 28rpx;
 }
 
-/* ---------- 非徒弟：申请入口 ---------- */
+/* ---------- 非徒弟 ---------- */
 .lock-section {
   display: flex;
   flex-direction: column;
@@ -44,6 +44,7 @@ page {
   color: #999;
   margin-bottom: 60rpx;
   text-align: center;
+  line-height: 1.6;
 }
 
 .apply-btn {
@@ -68,172 +69,249 @@ page {
   border-radius: 40rpx;
 }
 
-/* ---------- 欢迎条 ---------- */
-.welcome {
-  position: relative;
-  margin: 30rpx;
-  padding: 36rpx 40rpx;
-  border-radius: 20rpx;
-  background: linear-gradient(135deg, #552583, #7b3fa0);
-  box-shadow: 0 10rpx 24rpx rgba(85, 37, 131, 0.25);
-}
-
-.welcome-text {
-  display: block;
-  color: #fff;
-  font-size: 36rpx;
-  font-weight: bold;
-}
-
-.welcome-sub {
-  display: block;
-  margin-top: 10rpx;
-  color: #FDB927;
-  font-size: 26rpx;
-}
-
-/* ---------- 统计卡 ---------- */
-.stat-row {
+/* ---------- 师傅卡片 ---------- */
+.master-card {
   display: flex;
-  margin: 0 30rpx;
-  gap: 20rpx;
-}
-
-.stat-card + .stat-card {
-  margin-left: 20rpx;
-}
-
-.stat-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 28rpx 10rpx;
-  background: #fff;
+  justify-content: space-between;
+  margin: 30rpx 30rpx 0;
+  padding: 26rpx 30rpx;
+  background: linear-gradient(135deg, #fff8e6, #ffffff);
+  border: 2rpx solid rgba(253, 185, 39, 0.45);
   border-radius: 16rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.stat-num {
-  font-size: 44rpx;
-  font-weight: bold;
-  color: #552583;
+.master-left {
+  display: flex;
+  align-items: center;
 }
 
-.line-num {
+.master-tag {
+  padding: 6rpx 16rpx;
+  margin-right: 16rpx;
+  font-size: 22rpx;
+  color: #7a5200;
+  background: rgba(253, 185, 39, 0.25);
+  border-radius: 8rpx;
+}
+
+.master-name {
   font-size: 30rpx;
-  color: #FDB927;
+  font-weight: 600;
+  color: #333;
 }
 
-.stat-label {
-  margin-top: 8rpx;
+.master-game {
   font-size: 24rpx;
   color: #999;
 }
 
-/* ---------- 管理员入口 ---------- */
-.admin-btn {
+/* ---------- 我的定线 ---------- */
+.line-card {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  margin: 30rpx 30rpx 0;
-  height: 84rpx;
-  color: #fff;
-  font-size: 30rpx;
-  font-weight: 600;
-  border-radius: 16rpx;
-  background: linear-gradient(135deg, #FDB927, #f5a623);
-  box-shadow: 0 6rpx 16rpx rgba(253, 185, 39, 0.3);
-}
-
-.badge {
-  position: absolute;
-  top: -10rpx;
-  right: -6rpx;
-  min-width: 36rpx;
-  height: 36rpx;
-  line-height: 36rpx;
-  padding: 0 8rpx;
-  text-align: center;
-  font-size: 22rpx;
-  color: #fff;
-  background: #e74c3c;
-  border-radius: 18rpx;
-}
-
-/* ---------- 名单 ---------- */
-.members-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin: 30rpx;
-  padding: 26rpx 30rpx;
+  margin: 20rpx 30rpx 0;
+  padding: 32rpx 30rpx;
   background: #fff;
   border-radius: 16rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.member-list {
-  margin: 0 30rpx;
+.line-main {
+  display: flex;
+  flex-direction: column;
 }
 
-.member-card {
+.line-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.line-value {
+  margin-top: 8rpx;
+  font-size: 52rpx;
+  font-weight: bold;
+  color: #FDB927;
+  line-height: 1.2;
+}
+
+.line-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #c0392b;
+}
+
+.role-badge {
+  padding: 10rpx 22rpx;
+  font-size: 24rpx;
+  color: #666;
+  background: #f2f2f2;
+  border-radius: 24rpx;
+}
+
+.role-badge.is-master {
+  color: #7a5200;
+  background: rgba(253, 185, 39, 0.25);
+}
+
+.role-badge.is-admin {
+  color: #552583;
+  background: rgba(85, 37, 131, 0.1);
+}
+
+/* ---------- 区块 ---------- */
+.section {
+  margin: 30rpx 30rpx 0;
+}
+
+.section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* ---------- 任务卡片 ---------- */
+.task-card {
   padding: 26rpx 30rpx;
   margin-bottom: 16rpx;
   background: #fff;
   border-radius: 16rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  border-left: 6rpx solid #552583;
 }
 
-.member-info {
-  flex: 1;
+.task-top {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
 }
 
-.member-game {
-  font-size: 30rpx;
+.task-map {
+  font-size: 32rpx;
   font-weight: 600;
   color: #333;
 }
 
-.member-name {
-  margin-top: 6rpx;
+.task-days {
   font-size: 24rpx;
+  color: #c0392b;
+}
+
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6rpx 0;
+}
+
+.task-k {
+  font-size: 25rpx;
   color: #999;
 }
 
-.line-badge {
-  padding: 8rpx 20rpx;
-  font-size: 24rpx;
+.task-v {
+  font-size: 25rpx;
+  color: #333;
+}
+
+.task-v.strong {
   color: #552583;
   font-weight: 600;
-  background: rgba(85, 37, 131, 0.08);
-  border-radius: 24rpx;
 }
 
-.line-badge.empty {
-  color: #bbb;
-  background: #f2f2f2;
-  font-weight: normal;
-}
-
-.empty-hint {
-  display: block;
+/* ---------- 空状态 ---------- */
+.empty-box {
   padding: 40rpx 0;
   text-align: center;
   font-size: 26rpx;
   color: #bbb;
+  background: #fff;
+  border-radius: 16rpx;
 }
 
-/* ---------- 弹窗通用 ---------- */
+/* ---------- 入口 ---------- */
+.entry-grid {
+  display: flex;
+  margin: 30rpx 30rpx 0;
+}
+
+.entry {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 10rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.entry + .entry {
+  margin-left: 20rpx;
+}
+
+.entry-icon {
+  font-size: 48rpx;
+}
+
+.entry-text {
+  margin-top: 10rpx;
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.entry-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+/* ---------- 分享 ---------- */
+.share-row {
+  padding: 30rpx 30rpx 0;
+}
+
+.share-btn {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 76rpx;
+  line-height: 76rpx;
+  font-size: 27rpx;
+  color: #552583;
+  background: #ffffff;
+  border: 2rpx solid rgba(85, 37, 131, 0.15);
+  border-radius: 14rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.share-btn::after {
+  border: none;
+}
+
+.share-btn.ghost {
+  width: 420rpx;
+  margin-top: 32rpx;
+  background: transparent;
+  border: 2rpx solid rgba(85, 37, 131, 0.45);
+  box-shadow: none;
+}
+
+/* ---------- 弹窗 ---------- */
 .modal-mask {
   position: fixed;
   top: 0;
@@ -297,7 +375,6 @@ page {
 
 .modal-buttons {
   display: flex;
-  gap: 20rpx;
   padding: 30rpx 40rpx 10rpx;
 }
 
@@ -325,228 +402,6 @@ page {
   color: #fff;
 }
 
-.btn.edit {
-  background: linear-gradient(135deg, #FDB927, #f5a623);
-  color: #fff;
-}
-
-.modal-close {
-  margin: 20rpx 40rpx;
-  padding: 20rpx;
-  text-align: center;
-  font-size: 28rpx;
-  color: #666;
-  background: #f5f5f5;
-  border-radius: 12rpx;
-}
-
-/* ---------- 审批列表 ---------- */
-.app-list {
-  max-height: 56vh;
-  padding: 10rpx 0;
-}
-
-.app-item {
-  padding: 26rpx 40rpx;
-  border-bottom: 2rpx solid #f5f5f5;
-}
-
-.app-name {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-.app-game {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #888;
-}
-
-.app-statement {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #999;
-}
-
-.app-date {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #bbb;
-}
-
-.line-pick {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 18rpx;
-  padding: 18rpx 24rpx;
-  font-size: 26rpx;
-  color: #552583;
-  background: rgba(85, 37, 131, 0.06);
-  border-radius: 12rpx;
-}
-
-.picker-arrow {
-  color: #999;
-}
-
-/* ---------- 详情 ---------- */
-.detail-content {
-  max-height: 52vh;
-  padding: 10rpx 0;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22rpx 40rpx;
-  border-bottom: 2rpx solid #f7f7f7;
-}
-
-.detail-label {
-  flex-shrink: 0;
-  width: 160rpx;
-  font-size: 26rpx;
-  color: #888;
-}
-
-.detail-value {
-  flex: 1;
-  text-align: right;
-  font-size: 28rpx;
-  color: #333;
-  word-break: break-all;
-}
-
-.detail-value.no-data {
-  color: #ccc;
-}
-
-.detail-value.role-admin {
-  color: #FDB927;
-  font-weight: 600;
-}
-
-.detail-value.line-value {
-  color: #552583;
-  font-weight: 600;
-}
-
-.edit-input {
-  flex: 1;
-  height: 68rpx;
-  padding: 0 20rpx;
-  text-align: right;
-  font-size: 28rpx;
-  background: #f7f7f7;
-  border-radius: 10rpx;
-}
-
-.edit-textarea {
-  flex: 1;
-  height: 120rpx;
-  padding: 16rpx 20rpx;
-  font-size: 28rpx;
-  background: #f7f7f7;
-  border-radius: 10rpx;
-}
-
-.picker-value text + text {
-  margin-left: 10rpx;
-}
-
-.picker-value {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 12rpx 24rpx;
-  font-size: 28rpx;
-  color: #552583;
-  font-weight: 600;
-  background: rgba(85, 37, 131, 0.06);
-  border-radius: 10rpx;
-}
-
-/* ---------- 师傅（主演）卡片 ---------- */
-.master-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 20rpx 30rpx 0;
-  padding: 26rpx 30rpx;
-  background: linear-gradient(135deg, #fff8e6, #ffffff);
-  border: 2rpx solid rgba(253, 185, 39, 0.45);
-  border-radius: 16rpx;
-}
-
-.master-left {
-  display: flex;
-  align-items: center;
-}
-
-.master-tag {
-  padding: 6rpx 16rpx;
-  margin-right: 16rpx;
-  font-size: 22rpx;
-  color: #7a5200;
-  background: rgba(253, 185, 39, 0.25);
-  border-radius: 8rpx;
-}
-
-.master-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-.master-game {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.detail-value.role-master {
-  color: #b8860b;
-  font-weight: 600;
-}
-
-/* ---------- 分享按钮 ---------- */
-.share-row {
-  padding: 20rpx 30rpx 0;
-}
-
-.share-btn {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 76rpx;
-  line-height: 76rpx;
-  font-size: 27rpx;
-  color: #552583;
-  background: #ffffff;
-  border: 2rpx solid rgba(85, 37, 131, 0.15);
-  border-radius: 14rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-/* 去掉小程序 button 默认边框 */
-.share-btn::after {
-  border: none;
-}
-
-.share-btn.ghost {
-  width: 420rpx;
-  margin-top: 32rpx;
-  background: transparent;
-  border: 2rpx solid rgba(85, 37, 131, 0.45);
-  box-shadow: none;
-}
-
 /* ---------- 朋友圈单页模式 ---------- */
 .single-page {
   display: flex;
@@ -564,62 +419,4 @@ page {
   color: #7a6a90;
   background: rgba(85, 37, 131, 0.06);
   border-radius: 12rpx;
-}
-
-/* ---------- 从车队导入 ---------- */
-.import-btn {
-  margin: 10rpx 40rpx;
-  padding: 22rpx;
-  text-align: center;
-  font-size: 28rpx;
-  color: #552583;
-  background: rgba(85, 37, 131, 0.06);
-  border: 2rpx dashed rgba(85, 37, 131, 0.35);
-  border-radius: 12rpx;
-}
-
-.import-textarea {
-  height: 200rpx;
-  font-size: 24rpx;
-}
-
-.import-result {
-  margin: 20rpx 40rpx 0;
-  padding: 22rpx;
-  background: #faf8fd;
-  border-radius: 12rpx;
-}
-
-.result-line {
-  display: block;
-  font-size: 24rpx;
-  color: #666;
-  line-height: 1.7;
-}
-
-.result-line.is-preview {
-  color: #b8860b;
-  font-weight: 600;
-}
-
-.result-line.is-done {
-  color: #2e7d32;
-  font-weight: 600;
-}
-
-.result-list {
-  margin-top: 12rpx;
-  max-height: 200rpx;
-  overflow-y: auto;
-}
-
-.result-item {
-  display: block;
-  font-size: 23rpx;
-  color: #333;
-  line-height: 1.6;
-}
-
-.result-item.miss {
-  color: #c0392b;
 }
