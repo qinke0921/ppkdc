@@ -29,6 +29,9 @@ Page({
     me: null,
     myRecords: [],
     board: [],
+    boardDone: [],
+    boardUndone: [],
+    showUndone: false,
     settled: false,
     canManage: false,
     dateRange: '',
@@ -88,12 +91,17 @@ Page({
       });
       const now = Date.now();
 
+      const boardDone = board.filter((b) => b.bestMs !== null && b.bestMs !== undefined);
+      const boardUndone = board.filter((b) => b.bestMs === null || b.bestMs === undefined);
+
       this.setData({
         loading: false,
         task,
         me: r.me || null,
         myRecords: r.myRecords || [],
         board,
+        boardDone,
+        boardUndone,
         settled: !!r.settled,
         canManage: !!r.canManage,
         dateRange: shortDate(task.startAt) + ' - ' + shortDate(task.endAt),
@@ -220,6 +228,10 @@ Page({
 
   toggleBoard() {
     this.setData({ boardOpen: !this.data.boardOpen });
+  },
+
+  toggleUndone() {
+    this.setData({ showUndone: !this.data.showUndone });
   },
 
   async openMember(e) {

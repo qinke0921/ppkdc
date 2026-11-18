@@ -78,13 +78,13 @@
       <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，成绩由师傅或管理员录入</text></view>
     </view>
 
-    <!-- 榜单 -->
+    <!-- 榜单：已录入按成绩排序，未录入默认隐藏 -->
     <view class="section-title" bindtap="toggleBoard">
-      <text>全员榜单 ({{board.length}})</text>
+      <text>全员榜单 ({{boardDone.length}}/{{board.length}})</text>
       <text class="toggle-hint">{{boardOpen ? '收起 ▲' : '展开 ▼'}}</text>
     </view>
     <view class="card" wx:if="{{boardOpen}}">
-      <view class="board-row" wx:for="{{board}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
+      <view class="board-row" wx:for="{{boardDone}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
         <text class="board-rank">{{index + 1}}</text>
         <view class="board-who">
           <text class="board-name">{{item.gameName}}</text>
@@ -94,6 +94,28 @@
         <text class="board-status {{item.status}}">{{item.statusText}}</text>
         <text class="board-arrow">›</text>
       </view>
+
+      <view class="empty-line" wx:if="{{boardDone.length === 0}}">
+        <text>还没有人录入成绩</text>
+      </view>
+
+      <view class="undone-toggle" wx:if="{{boardUndone.length > 0}}" bindtap="toggleUndone">
+        <text>未完成名单 {{boardUndone.length}} 人</text>
+        <text class="undone-arrow">{{showUndone ? '收起 ▲' : '查看 ▼'}}</text>
+      </view>
+
+      <block wx:if="{{showUndone}}">
+        <view class="board-row undone" wx:for="{{boardUndone}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
+          <text class="board-rank">—</text>
+          <view class="board-who">
+            <text class="board-name">{{item.gameName}}</text>
+            <text class="board-line">{{item.line}}</text>
+          </view>
+          <text class="board-best">—</text>
+          <text class="board-status {{item.status}}">{{item.statusText}}</text>
+          <text class="board-arrow">›</text>
+        </view>
+      </block>
     </view>
 
     <!-- 管理操作 -->
