@@ -249,6 +249,13 @@
   border-bottom: none;
 }
 
+.board-rank {
+  width: 44rpx;
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: #bbb;
+}
+
 .board-who {
   flex: 1;
   display: flex;

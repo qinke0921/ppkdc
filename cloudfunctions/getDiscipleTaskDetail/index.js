@@ -294,12 +294,12 @@ exports.main = async (event) => {
       };
     });
 
+    // 榜单排序：每个人取自己的最快纪录，快的在前，慢的在后，没有记录的排末尾
     board.sort((a, b) => {
-      const r = statusRank(a.status) - statusRank(b.status);
-      if (r !== 0) return r;
-      const am = a.bestMs === null ? 9999999 : a.bestMs;
-      const bm = b.bestMs === null ? 9999999 : b.bestMs;
-      return am - bm;
+      const am = (a.bestMs === null || a.bestMs === undefined) ? Number.MAX_SAFE_INTEGER : a.bestMs;
+      const bm = (b.bestMs === null || b.bestMs === undefined) ? Number.MAX_SAFE_INTEGER : b.bestMs;
+      if (am !== bm) return am - bm;
+      return String(a.gameName).localeCompare(String(b.gameName));
     });
 
     const mine = board.filter((b) => b.openid === OPENID)[0] || null;

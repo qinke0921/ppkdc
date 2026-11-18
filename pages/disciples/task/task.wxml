@@ -85,6 +85,7 @@
     </view>
     <view class="card" wx:if="{{boardOpen}}">
       <view class="board-row" wx:for="{{board}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
+        <text class="board-rank">{{index + 1}}</text>
         <view class="board-who">
           <text class="board-name">{{item.gameName}}</text>
           <text class="board-line">{{item.line}}</text>
