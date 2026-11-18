@@ -159,7 +159,7 @@ Page({
   /* ---------------- 跳转 ---------------- */
 
   goMembers() {
-    wx.navigateTo({ url: '/pages/disciples/members' });
+    wx.navigateTo({ url: '/pages/disciples/members/members' });
   },
 
   goAdmin() {
@@ -176,7 +176,7 @@ Page({
       wx.showToast({ title: '任务系统开发中', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url: '/pages/disciples/task?id=' + id });
+    wx.navigateTo({ url: '/pages/disciples/task/task?id=' + id });
   },
 
   /* ---------------- 拜师申请 ---------------- */

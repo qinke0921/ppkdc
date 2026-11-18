@@ -136,7 +136,7 @@ Page({
   },
 
   goMembers() {
-    wx.navigateTo({ url: '/pages/disciples/members' });
+    wx.navigateTo({ url: '/pages/disciples/members/members' });
   },
 
   goPublish() {
@@ -156,6 +156,6 @@ Page({
   goTask(e) {
     const id = e.currentTarget.dataset.id;
     if (!id) return;
-    wx.navigateTo({ url: '/pages/disciples/task?id=' + id });
+    wx.navigateTo({ url: '/pages/disciples/task/task?id=' + id });
   }
 });

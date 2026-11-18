@@ -94,6 +94,6 @@ Page({
 
   goMember(e) {
     const id = e.currentTarget.dataset.id;
-    wx.navigateTo({ url: '/pages/disciples/member?id=' + id });
+    wx.navigateTo({ url: '/pages/disciples/member/member?id=' + id });
   }
 });
