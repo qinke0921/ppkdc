@@ -1,5 +1,5 @@
 // pages/disciples/task/task.js
-// 任务详情：分线表、我的目标与判定、记录、进步曲线、全员榜单
+// 任务详情：分线表、我的目标与判定、记录、进步曲线、全员榜单（可点开某人看成绩）
 const util = require('../../../utils/disciple');
 
 const STATUS_TEXT = {
@@ -33,7 +33,17 @@ Page({
     canManage: false,
     dateRange: '',
     daysLeft: 0,
-    boardOpen: false
+    boardOpen: true,   // 榜单默认展开，避免「看不见别人成绩」
+
+    // 某人成绩弹层
+    showMember: false,
+    memberDetail: null,
+    memberStatus: '',
+    memberStatusClass: '',
+    memberBest: '',
+    memberTargetLevel: '',
+    memberTargetText: '',
+    memberRecords: []
   },
 
   onLoad(options) {
@@ -87,7 +97,7 @@ Page({
         dateRange: shortDate(task.startAt) + ' - ' + shortDate(task.endAt),
         daysLeft: Math.max(0, Math.ceil((task.endAt - now) / 86400000))
       }, () => {
-        this.drawCurve();
+        this.drawChart('#curve', this.data.myRecords, (this.data.me || {}).targetMs);
       });
     } catch (err) {
       console.error('加载任务详情失败', err);
@@ -96,17 +106,13 @@ Page({
     }
   },
 
-  /* ---------------- 进步曲线 ---------------- */
+  /* ---------------- 曲线（通用） ---------------- */
 
-  drawCurve() {
-    const records = this.data.myRecords || [];
-    if (records.length < 2) return;
-
-    const me = this.data.me || {};
-    const targetMs = me.targetMs || null;
+  drawChart(selector, records, targetMs) {
+    if (!records || records.length < 2) return;
 
     wx.createSelectorQuery()
-      .select('#curve')
+      .select(selector)
       .fields({ node: true, size: true })
       .exec((res) => {
         const item = res && res[0];
@@ -128,13 +134,13 @@ Page({
         let min = Math.min.apply(null, all);
         let max = Math.max.apply(null, all);
         const span = Math.max(500, max - min);
-        min -= span * 0.2;
-        max += span * 0.2;
+        min -= span * 0.35;
+        max += span * 0.35;
 
-        const padL = 10;
-        const padR = 10;
-        const padT = 16;
-        const padB = 22;
+        const padL = 12;
+        const padR = 12;
+        const padT = 26;
+        const padB = 30;
 
         const x = (i) => padL + (w - padL - padR) * (records.length === 1 ? 0.5 : i / (records.length - 1));
         const y = (v) => padT + (h - padT - padB) * ((v - min) / (max - min));
@@ -166,10 +172,12 @@ Page({
         });
         ctx.stroke();
 
-        // 数据点
+        // 数据点 + 成绩 + 日期
+        const dense = records.length > 7;
         records.forEach((r, i) => {
           const px = x(i);
           const py = y(r.scoreMs);
+
           ctx.beginPath();
           ctx.arc(px, py, 3.5, 0, Math.PI * 2);
           ctx.fillStyle = '#552583';
@@ -177,32 +185,76 @@ Page({
           ctx.lineWidth = 2;
           ctx.strokeStyle = '#fff';
           ctx.stroke();
-        });
 
-        // 底部标签（首尾）
-        ctx.fillStyle = '#bbb';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(records[0].recordDate || '', padL, h - 6);
-        ctx.textAlign = 'right';
-        const last = records[records.length - 1];
-        ctx.fillText(last.recordDate || '', w - padR, h - 6);
+          // 成绩（点在点上方）
+          ctx.fillStyle = '#552583';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(r.scoreText || '', px, Math.max(10, py - 9));
+
+          // 日期（点在点下方，拥挤时隔一个显示）
+          const showDate = !dense || i % 2 === 0 || i === records.length - 1;
+          if (showDate) {
+            ctx.fillStyle = '#aaa';
+            ctx.font = '9px sans-serif';
+            const label = r.recordDate ? String(r.recordDate).slice(5) : (r.recordedAt ? shortDate(r.recordedAt) : '—');
+            ctx.fillText(label, px, h - 10);
+          }
+        });
       });
   },
+
+  /* ---------------- 榜单 ---------------- */
 
   toggleBoard() {
     this.setData({ boardOpen: !this.data.boardOpen });
   },
 
-  goScores() {
-    wx.navigateTo({ url: '/pages/disciples/admin/scores/scores?taskId=' + this.data.taskId });
+  async openMember(e) {
+    const openid = e.currentTarget.dataset.openid;
+    if (!openid) return;
+
+    wx.showLoading({ title: '加载中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getMemberTaskDetail',
+        data: { taskId: this.data.taskId, openid }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+
+      if (!r.success) {
+        wx.showToast({ title: r.error || '加载失败', icon: 'none' });
+        return;
+      }
+
+      this.setData({
+        showMember: true,
+        memberDetail: r.member || null,
+        memberStatus: r.statusText || '',
+        memberStatusClass: r.status || '',
+        memberBest: r.bestText || '',
+        memberTargetLevel: r.targetLevel || '',
+        memberTargetText: r.targetText || '',
+        memberRecords: r.records || []
+      }, () => {
+        this.drawChart('#curveMember', this.data.memberRecords, r.targetMs);
+      });
+    } catch (err) {
+      console.error('加载成员成绩失败', err);
+      wx.hideLoading();
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    }
   },
 
-  goMember(e) {
-    const id = e.currentTarget.dataset.id;
-    if (id) {
-      wx.navigateTo({ url: '/pages/disciples/member/member?id=' + id });
-    }
+  closeMember() {
+    this.setData({ showMember: false });
+  },
+
+  /* ---------------- 管理操作 ---------------- */
+
+  goScores() {
+    wx.navigateTo({ url: '/pages/disciples/admin/scores/scores?taskId=' + this.data.taskId });
   },
 
   async closeTask() {
@@ -241,5 +293,7 @@ Page({
         }
       }
     });
-  }
+  },
+
+  stopPropagation() {}
 });

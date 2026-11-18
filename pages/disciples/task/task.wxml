@@ -78,13 +78,14 @@
       <text class="toggle-hint">{{boardOpen ? '收起 ▲' : '展开 ▼'}}</text>
     </view>
     <view class="card" wx:if="{{boardOpen}}">
-      <view class="board-row" wx:for="{{board}}" wx:key="openid" bindtap="goMember" data-id="{{item.id}}">
+      <view class="board-row" wx:for="{{board}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
         <view class="board-who">
           <text class="board-name">{{item.gameName}}</text>
           <text class="board-line">{{item.line}}</text>
         </view>
         <text class="board-best">{{item.bestText || '—'}}</text>
         <text class="board-status {{item.status}}">{{item.statusText}}</text>
+        <text class="board-arrow">›</text>
       </view>
     </view>
 
@@ -94,4 +95,36 @@
       <view class="btn confirm" wx:if="{{!settled}}" bindtap="closeTask">结束并结算</view>
     </view>
   </block>
+
+  <!-- 某人成绩 -->
+  <view class="modal-mask" wx:if="{{showMember}}" bindtap="closeMember">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">{{memberDetail.gameName}}<text class="modal-sub"> · {{memberDetail.line}}</text></view>
+
+      <scroll-view scroll-y="true" class="modal-body">
+        <view class="m-stats">
+          <text class="m-status {{memberStatusClass}}">{{memberStatus}}</text>
+          <text class="m-best">最佳 {{memberBest || '—'}}</text>
+          <text class="m-target">目标 {{memberTargetLevel}} {{memberTargetText || '未设'}}</text>
+        </view>
+
+        <view class="chart-wrap" wx:if="{{memberRecords.length >= 2}}">
+          <canvas type="2d" id="curveMember" class="curve"></canvas>
+        </view>
+        <view class="chart-empty" wx:else>
+          <text>{{memberRecords.length === 0 ? '没有记录' : '只有 1 条记录，无法画曲线'}}</text>
+        </view>
+
+        <view class="rec-list">
+          <view class="rec-row" wx:for="{{memberRecords}}" wx:key="recordedAt">
+            <text class="rec-date">{{item.recordDate || '未注日期'}}</text>
+            <text class="rec-score">{{item.scoreText}}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="modal-close" catchtap="closeMember">关闭</view>
+    </view>
+  </view>
+
 </view>

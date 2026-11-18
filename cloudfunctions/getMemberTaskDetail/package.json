@@ -1,0 +1,9 @@
+{
+  "name": "getMemberTaskDetail",
+  "version": "1.0.0",
+  "description": "主演徒弟：查看某人某任务成绩",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -120,6 +120,7 @@ npm install
 | `getScoreSheet` / `saveTaskScores` | 主演徒弟：按日批量录入成绩（有日期覆盖 / 无日期追加） |
 | `getDiscipleTaskDetail` | 主演徒弟：任务详情、我的目标、全员榜单 |
 | `getDiscipleTaskHistory` / `getAdminHistory` | 主演徒弟：个人历史 / 全部任务历史 |
+| `getMemberTaskDetail` | 主演徒弟：查看某人在某任务的判定、记录与曲线（互相可见） |
 
 ## 数据库集合
 
