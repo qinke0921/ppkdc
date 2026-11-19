@@ -6,6 +6,12 @@
   </view>
 
   <block wx:else>
+    <!-- 待办概览：红点看不清时也能看到数字 -->
+    <view class="overview">
+      <text class="overview-title">待办 {{pendingTotal}} 项</text>
+      <text class="overview-sub">拜师申请 {{pendingApplications.length}} · 成绩申请 {{pendingRequestCount}}</text>
+    </view>
+
     <!-- 待审批 -->
     <view class="section">
       <view class="section-head">

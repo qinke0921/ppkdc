@@ -117,7 +117,19 @@ Page({
       if (info) info.formattedJoinedAt = this.formatTime(info.joinedAt);
 
       // 待办 = 拜师申请 + 成绩申请
-      const pendingTotal = ((r.pendingApplications || []).length) + (r.pendingRequestCount || 0);
+      // 兼容旧版云函数：没返回 pendingRequestCount 时，直接查一次待审批列表
+      let pendingRequestCount = r.pendingRequestCount;
+      if (r.canManage && (pendingRequestCount === undefined || pendingRequestCount === null)) {
+        try {
+          const reqRes = await wx.cloud.callFunction({ name: 'getPendingTaskRequests' });
+          const rr = (reqRes && reqRes.result) || {};
+          pendingRequestCount = rr.success ? (rr.total || 0) : 0;
+        } catch (err) {
+          pendingRequestCount = 0;
+        }
+      }
+
+      const pendingTotal = ((r.pendingApplications || []).length) + (pendingRequestCount || 0);
 
       this.setData({
         loading: false,

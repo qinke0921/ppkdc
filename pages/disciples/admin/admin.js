@@ -62,14 +62,26 @@ Page({
         return a;
       });
 
-      const totalPending = pending.length + (r.pendingRequestCount || 0);
+      // 兼容旧版云函数：没返回 pendingRequestCount 时，直接查待审批列表
+      let requestCount = r.pendingRequestCount;
+      if (requestCount === undefined || requestCount === null) {
+        try {
+          const reqRes = await wx.cloud.callFunction({ name: 'getPendingTaskRequests' });
+          const rr = (reqRes && reqRes.result) || {};
+          requestCount = rr.success ? (rr.total || 0) : 0;
+        } catch (err) {
+          requestCount = 0;
+        }
+      }
+
+      const totalPending = pending.length + (requestCount || 0);
 
       this.setData({
         loading: false,
         canManage: true,
         isMaster: !!r.isMaster,
         pendingApplications: pending,
-        pendingRequestCount: r.pendingRequestCount || 0,
+        pendingRequestCount: requestCount || 0,
         pendingTotal: totalPending,
         activeTasks: (r.activeTasks || []).map((t) => {
           t.rangeText = fmtRange(t.startAt, t.endAt);
