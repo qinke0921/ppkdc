@@ -18,6 +18,7 @@ Page({
 
     // 进行中任务（任务系统上线后填充）
     activeTasks: [],
+    pendingTotal: 0,
 
     showApplyModal: false,
     applyForm: {
@@ -115,6 +116,9 @@ Page({
       const info = r.disciple || null;
       if (info) info.formattedJoinedAt = this.formatTime(info.joinedAt);
 
+      // 待办 = 拜师申请 + 成绩申请
+      const pendingTotal = ((r.pendingApplications || []).length) + (r.pendingRequestCount || 0);
+
       this.setData({
         loading: false,
         isDisciple: !!r.isDisciple,
@@ -125,12 +129,30 @@ Page({
         masterInfo: r.master || null,
         discipleCount: r.discipleCount || 0,
         canClaimMaster: !!r.canClaimMaster,
-        activeTasks: r.activeTasks || []
+        activeTasks: r.activeTasks || [],
+        pendingTotal
       });
+
+      if (r.canManage) {
+        this.syncTabBadge(pendingTotal);
+      }
     } catch (err) {
       console.error('加载徒弟身份失败', err);
       this.setData({ loading: false });
       this.showError('加载失败，请检查云函数是否已部署');
+    }
+  },
+
+  // tabBar 红点：主演徒弟在第 4 个 tab（index 3）
+  syncTabBadge(count) {
+    try {
+      if (count > 0) {
+        wx.setTabBarBadge({ index: 3, text: count > 99 ? '99+' : String(count) });
+      } else {
+        wx.removeTabBarBadge({ index: 3 });
+      }
+    } catch (err) {
+      // 非 tabBar 页面或基础库不支持时忽略
     }
   },
 

@@ -16,6 +16,7 @@ Page({
     isMaster: false,
     pendingApplications: [],
     pendingRequestCount: 0,
+    pendingTotal: 0,
     activeTasks: [],
     lineOptions: util.DISCIPLE_LINES
   },
@@ -61,17 +62,22 @@ Page({
         return a;
       });
 
+      const totalPending = pending.length + (r.pendingRequestCount || 0);
+
       this.setData({
         loading: false,
         canManage: true,
         isMaster: !!r.isMaster,
         pendingApplications: pending,
         pendingRequestCount: r.pendingRequestCount || 0,
+        pendingTotal: totalPending,
         activeTasks: (r.activeTasks || []).map((t) => {
           t.rangeText = fmtRange(t.startAt, t.endAt);
           return t;
         })
       });
+
+      this.syncTabBadge(totalPending);
     } catch (err) {
       console.error('加载管理中心失败', err);
       this.setData({ loading: false });
@@ -134,6 +140,18 @@ Page({
     } catch (err) {
       wx.hideLoading();
       wx.showToast({ title: '操作失败', icon: 'none' });
+    }
+  },
+
+  syncTabBadge(count) {
+    try {
+      if (count > 0) {
+        wx.setTabBarBadge({ index: 3, text: count > 99 ? '99+' : String(count) });
+      } else {
+        wx.removeTabBarBadge({ index: 3 });
+      }
+    } catch (err) {
+      // 忽略不支持的情况
     }
   },
 

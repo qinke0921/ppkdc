@@ -156,6 +156,7 @@
 
 /* 入口 */
 .entry {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 28rpx;
@@ -252,4 +253,18 @@
   color: #fff;
   background: #e74c3c;
   border-radius: 18rpx;
+}
+
+/* 待审批红点 */
+.title-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.red-dot {
+  width: 16rpx;
+  height: 16rpx;
+  margin-right: 12rpx;
+  background: #e74c3c;
+  border-radius: 8rpx;
 }

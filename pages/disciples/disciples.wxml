@@ -101,9 +101,10 @@
         <text class="entry-sub">往期判定</text>
       </view>
       <view class="entry" wx:if="{{canManage}}" bindtap="goAdmin">
+        <view class="entry-badge" wx:if="{{pendingTotal > 0}}">{{pendingTotal > 99 ? '99+' : pendingTotal}}</view>
         <text class="entry-icon">⚙️</text>
         <text class="entry-text">管理中心</text>
-        <text class="entry-sub">审批 · 任务</text>
+        <text class="entry-sub">{{pendingTotal > 0 ? pendingTotal + ' 项待审批' : '审批 · 任务'}}</text>
       </view>
     </view>
 
