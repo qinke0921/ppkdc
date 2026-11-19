@@ -47,6 +47,9 @@ Page({
     applyScore: '',
     submitting: false,
     myRequests: [],
+    showRequests: false,     // 我的申请：默认收起
+    requestsLoaded: false,
+    requestsLoading: false,
     today: (function () {
       const d = new Date();
       const pad = (n) => (n < 10 ? '0' + n : String(n));
@@ -126,7 +129,6 @@ Page({
         task,
         me: r.me || null,
         myRecords: r.myRecords || [],
-        myRequests: r.myRequests || [],
         myReported: !!r.myReported,
         board,
         boardDone,
@@ -341,6 +343,36 @@ Page({
     }
   },
 
+  /* ---------------- 我的申请（懒加载） ---------------- */
+
+  async toggleRequests() {
+    const willShow = !this.data.showRequests;
+    this.setData({ showRequests: willShow });
+    if (willShow && !this.data.requestsLoaded) {
+      await this.loadRequests();
+    }
+  },
+
+  async loadRequests() {
+    if (this.data.requestsLoading) return;
+    this.setData({ requestsLoading: true });
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getMyTaskRequests',
+        data: { taskId: this.data.taskId }
+      });
+      const r = (res && res.result) || {};
+      if (r.success) {
+        this.setData({ myRequests: r.list || [], requestsLoaded: true });
+      }
+    } catch (err) {
+      console.error('加载我的申请失败', err);
+    } finally {
+      this.setData({ requestsLoading: false });
+    }
+  },
+
   /* ---------------- 视频失效反馈 ---------------- */
 
   openReport() {
@@ -503,7 +535,8 @@ Page({
       }
 
       wx.showToast({ title: r.updated ? '申请已更新' : '申请已提交', icon: 'success' });
-      this.setData({ showApply: false, applyScore: '' });
+      this.setData({ showApply: false, applyScore: '', showRequests: true, requestsLoaded: false });
+      await this.loadRequests();
       this.load(true);
     } catch (err) {
       console.error('提交成绩申请失败', err);

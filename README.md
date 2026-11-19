@@ -126,6 +126,7 @@ npm install
 | `submitTaskScoreRequest` | 主演徒弟：徒弟提交自己的成绩申请（待审批） |
 | `reviewTaskScoreRequest` | 主演徒弟：审批成绩申请，通过才写入成绩 |
 | `getPendingTaskRequests` | 主演徒弟：待审批成绩申请列表 |
+| `getMyTaskRequests` | 主演徒弟：我的成绩申请（任务详情展开时按需查询） |
 | `updateTaskVideo` | 主演徒弟：更新任务的视频讲解（链接 / 提取码 / 说明），并自动处理该任务的失效反馈 |
 | `reportTaskVideo` | 主演徒弟：徒弟反馈视频打不开 |
 | `listTaskReports` / `resolveTaskReport` | 主演徒弟：待处理反馈列表 / 标记已处理 |

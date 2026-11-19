@@ -1,0 +1,9 @@
+{
+  "name": "getMyTaskRequests",
+  "version": "1.0.0",
+  "description": "主演徒弟：我的成绩申请",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

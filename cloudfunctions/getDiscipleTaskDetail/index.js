@@ -310,25 +310,6 @@ exports.main = async (event) => {
       return (a.recordedAt || 0) - (b.recordedAt || 0);
     });
 
-    // 我的成绩申请（最近 10 条）
-    let myRequests = [];
-    try {
-      const reqs = await fetchAll('disciple_task_requests', { taskId: payload.taskId, _openid: OPENID });
-      myRequests = reqs
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-        .slice(0, 10)
-        .map((r) => ({
-          requestId: r._id,
-          scoreText: r.scoreText,
-          recordDate: r.recordDate || '',
-          status: r.status,
-          statusText: r.status === 'pending' ? '待审批' : (r.status === 'approved' ? '已通过' : '已拒绝'),
-          createdAt: r.createdAt || null
-        }));
-    } catch (err) {
-      myRequests = [];
-    }
-
     // 我是否已反馈该任务的视频失效
     let myReported = false;
     try {
@@ -371,7 +352,6 @@ exports.main = async (event) => {
         recordDate: r.recordDate || '',
         recordedAt: r.recordedAt || null
       })),
-      myRequests,
       myReported,
       board
     };
