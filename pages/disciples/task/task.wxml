@@ -75,8 +75,26 @@
         <text class="rec-date">{{item.recordDate || '未注日期'}}</text>
         <text class="rec-score">{{item.scoreText}}</text>
       </view>
-      <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，成绩由师傅或管理员录入</text></view>
+      <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，可点下方「申请录入成绩」提交</text></view>
     </view>
+
+    <!-- 申请录入成绩 -->
+    <view class="apply-row" wx:if="{{!settled}}">
+      <view class="apply-btn" bindtap="openApply">📝 申请录入成绩</view>
+      <text class="apply-hint">提交后需师傅或管理员审批，通过才写入成绩</text>
+    </view>
+
+    <!-- 我的申请 -->
+    <block wx:if="{{myRequests.length > 0}}">
+      <view class="section-title"><text>我的申请</text></view>
+      <view class="card">
+        <view class="rec-row" wx:for="{{myRequests}}" wx:key="requestId">
+          <text class="rec-date">{{item.recordDate || '未注日期'}}</text>
+          <text class="rec-score">{{item.scoreText}}</text>
+          <text class="req-status {{item.status}}">{{item.statusText}}</text>
+        </view>
+      </view>
+    </block>
 
     <!-- 榜单：已录入按成绩排序，未录入默认隐藏 -->
     <view class="section-title" bindtap="toggleBoard">
@@ -124,6 +142,38 @@
       <view class="btn confirm" wx:if="{{!settled}}" bindtap="closeTask">结束并结算</view>
     </view>
   </block>
+
+  <!-- 申请录入成绩 -->
+  <view class="modal-mask" wx:if="{{showApply}}" bindtap="closeApply">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📝 申请录入成绩</view>
+
+      <view class="form-item">
+        <text class="label">日期（可选）</text>
+        <view class="date-row">
+          <picker mode="date" value="{{applyDate || today}}" bindchange="onApplyDate">
+            <view class="picker-value">
+              <text>{{applyDate || '不指定日期'}}</text>
+              <text class="picker-arrow">▾</text>
+            </view>
+          </picker>
+          <text class="clear-date" wx:if="{{applyDate}}" bindtap="clearApplyDate">不指定</text>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">成绩</text>
+        <input class="input" placeholder="例如 1:27.99" value="{{applyScore}}" bindinput="onApplyScore"/>
+      </view>
+
+      <view class="hint-line">同一天已有成绩时，审批通过会覆盖原成绩</view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="closeApply">取消</view>
+        <view class="btn confirm {{submitting ? 'disabled' : ''}}" bindtap="submitApply">提交申请</view>
+      </view>
+    </view>
+  </view>
 
   <!-- 某人成绩 -->
   <view class="modal-mask" wx:if="{{showMember}}" bindtap="closeMember">

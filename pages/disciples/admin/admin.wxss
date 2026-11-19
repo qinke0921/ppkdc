@@ -240,3 +240,16 @@
   background: #fff;
   border: 2rpx solid rgba(85, 37, 131, 0.2);
 }
+
+.entry-badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  padding: 0 10rpx;
+  margin-right: 12rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #fff;
+  background: #e74c3c;
+  border-radius: 18rpx;
+}

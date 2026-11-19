@@ -139,6 +139,17 @@ exports.main = async () => {
     const isAdmin = !!disciple && disciple.role === 'admin';
     const canManage = isMaster || isAdmin;
 
+    // 待审批的成绩申请数（管理端红点）
+    let pendingRequestCount = 0;
+    if (canManage) {
+      try {
+        const reqCount = await db.collection('disciple_task_requests').where({ status: 'pending' }).count();
+        pendingRequestCount = reqCount.total;
+      } catch (err) {
+        pendingRequestCount = 0;
+      }
+    }
+
     // 5. 只有可管理人才能看待审批（走云函数，不依赖集合权限）
     let pendingApplications = [];
     if (canManage) {
@@ -230,6 +241,7 @@ exports.main = async () => {
       hasMaster: !!master,
       canClaimMaster: !master,
       activeTasks,
+      pendingRequestCount,
       pendingApplications
     };
   } catch (err) {

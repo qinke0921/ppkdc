@@ -15,6 +15,7 @@ Page({
     canManage: false,
     isMaster: false,
     pendingApplications: [],
+    pendingRequestCount: 0,
     activeTasks: [],
     lineOptions: util.DISCIPLE_LINES
   },
@@ -65,6 +66,7 @@ Page({
         canManage: true,
         isMaster: !!r.isMaster,
         pendingApplications: pending,
+        pendingRequestCount: r.pendingRequestCount || 0,
         activeTasks: (r.activeTasks || []).map((t) => {
           t.rangeText = fmtRange(t.startAt, t.endAt);
           return t;
@@ -137,6 +139,10 @@ Page({
 
   goMembers() {
     wx.navigateTo({ url: '/pages/disciples/members/members' });
+  },
+
+  goRequests() {
+    wx.navigateTo({ url: '/pages/disciples/admin/requests/requests' });
   },
 
   goPublish() {

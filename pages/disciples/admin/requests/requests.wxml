@@ -1,0 +1,40 @@
+<!--pages/disciples/admin/requests/requests.wxml-->
+<view class="page">
+  <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
+
+  <block wx:else>
+    <view class="head">
+      <text class="head-title">待审批 {{total}} 条</text>
+      <text class="head-hint">通过后写入成绩，同日期会覆盖原记录</text>
+    </view>
+
+    <view class="card" wx:for="{{list}}" wx:key="requestId">
+      <view class="top">
+        <text class="name">{{item.gameName}}</text>
+        <text class="map">{{item.mapName}}</text>
+      </view>
+
+      <view class="row">
+        <text class="k">日期</text>
+        <text class="v">{{item.recordDate || '未指定'}}</text>
+      </view>
+      <view class="row">
+        <text class="k">申请成绩</text>
+        <text class="v strong">{{item.scoreText}}</text>
+      </view>
+      <view class="row" wx:if="{{item.currentText}}">
+        <text class="k">库中现有</text>
+        <text class="v muted">{{item.currentText}}（通过后覆盖）</text>
+      </view>
+
+      <view class="actions">
+        <view class="btn reject" catchtap="review" data-id="{{item.requestId}}" data-approve="0">拒绝</view>
+        <view class="btn approve" catchtap="review" data-id="{{item.requestId}}" data-approve="1">通过</view>
+      </view>
+    </view>
+
+    <view class="empty-box" wx:if="{{list.length === 0}}">
+      <text>暂无待审批的成绩申请</text>
+    </view>
+  </block>
+</view>

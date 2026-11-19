@@ -65,6 +65,16 @@
 
     <!-- 其它入口 -->
     <view class="section">
+      <view class="entry" bindtap="goRequests">
+        <text class="entry-icon">📝</text>
+        <view class="entry-body">
+          <text class="entry-text">成绩申请</text>
+          <text class="entry-sub">徒弟提交的成绩，通过后才入库</text>
+        </view>
+        <view class="entry-badge" wx:if="{{pendingRequestCount > 0}}">{{pendingRequestCount}}</view>
+        <text class="arrow">›</text>
+      </view>
+
       <view class="entry" bindtap="goPublish">
         <text class="entry-icon">➕</text>
         <view class="entry-body">

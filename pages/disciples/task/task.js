@@ -40,6 +40,18 @@ Page({
     showLineTable: false, // 分线表默认收起
     showRecords: false,   // 我的记录默认收起
 
+    // 成绩申请
+    showApply: false,
+    applyDate: '',
+    applyScore: '',
+    submitting: false,
+    myRequests: [],
+    today: (function () {
+      const d = new Date();
+      const pad = (n) => (n < 10 ? '0' + n : String(n));
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    })(),
+
     // 某人成绩弹层
     showMember: false,
     memberDetail: null,
@@ -99,6 +111,7 @@ Page({
         task,
         me: r.me || null,
         myRecords: r.myRecords || [],
+        myRequests: r.myRequests || [],
         board,
         boardDone,
         boardUndone,
@@ -273,6 +286,74 @@ Page({
 
   closeMember() {
     this.setData({ showMember: false });
+  },
+
+  /* ---------------- 成绩申请 ---------------- */
+
+  openApply() {
+    if (this.data.settled) {
+      wx.showToast({ title: '任务已结束，无法申请', icon: 'none' });
+      return;
+    }
+    this.setData({ showApply: true, applyDate: this.data.today, applyScore: '' });
+  },
+
+  closeApply() {
+    this.setData({ showApply: false, applyScore: '' });
+  },
+
+  onApplyDate(e) {
+    this.setData({ applyDate: e.detail.value });
+  },
+
+  clearApplyDate() {
+    this.setData({ applyDate: '' });
+  },
+
+  onApplyScore(e) {
+    this.setData({ applyScore: e.detail.value });
+  },
+
+  async submitApply() {
+    const text = String(this.data.applyScore || '').trim();
+    if (!text) {
+      wx.showToast({ title: '请填写成绩', icon: 'none' });
+      return;
+    }
+    if (isNaN(util.timeToMs(text))) {
+      wx.showToast({ title: '成绩格式不合法：' + text, icon: 'none' });
+      return;
+    }
+
+    this.setData({ submitting: true });
+    wx.showLoading({ title: '提交中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'submitTaskScoreRequest',
+        data: {
+          taskId: this.data.taskId,
+          scoreText: text,
+          recordDate: this.data.applyDate || ''
+        }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+      this.setData({ submitting: false });
+
+      if (!r.success) {
+        wx.showToast({ title: r.error || '提交失败', icon: 'none' });
+        return;
+      }
+
+      wx.showToast({ title: r.updated ? '申请已更新' : '申请已提交', icon: 'success' });
+      this.setData({ showApply: false, applyScore: '' });
+      this.load(true);
+    } catch (err) {
+      console.error('提交成绩申请失败', err);
+      wx.hideLoading();
+      this.setData({ submitting: false });
+      wx.showToast({ title: '提交失败，请检查云函数', icon: 'none' });
+    }
   },
 
   /* ---------------- 管理操作 ---------------- */
