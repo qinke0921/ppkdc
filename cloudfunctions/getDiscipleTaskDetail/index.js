@@ -329,6 +329,17 @@ exports.main = async (event) => {
       myRequests = [];
     }
 
+    // 我是否已反馈该任务的视频失效
+    let myReported = false;
+    try {
+      const rep = await db.collection('disciple_task_reports')
+        .where({ taskId: payload.taskId, _openid: OPENID, status: 'pending' })
+        .get();
+      myReported = !!(rep.data && rep.data.length);
+    } catch (err) {
+      myReported = false;
+    }
+
     const myLine = normalizeLine(caller ? caller.masterLine : '');
     const j2 = judge(mine ? mine.bestMs : null, task.lineTable, caller ? caller.masterLine : '');
     const settled = task.status === 'closed';
@@ -361,6 +372,7 @@ exports.main = async (event) => {
         recordedAt: r.recordedAt || null
       })),
       myRequests,
+      myReported,
       board
     };
   } catch (err) {

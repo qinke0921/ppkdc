@@ -16,6 +16,7 @@ Page({
     isMaster: false,
     pendingApplications: [],
     pendingRequestCount: 0,
+    pendingReportCount: 0,
     pendingTotal: 0,
     activeTasks: [],
     lineOptions: util.DISCIPLE_LINES
@@ -74,7 +75,7 @@ Page({
         }
       }
 
-      const totalPending = pending.length + (requestCount || 0);
+      const totalPending = pending.length + (requestCount || 0) + (r.pendingReportCount || 0);
 
       this.setData({
         loading: false,
@@ -82,6 +83,7 @@ Page({
         isMaster: !!r.isMaster,
         pendingApplications: pending,
         pendingRequestCount: requestCount || 0,
+        pendingReportCount: r.pendingReportCount || 0,
         pendingTotal: totalPending,
         activeTasks: (r.activeTasks || []).map((t) => {
           t.rangeText = fmtRange(t.startAt, t.endAt);
@@ -169,6 +171,10 @@ Page({
 
   goMembers() {
     wx.navigateTo({ url: '/pages/disciples/members/members' });
+  },
+
+  goReports() {
+    wx.navigateTo({ url: '/pages/disciples/admin/reports/reports' });
   },
 
   goRequests() {

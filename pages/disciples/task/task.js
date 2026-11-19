@@ -61,6 +61,12 @@ Page({
     videoNote: '',
     videoPlatform: '',
 
+    // 视频反馈
+    myReported: false,
+    showReport: false,
+    reportNote: '',
+    reporting: false,
+
     // 某人成绩弹层
     showMember: false,
     memberDetail: null,
@@ -121,6 +127,7 @@ Page({
         me: r.me || null,
         myRecords: r.myRecords || [],
         myRequests: r.myRequests || [],
+        myReported: !!r.myReported,
         board,
         boardDone,
         boardUndone,
@@ -331,6 +338,49 @@ Page({
       console.error('保存视频失败', err);
       wx.hideLoading();
       wx.showToast({ title: '保存失败，请检查云函数', icon: 'none' });
+    }
+  },
+
+  /* ---------------- 视频失效反馈 ---------------- */
+
+  openReport() {
+    this.setData({ showReport: true, reportNote: '' });
+  },
+
+  closeReport() {
+    this.setData({ showReport: false });
+  },
+
+  onReportNote(e) {
+    this.setData({ reportNote: e.detail.value });
+  },
+
+  async submitReport() {
+    if (this.data.reporting) return;
+
+    this.setData({ reporting: true });
+    wx.showLoading({ title: '提交中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'reportTaskVideo',
+        data: { taskId: this.data.taskId, note: this.data.reportNote }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+      this.setData({ reporting: false });
+
+      if (!r.success) {
+        wx.showToast({ title: r.error || '提交失败', icon: 'none' });
+        return;
+      }
+
+      wx.showToast({ title: r.duplicate ? '已反馈过' : '已反馈给管理', icon: 'success' });
+      this.setData({ showReport: false, myReported: true });
+    } catch (err) {
+      console.error('反馈视频失败', err);
+      wx.hideLoading();
+      this.setData({ reporting: false });
+      wx.showToast({ title: '提交失败，请检查云函数', icon: 'none' });
     }
   },
 

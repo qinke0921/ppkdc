@@ -33,6 +33,8 @@
       <text class="video-hint">微信内不能直接打开网盘链接：点一下复制，再到网盘 App 或浏览器粘贴打开</text>
 
       <view class="video-edit" wx:if="{{canManage}}" catchtap="openVideoEdit">修改视频</view>
+      <view class="video-report" wx:elif="{{!myReported}}" catchtap="openReport">视频打不开？点此反馈给管理</view>
+      <view class="video-report done" wx:else>已反馈，等待管理员处理</view>
     </view>
 
     <view class="video-add" wx:elif="{{canManage}}" bindtap="openVideoEdit">📺 添加视频讲解</view>
@@ -103,7 +105,23 @@
       <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，可点下方「申请录入成绩」提交</text></view>
     </view>
 
-    <!-- 修改视频讲解 -->
+    <!-- 反馈视频失效 -->
+  <view class="modal-mask" wx:if="{{showReport}}" bindtap="closeReport">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">反馈视频失效</view>
+      <view class="form-item">
+        <text class="label">说明（选填）</text>
+        <input class="input" placeholder="例如：提示分享已过期" value="{{reportNote}}" bindinput="onReportNote"/>
+      </view>
+      <view class="hint-line">管理员会看到这条反馈，更新视频后自动标记为已处理</view>
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="closeReport">取消</view>
+        <view class="btn confirm {{reporting ? 'disabled' : ''}}" bindtap="submitReport">提交反馈</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 修改视频讲解 -->
   <view class="modal-mask" wx:if="{{showVideoEdit}}" bindtap="closeVideoEdit">
     <view class="modal" catchtap="stopPropagation">
       <view class="modal-title">📺 视频讲解</view>

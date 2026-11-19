@@ -13,6 +13,7 @@
     "pages/disciples/admin/scores/scores",
     "pages/disciples/admin/history/history",
     "pages/disciples/admin/requests/requests",
+    "pages/disciples/admin/reports/reports",
     "pages/disciples/task/task",
     "pages/disciples/history/history",
     "pages/competition/competition",

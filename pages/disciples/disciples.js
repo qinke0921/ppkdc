@@ -129,7 +129,9 @@ Page({
         }
       }
 
-      const pendingTotal = ((r.pendingApplications || []).length) + (pendingRequestCount || 0);
+      const pendingTotal = ((r.pendingApplications || []).length)
+        + (pendingRequestCount || 0)
+        + (r.pendingReportCount || 0);
 
       this.setData({
         loading: false,

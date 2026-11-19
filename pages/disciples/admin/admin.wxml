@@ -9,7 +9,7 @@
     <!-- 待办概览：红点看不清时也能看到数字 -->
     <view class="overview">
       <text class="overview-title">待办 {{pendingTotal}} 项</text>
-      <text class="overview-sub">拜师申请 {{pendingApplications.length}} · 成绩申请 {{pendingRequestCount}}</text>
+      <text class="overview-sub">拜师 {{pendingApplications.length}} · 成绩 {{pendingRequestCount}} · 视频 {{pendingReportCount}}</text>
     </view>
 
     <!-- 待审批 -->
@@ -74,6 +74,16 @@
 
     <!-- 其它入口 -->
     <view class="section">
+      <view class="entry" bindtap="goReports">
+        <text class="entry-icon">⚠️</text>
+        <view class="entry-body">
+          <text class="entry-text">视频失效反馈</text>
+          <text class="entry-sub">徒弟反馈网盘链接打不开</text>
+        </view>
+        <view class="entry-badge" wx:if="{{pendingReportCount > 0}}">{{pendingReportCount}}</view>
+        <text class="arrow">›</text>
+      </view>
+
       <view class="entry" bindtap="goRequests">
         <text class="entry-icon">📝</text>
         <view class="entry-body">

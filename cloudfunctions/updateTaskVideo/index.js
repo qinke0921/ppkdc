@@ -288,6 +288,15 @@ exports.main = async (event) => {
       }
     });
 
+    // 更新了视频，自动把该任务的失效反馈标记为已处理
+    try {
+      await db.collection('disciple_task_reports').where({ taskId: payload.taskId, status: 'pending' }).update({
+        data: { status: 'resolved', resolvedAt: Date.now(), resolvedBy: OPENID }
+      });
+    } catch (err) {
+      // 集合未创建时忽略
+    }
+
     return { success: true };
   } catch (err) {
     if (isMissingCollection(err)) return missingErr();

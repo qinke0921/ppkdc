@@ -1,0 +1,9 @@
+{
+  "name": "reportTaskVideo",
+  "version": "1.0.0",
+  "description": "主演徒弟：反馈视频失效",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

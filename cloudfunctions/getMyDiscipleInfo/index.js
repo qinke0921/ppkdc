@@ -150,6 +150,17 @@ exports.main = async () => {
       }
     }
 
+    // 待处理的视频失效反馈
+    let pendingReportCount = 0;
+    if (canManage) {
+      try {
+        const repCount = await db.collection('disciple_task_reports').where({ status: 'pending' }).count();
+        pendingReportCount = repCount.total;
+      } catch (err) {
+        pendingReportCount = 0;
+      }
+    }
+
     // 5. 只有可管理人才能看待审批（走云函数，不依赖集合权限）
     let pendingApplications = [];
     if (canManage) {
@@ -242,6 +253,7 @@ exports.main = async () => {
       canClaimMaster: !master,
       activeTasks,
       pendingRequestCount,
+      pendingReportCount,
       pendingApplications
     };
   } catch (err) {

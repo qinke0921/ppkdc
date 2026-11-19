@@ -1,0 +1,9 @@
+{
+  "name": "listTaskReports",
+  "version": "1.0.0",
+  "description": "主演徒弟：待处理反馈列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
