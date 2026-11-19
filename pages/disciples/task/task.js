@@ -243,7 +243,14 @@ Page({
     if (!url) return;
     wx.setClipboardData({
       data: url,
-      success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+      success: () => {
+        wx.showModal({
+          title: '链接已复制',
+          content: '微信内不能直接打开网盘链接。请打开网盘 App 或浏览器，粘贴后即可查看。',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      }
     });
   },
 
