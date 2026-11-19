@@ -35,8 +35,8 @@
       <view class="video-edit" wx:if="{{canManage}}" catchtap="openVideoEdit">修改视频</view>
     </view>
 
-    <!-- 视频失效反馈：仅徒弟可见，管理员直接改视频 -->
-    <view class="report-bar" wx:if="{{task.videoUrl && !canManage}}">
+    <!-- 视频失效反馈：所有人可见（含管理，便于自测） -->
+    <view class="report-bar" wx:if="{{task.videoUrl}}">
       <view class="report-btn" wx:if="{{!myReported}}" bindtap="openReport">⚠️ 视频打不开？反馈给管理</view>
       <view class="report-done" wx:else>✔ 已反馈，等待管理员处理</view>
     </view>
