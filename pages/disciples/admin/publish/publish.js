@@ -1,6 +1,7 @@
 // pages/disciples/admin/publish/publish.js
 // 发布任务：选地图 → 自动带出 7 档分线 → 调整时间与分线 → 发布
 const util = require('../../../../utils/disciple');
+const share = require('../../../../utils/share');
 
 const TASK_LINES = ['国服记录', '强主', '主力', '一线', '二线', '三线', '娱乐'];
 
@@ -26,7 +27,14 @@ Page({
     lineRows: TASK_LINES.map((level) => ({ level, timeText: '' })),
     startDate: todayStr(0),
     endDate: todayStr(6),
-    saving: false
+    saving: false,
+
+    // 视频讲解（网盘分享）
+    shareText: '',
+    videoUrl: '',
+    videoCode: '',
+    videoNote: '',
+    videoPlatform: ''
   },
 
   onLoad() {
@@ -76,6 +84,25 @@ Page({
     this.setData({ ['lineRows[' + idx + '].timeText']: e.detail.value });
   },
 
+  // 粘贴网盘分享文本 → 自动识别链接 / 提取码 / 标题
+  onShareTextInput(e) {
+    const text = e.detail.value;
+    const parsed = share.parseShareText(text);
+    this.setData({
+      shareText: text,
+      videoUrl: parsed.url || '',
+      videoCode: parsed.code || '',
+      videoNote: parsed.title || '',
+      videoPlatform: parsed.platform || ''
+    });
+  },
+
+  // 允许手动修正识别结果
+  onVideoInput(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({ [field]: e.detail.value });
+  },
+
   onStartChange(e) {
     this.setData({ startDate: e.detail.value });
   },
@@ -122,6 +149,11 @@ Page({
           startAt,
           endAt,
           lineTable,
+          videoUrl: this.data.videoUrl.trim(),
+          videoCode: this.data.videoCode.trim(),
+          videoNote: this.data.videoNote.trim(),
+          videoRaw: this.data.shareText.trim(),
+          videoPlatform: this.data.videoPlatform,
           status: 'published'
         }
       });

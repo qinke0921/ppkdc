@@ -570,3 +570,111 @@
 .btn.disabled {
   opacity: 0.6;
 }
+
+/* 视频讲解 */
+.video-card {
+  margin-top: 20rpx;
+  padding: 24rpx 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  border-left: 6rpx solid #FDB927;
+}
+
+.video-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.video-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.video-platform {
+  font-size: 21rpx;
+  color: #7a5200;
+  background: rgba(253, 185, 39, 0.25);
+  padding: 4rpx 14rpx;
+  border-radius: 14rpx;
+}
+
+.video-note {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+
+.video-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.video-url {
+  flex: 1;
+  font-size: 22rpx;
+  color: #552583;
+  word-break: break-all;
+  margin-right: 16rpx;
+}
+
+.video-code {
+  flex: 1;
+  font-size: 24rpx;
+  color: #333;
+  letter-spacing: 1rpx;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+  border-radius: 20rpx;
+}
+
+.video-hint {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 20rpx;
+  color: #bbb;
+  line-height: 1.6;
+}
+
+.video-edit {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid #f7f7f7;
+  text-align: right;
+  font-size: 23rpx;
+  color: #552583;
+}
+
+.video-add {
+  margin-top: 20rpx;
+  padding: 26rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #552583;
+  background: #fff;
+  border: 2rpx dashed rgba(85, 37, 131, 0.35);
+  border-radius: 16rpx;
+}
+
+/* 视频编辑弹窗的文本域 */
+.textarea {
+  width: 100%;
+  height: 150rpx;
+  padding: 18rpx 20rpx;
+  font-size: 24rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  border-radius: 10rpx;
+}

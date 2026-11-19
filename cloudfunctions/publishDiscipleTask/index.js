@@ -292,6 +292,16 @@ exports.main = async (event) => {
       updatedAt: Date.now()
     };
 
+    if (payload.videoUrl) {
+      doc.videoType = 'link';
+      doc.videoUrl = String(payload.videoUrl).trim();
+      doc.videoCode = String(payload.videoCode || '').trim();
+      doc.videoNote = String(payload.videoNote || '').trim();
+      doc.videoRaw = String(payload.videoRaw || '').trim();
+      doc.videoPlatform = String(payload.videoPlatform || '').trim();
+      doc.videoUpdatedAt = Date.now();
+    }
+
     if (payload.taskId) {
       await db.collection('disciple_tasks').doc(payload.taskId).update({ data: doc });
       return { success: true, taskId: payload.taskId, updated: true };

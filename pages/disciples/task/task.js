@@ -1,6 +1,7 @@
 // pages/disciples/task/task.js
 // 任务详情：分线表、我的目标与判定、记录、进步曲线、全员榜单（可点开某人看成绩）
 const util = require('../../../utils/disciple');
+const share = require('../../../utils/share');
 
 const STATUS_TEXT = {
   over: '超线完成',
@@ -51,6 +52,14 @@ Page({
       const pad = (n) => (n < 10 ? '0' + n : String(n));
       return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
     })(),
+
+    // 视频讲解
+    showVideoEdit: false,
+    videoText: '',
+    videoUrl: '',
+    videoCode: '',
+    videoNote: '',
+    videoPlatform: '',
 
     // 某人成绩弹层
     showMember: false,
@@ -225,6 +234,97 @@ Page({
           }
         });
       });
+  },
+
+  /* ---------------- 视频讲解 ---------------- */
+
+  copyVideoLink() {
+    const url = this.data.task && this.data.task.videoUrl;
+    if (!url) return;
+    wx.setClipboardData({
+      data: url,
+      success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+    });
+  },
+
+  copyVideoCode() {
+    const code = this.data.task && this.data.task.videoCode;
+    if (!code) return;
+    wx.setClipboardData({
+      data: code,
+      success: () => wx.showToast({ title: '提取码已复制', icon: 'success' })
+    });
+  },
+
+  openVideoEdit() {
+    const t = this.data.task || {};
+    this.setData({
+      showVideoEdit: true,
+      videoText: t.videoRaw || '',
+      videoUrl: t.videoUrl || '',
+      videoCode: t.videoCode || '',
+      videoNote: t.videoNote || '',
+      videoPlatform: t.videoPlatform || ''
+    });
+  },
+
+  closeVideoEdit() {
+    this.setData({ showVideoEdit: false });
+  },
+
+  onVideoTextInput(e) {
+    const text = e.detail.value;
+    const parsed = share.parseShareText(text);
+    this.setData({
+      videoText: text,
+      videoUrl: parsed.url || '',
+      videoCode: parsed.code || '',
+      videoNote: parsed.title || '',
+      videoPlatform: parsed.platform || ''
+    });
+  },
+
+  onVideoFieldInput(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({ [field]: e.detail.value });
+  },
+
+  async saveVideo() {
+    const url = String(this.data.videoUrl || '').trim();
+    if (!url) {
+      wx.showToast({ title: '请先粘贴分享内容或填写链接', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '保存中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'updateTaskVideo',
+        data: {
+          taskId: this.data.taskId,
+          videoUrl: url,
+          videoCode: this.data.videoCode,
+          videoNote: this.data.videoNote,
+          videoRaw: this.data.videoText,
+          videoPlatform: this.data.videoPlatform
+        }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+
+      if (!r.success) {
+        wx.showToast({ title: r.error || '保存失败', icon: 'none' });
+        return;
+      }
+
+      wx.showToast({ title: '已保存', icon: 'success' });
+      this.setData({ showVideoEdit: false });
+      this.load(true);
+    } catch (err) {
+      console.error('保存视频失败', err);
+      wx.hideLoading();
+      wx.showToast({ title: '保存失败，请检查云函数', icon: 'none' });
+    }
   },
 
   /* ---------------- 折叠区 ---------------- */

@@ -115,6 +115,11 @@
   startAt, endAt,                    // 时间戳，可重叠
   overRule: 'oneAbove',
   status: 'draft' | 'published' | 'closed',
+  // 视频讲解（网盘分享，可选）
+  videoType: 'link',
+  videoUrl, videoCode, videoNote, videoPlatform,
+  videoRaw,                 // 原始粘贴文本，便于追溯
+  videoUpdatedAt,
   imported: false,                   // 历史导入标记
   createdBy, createdAt, updatedAt
 }

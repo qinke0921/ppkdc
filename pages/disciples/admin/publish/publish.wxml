@@ -44,6 +44,35 @@
       </view>
     </view>
 
+    <view class="section-head">
+      <text class="section-title">视频讲解（选填）</text>
+      <text class="section-sub">粘贴网盘分享内容自动识别</text>
+    </view>
+
+    <view class="card">
+      <view class="form-block">
+        <text class="k block">粘贴分享内容</text>
+        <textarea class="textarea" placeholder="从网盘复制整段分享内容粘贴进来，例如：我用夸克网盘给你分享了「…」…提取码：tdnG" value="{{shareText}}" bindinput="onShareTextInput"/>
+      </view>
+
+      <view class="parsed" wx:if="{{videoUrl}}">
+        <text class="parsed-line" wx:if="{{videoPlatform}}">✅ 已识别：{{videoPlatform}}</text>
+        <text class="parsed-line">🔗 {{videoUrl}}</text>
+        <text class="parsed-line" wx:if="{{videoCode}}">🔑 提取码：{{videoCode}}</text>
+        <text class="parsed-line" wx:if="{{videoNote}}">🏷️ {{videoNote}}</text>
+      </view>
+
+      <view class="row">
+        <text class="k">链接</text>
+        <input class="edit-input" placeholder="自动识别，可手改" value="{{videoUrl}}" data-field="videoUrl" bindinput="onVideoInput"/>
+      </view>
+
+      <view class="row">
+        <text class="k">提取码</text>
+        <input class="edit-input" placeholder="选填，可手改" value="{{videoCode}}" data-field="videoCode" bindinput="onVideoInput"/>
+      </view>
+    </view>
+
     <view class="actions">
       <view class="btn confirm {{saving ? 'disabled' : ''}}" bindtap="submit">发布任务</view>
     </view>

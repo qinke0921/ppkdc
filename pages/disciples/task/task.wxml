@@ -12,6 +12,31 @@
       <text class="hero-range">{{dateRange}}</text>
     </view>
 
+    <!-- 视频讲解 -->
+    <view class="video-card" wx:if="{{task.videoUrl}}">
+      <view class="video-head">
+        <text class="video-title">📺 视频讲解</text>
+        <text class="video-platform">{{task.videoPlatform || '网盘'}}</text>
+      </view>
+      <text class="video-note" wx:if="{{task.videoNote}}">{{task.videoNote}}</text>
+
+      <view class="video-row">
+        <text class="video-url">{{task.videoUrl}}</text>
+        <view class="copy-btn" catchtap="copyVideoLink">复制链接</view>
+      </view>
+
+      <view class="video-row" wx:if="{{task.videoCode}}">
+        <text class="video-code">提取码 {{task.videoCode}}</text>
+        <view class="copy-btn" catchtap="copyVideoCode">复制提取码</view>
+      </view>
+
+      <text class="video-hint">微信内可能打不开网盘链接，请复制到浏览器或网盘 App 中查看</text>
+
+      <view class="video-edit" wx:if="{{canManage}}" catchtap="openVideoEdit">修改视频</view>
+    </view>
+
+    <view class="video-add" wx:elif="{{canManage}}" bindtap="openVideoEdit">📺 添加视频讲解</view>
+
     <!-- 我的概览 -->
     <view class="card">
       <view class="row">
@@ -78,7 +103,43 @@
       <view class="empty-line" wx:if="{{myRecords.length === 0}}"><text>暂无记录，可点下方「申请录入成绩」提交</text></view>
     </view>
 
-    <!-- 申请录入成绩 -->
+    <!-- 修改视频讲解 -->
+  <view class="modal-mask" wx:if="{{showVideoEdit}}" bindtap="closeVideoEdit">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">📺 视频讲解</view>
+
+      <scroll-view scroll-y="true" class="modal-body">
+        <view class="form-item">
+          <text class="label">粘贴网盘分享内容</text>
+          <textarea class="textarea" placeholder="从网盘复制整段内容粘贴，自动识别链接和提取码" value="{{videoText}}" bindinput="onVideoTextInput"/>
+        </view>
+
+        <view class="hint-line" wx:if="{{videoPlatform}}">已识别：{{videoPlatform}}</view>
+
+        <view class="form-item">
+          <text class="label">链接</text>
+          <input class="input" value="{{videoUrl}}" data-field="videoUrl" bindinput="onVideoFieldInput" placeholder="自动识别，可手改"/>
+        </view>
+
+        <view class="form-item">
+          <text class="label">提取码</text>
+          <input class="input" value="{{videoCode}}" data-field="videoCode" bindinput="onVideoFieldInput" placeholder="选填，可手改"/>
+        </view>
+
+        <view class="form-item">
+          <text class="label">说明</text>
+          <input class="input" value="{{videoNote}}" data-field="videoNote" bindinput="onVideoFieldInput" placeholder="例如：第47期 跑法讲解"/>
+        </view>
+      </scroll-view>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="closeVideoEdit">取消</view>
+        <view class="btn confirm" bindtap="saveVideo">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请录入成绩 -->
     <view class="apply-row" wx:if="{{!settled}}">
       <view class="apply-btn" bindtap="openApply">📝 申请录入成绩</view>
       <text class="apply-hint">提交后需师傅或管理员审批，通过才写入成绩</text>

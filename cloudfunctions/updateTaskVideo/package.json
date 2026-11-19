@@ -1,0 +1,9 @@
+{
+  "name": "updateTaskVideo",
+  "version": "1.0.0",
+  "description": "主演徒弟：更新任务视频讲解",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
