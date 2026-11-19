@@ -33,8 +33,12 @@
       <text class="video-hint">微信内不能直接打开网盘链接：点一下复制，再到网盘 App 或浏览器粘贴打开</text>
 
       <view class="video-edit" wx:if="{{canManage}}" catchtap="openVideoEdit">修改视频</view>
-      <view class="video-report" wx:elif="{{!myReported}}" catchtap="openReport">视频打不开？点此反馈给管理</view>
-      <view class="video-report done" wx:else>已反馈，等待管理员处理</view>
+    </view>
+
+    <!-- 视频失效反馈：仅徒弟可见，管理员直接改视频 -->
+    <view class="report-bar" wx:if="{{task.videoUrl && !canManage}}">
+      <view class="report-btn" wx:if="{{!myReported}}" bindtap="openReport">⚠️ 视频打不开？反馈给管理</view>
+      <view class="report-done" wx:else>✔ 已反馈，等待管理员处理</view>
     </view>
 
     <view class="video-add" wx:elif="{{canManage}}" bindtap="openVideoEdit">📺 添加视频讲解</view>

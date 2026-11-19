@@ -680,15 +680,25 @@
 }
 
 /* 视频失效反馈 */
-.video-report {
-  margin-top: 12rpx;
-  text-align: right;
-  font-size: 22rpx;
-  color: #c0392b;
-  text-decoration: underline;
+.report-bar {
+  margin-top: 16rpx;
 }
 
-.video-report.done {
+.report-btn {
+  padding: 22rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #c0392b;
+  background: #fff;
+  border: 2rpx dashed rgba(192, 57, 43, 0.4);
+  border-radius: 14rpx;
+}
+
+.report-done {
+  padding: 18rpx;
+  text-align: center;
+  font-size: 24rpx;
   color: #999;
-  text-decoration: none;
+  background: #fff;
+  border-radius: 14rpx;
 }
