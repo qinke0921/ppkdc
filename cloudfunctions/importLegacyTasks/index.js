@@ -256,7 +256,14 @@ async function settleTask(taskId, onlyOpenids, operator) {
 // ⚠️ 本函数【无鉴权】：云开发控制台的「云端测试」没有登录态，
 //    getWXContext().OPENID 为空，基于身份的判断永远无法通过。
 //    仅供开发期一次性使用，导入完成后请立即在控制台删除本云函数。
-const legacyData = require('./data.json');
+// data.json 未随函数上传时，require 会在冷启动阶段直接抛错，
+// 控制台只会显示 -3 system error。这里改成可读的错误返回。
+let legacyData = null;
+try {
+  legacyData = require('./data.json');
+} catch (err) {
+  legacyData = null;
+}
 
 function nameKey(s) {
   return String(s || '').trim().replace(/\s+/g, '');
@@ -269,6 +276,13 @@ exports.main = async (event) => {
     const cursor = Math.max(0, Number(payload.cursor) || 0);
     const batch = Math.min(50, Math.max(1, Number(payload.batch) || 5));
     const dryRun = payload.dryRun === true;
+
+    if (!legacyData) {
+      return {
+        success: false,
+        error: 'data.json 没有随函数上传：请在开发者工具里对 importLegacyTasks 重新执行「上传并部署：云端安装依赖」'
+      };
+    }
 
     // data.json 是期数数组；兼容 { weeks: [...] } 结构
     const weeks = Array.isArray(legacyData) ? legacyData : (legacyData.weeks || []);
