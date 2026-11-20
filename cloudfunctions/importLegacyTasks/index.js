@@ -273,6 +273,15 @@ exports.main = async (event) => {
   const payload = event || {};
 
   try {
+    // 可选：先清空上一次导入的历史数据（只删 legacy 来源，不动新录入的成绩）
+    let resetDone = false;
+    if (payload.reset === true) {
+      await db.collection('disciple_task_records').where({ source: 'legacy' }).remove();
+      await db.collection('disciple_task_results').where({ computedBy: 'legacy-import' }).remove();
+      await db.collection('disciple_tasks').where({ imported: true }).remove();
+      resetDone = true;
+    }
+
     const cursor = Math.max(0, Number(payload.cursor) || 0);
     const batch = Math.min(50, Math.max(1, Number(payload.batch) || 5));
     const dryRun = payload.dryRun === true;
@@ -459,6 +468,7 @@ exports.main = async (event) => {
     return {
       success: true,
       dryRun,
+      reset: resetDone,
       nextCursor: cursor + slice.length,
       done: cursor + slice.length >= weeks.length,
       total: weeks.length,

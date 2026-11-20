@@ -229,7 +229,7 @@ disciples
 
 把《徒弟作业成绩记录.xlsx》的 47 期历史成绩导入平台，数据已清洗为 `legacy/import.json`（同时打包进 `cloudfunctions/importLegacyTasks/data.json`）。
 
-清洗结果：47 期、2261 条有效成绩（国服表）、19 条非法时间被跳过、726 行台服表跳过。
+清洗结果：47 期、2740 个成员行、3687 条有效成绩、24 条非法时间被跳过。
 
 **清洗规则**
 
@@ -250,6 +250,12 @@ disciples
 ```
 
 返回 `nextCursor` 后继续调用，直到 `done: true`；首次可加 `"dryRun": true` 只统计不写库。
+
+重复导入或修正解析后重跑，加 `"reset": true` 即可先清空上一次的历史数据（只删 `source: legacy` 的成绩与 `imported: true` 的任务，不影响新录入的数据）：
+
+```json
+{ "cursor": 0, "batch": 10, "reset": true }
+```
 
 > ⚠️ 该函数**无鉴权**（云端测试没有登录态，无法判断调用者身份），仅供开发期一次性使用。**导入完成后请立即在控制台删除 `importLegacyTasks`**，不要留在线上环境。
 
