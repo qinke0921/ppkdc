@@ -310,8 +310,16 @@ exports.main = async (event) => {
       // 幂等：已导入过的期直接跳过
       const exist = await db.collection('disciple_tasks').where({ legacyKey: week.legacyKey }).limit(1).get();
       if (exist.data && exist.data.length) {
-        stats.skippedTopics.push(week.weekLabel);
-        continue;
+        const prev = exist.data[0];
+        if (!prev.importing) {
+          // 已经完整导入过
+          stats.skippedTopics.push(week.weekLabel);
+          continue;
+        }
+        // 上次执行中断（超时等），清理半成品后重导
+        await db.collection('disciple_task_records').where({ taskId: prev._id }).remove();
+        await db.collection('disciple_task_results').where({ taskId: prev._id }).remove();
+        await db.collection('disciple_tasks').doc(prev._id).remove();
       }
 
       if (dryRun) {
@@ -336,7 +344,8 @@ exports.main = async (event) => {
         startAt: week.startAt,
         endAt: week.endAt,
         overRule: 'oneAbove',
-        status: 'closed',
+        status: 'draft',
+        importing: true,
         imported: true,
         sourceNote: '徒弟作业成绩记录.xlsx ' + week.weekLabel,
         createdBy: 'legacy-import',
@@ -421,7 +430,9 @@ exports.main = async (event) => {
         else summary.absent++;
       });
 
-      await db.collection('disciple_tasks').doc(taskId).update({ data: { summary } });
+      await db.collection('disciple_tasks').doc(taskId).update({
+        data: { summary, status: 'closed', importing: false, updatedAt: Date.now() }
+      });
       stats.weeks += 1;
     }
 

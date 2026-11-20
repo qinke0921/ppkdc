@@ -112,6 +112,15 @@
         <text class="arrow">›</text>
       </view>
 
+      <view class="entry" bindtap="goImport">
+        <text class="entry-icon">📥</text>
+        <view class="entry-body">
+          <text class="entry-text">导入历史数据</text>
+          <text class="entry-sub">把 Excel 的 47 期记录写入平台</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+
       <view class="entry" bindtap="goMembers">
         <text class="entry-icon">👥</text>
         <view class="entry-body">

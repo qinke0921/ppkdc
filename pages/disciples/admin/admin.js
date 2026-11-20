@@ -173,6 +173,10 @@ Page({
     wx.navigateTo({ url: '/pages/disciples/members/members' });
   },
 
+  goImport() {
+    wx.navigateTo({ url: '/pages/disciples/admin/import/import' });
+  },
+
   goReports() {
     wx.navigateTo({ url: '/pages/disciples/admin/reports/reports' });
   },

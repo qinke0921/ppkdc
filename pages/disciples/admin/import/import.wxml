@@ -1,0 +1,38 @@
+<!--pages/disciples/admin/import/import.wxml-->
+<view class="page">
+
+  <view class="card intro">
+    <text class="title">历史作业导入</text>
+    <text class="desc">把 47 期 Excel 历史成绩写入平台。每期会成为一条「已结算」任务；已导入的期自动跳过，中途中断也能续跑。</text>
+  </view>
+
+  <view class="card">
+    <view class="stat-row">
+      <view class="stat"><text class="num">47</text><text class="label">期</text></view>
+      <view class="stat"><text class="num">{{stats ? stats.members : '—'}}</text><text class="label">匹配成员</text></view>
+      <view class="stat"><text class="num">{{stats ? stats.records : '—'}}</text><text class="label">成绩条</text></view>
+    </view>
+    <text class="hint" wx:if="{{!stats}}">先点「检查匹配」，看看有多少能对上账号</text>
+  </view>
+
+  <view class="actions">
+    <view class="btn ghost {{checking ? 'disabled' : ''}}" bindtap="check">{{checking ? '检查中...' : '① 检查匹配'}}</view>
+    <view class="btn confirm {{importing ? 'disabled' : ''}}" bindtap="start">{{importing ? '导入中...' : '② 开始导入'}}</view>
+  </view>
+
+  <view class="progress" wx:if="{{progress}}">
+    <text>{{progress}}</text>
+  </view>
+
+  <view class="card" wx:if="{{unmatched.length > 0}}">
+    <text class="unmatched-title">匹配不到账号的 {{unmatched.length}} 人（不会导入）</text>
+    <view class="chips">
+      <text class="chip" wx:for="{{unmatched}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="tip">
+    <text>匹配规则：Excel 名字与徒弟的「游戏名 / 昵称」精确匹配。对不上的不会导入；改名后可重跑，已导入的期不会重复。</text>
+  </view>
+
+</view>
