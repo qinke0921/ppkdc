@@ -273,6 +273,20 @@ exports.main = async (event) => {
   const payload = event || {};
 
   try {
+    // 只查状态，不改数据：{ "statusOnly": true }
+    if (payload.statusOnly === true) {
+      const [taskCnt, recCnt, resCnt] = await Promise.all([
+        db.collection('disciple_tasks').where({ imported: true }).count(),
+        db.collection('disciple_task_records').where({ source: 'legacy' }).count(),
+        db.collection('disciple_task_results').where({ computedBy: 'legacy-import' }).count()
+      ]);
+      return {
+        success: true,
+        statusOnly: true,
+        status: { tasks: taskCnt.total, records: recCnt.total, results: resCnt.total }
+      };
+    }
+
     // 可选：只重导指定期次（按 legacyKey 精确清理）
     if (Array.isArray(payload.resetKeys) && payload.resetKeys.length) {
       for (const key of payload.resetKeys) {

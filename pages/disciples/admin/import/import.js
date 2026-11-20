@@ -102,7 +102,7 @@ Page({
 
       let r = null;
       let attempt = 0;
-      const MAX_RETRY = 4;
+      const MAX_RETRY = 2;
 
       while (attempt < MAX_RETRY) {
         try {
