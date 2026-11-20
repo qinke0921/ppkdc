@@ -388,13 +388,33 @@ exports.main = async (event) => {
           stats.unmatchedNames.push(m.name);
           continue;
         }
-        if (!m.records.length) continue;
 
         const valid = m.records.filter((r) => typeof r.ms === 'number' && r.ms > 0);
         stats.skippedRecords += m.records.length - valid.length;
-        if (!valid.length) continue;
 
+        // 匹配上的成员都要有判定：没交成绩的就是「逃课」
         stats.members += 1;
+
+        if (!valid.length) {
+          const member0 = roster.filter((x) => x._openid === openid)[0] || {};
+          const j0 = judge(null, week.lineTable, member0.masterLine);
+          results.push({
+            taskId,
+            _openid: openid,
+            gameName: m.name,
+            bestMs: null,
+            bestText: '',
+            targetLevel: j0.targetLevel,
+            targetMs: j0.targetMs,
+            status: 'absent',
+            recordCount: 0,
+            legacyK: m.legacyK || '',
+            computedAt: Date.now(),
+            computedBy: 'legacy-import'
+          });
+          continue;
+        }
+
         stats.records += valid.length;
 
         valid.forEach((r) => {
