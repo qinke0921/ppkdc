@@ -20,6 +20,10 @@
     <view class="btn confirm {{importing ? 'disabled' : ''}}" bindtap="start">{{importing ? '导入中...' : '② 开始导入'}}</view>
   </view>
 
+  <view class="actions">
+    <view class="btn danger {{resetting ? 'disabled' : ''}}" bindtap="resetAll">{{resetting ? '重置中...' : '③ 重置并重导前先清空'}}</view>
+  </view>
+
   <view class="progress" wx:if="{{progress}}">
     <text>{{progress}}</text>
   </view>

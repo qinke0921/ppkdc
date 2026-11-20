@@ -280,6 +280,11 @@ exports.main = async (event) => {
       await db.collection('disciple_task_results').where({ computedBy: 'legacy-import' }).remove();
       await db.collection('disciple_tasks').where({ imported: true }).remove();
       resetDone = true;
+
+      // 只重置、不导入：避免删除 + 大批写入挤在一次调用里超时
+      if (payload.resetOnly === true) {
+        return { success: true, reset: true, resetOnly: true, done: true, nextCursor: 0, total: 0, stats: null };
+      }
     }
 
     const cursor = Math.max(0, Number(payload.cursor) || 0);

@@ -131,3 +131,9 @@
   color: #c4bfd0;
   line-height: 1.7;
 }
+
+.btn.danger {
+  color: #c0392b;
+  background: #fff;
+  border: 2rpx solid rgba(192, 57, 43, 0.4);
+}
