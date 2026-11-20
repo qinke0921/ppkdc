@@ -75,3 +75,41 @@
   font-size: 26rpx;
   color: #bbb;
 }
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.filter-count {
+  font-size: 23rpx;
+  color: #999;
+}
+
+.filter-chip {
+  padding: 10rpx 22rpx;
+  font-size: 23rpx;
+  color: #552583;
+  background: #fff;
+  border-radius: 24rpx;
+}
+
+.filter-chip.on {
+  color: #fff;
+  background: #552583;
+}
+
+.card.no-result {
+  border-left: 6rpx solid #ececec;
+}
+
+.sub.muted {
+  color: #b8b8b8;
+}
+
+.status.absent {
+  color: #999;
+  background: #f2f2f2;
+}

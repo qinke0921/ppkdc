@@ -264,27 +264,32 @@ exports.main = async (event) => {
       return { success: false, error: '仅师傅或管理员可查看他人历史' };
     }
 
-    const results = await fetchAll('disciple_task_results', { _openid: targetOpenid });
-    const tasks = await fetchAll('disciple_tasks', { status: 'closed' });
-    const taskMap = {};
-    tasks.forEach((t) => { taskMap[t._id] = t; });
+    // 以「任务」为主：列出全部已结算任务，再挂上我的结果。
+    // 我没有记录（名字不在名单里 / 逃课）时也照样能看到这一期，并可进入看别人的成绩。
+    const [results, tasks] = await Promise.all([
+      fetchAll('disciple_task_results', { _openid: targetOpenid }),
+      fetchAll('disciple_tasks', { status: 'closed' })
+    ]);
 
-    const list = results
-      .filter((r) => taskMap[r.taskId])
-      .map((r) => {
-        const t = taskMap[r.taskId];
+    const resultMap = {};
+    results.forEach((r) => { resultMap[r.taskId] = r; });
+
+    const list = tasks
+      .map((t) => {
+        const r = resultMap[t._id] || null;
         return {
-          taskId: r.taskId,
+          taskId: t._id,
           mapName: t.mapName,
           title: t.title || t.mapName,
           startAt: t.startAt,
           endAt: t.endAt,
-          status: r.status,
-          statusText: STATUS_TEXT[r.status] || '',
-          bestText: r.bestText || '',
-          targetLevel: r.targetLevel || '',
-          targetText: formatMs(r.targetMs),
-          recordCount: r.recordCount || 0
+          hasResult: !!r,
+          status: r ? r.status : 'absent',
+          statusText: r ? (STATUS_TEXT[r.status] || '') : '无记录',
+          bestText: r ? (r.bestText || '') : '',
+          targetLevel: r ? (r.targetLevel || '') : '',
+          targetText: r ? formatMs(r.targetMs) : '',
+          recordCount: r ? (r.recordCount || 0) : 0
         };
       })
       .sort((a, b) => (b.endAt || 0) - (a.endAt || 0));

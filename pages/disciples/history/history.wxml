@@ -3,7 +3,14 @@
   <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
 
   <block wx:else>
-    <view class="card" wx:for="{{list}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
+    <view class="filter-bar">
+      <text class="filter-count">共 {{allList.length}} 期</text>
+      <view class="filter-chip {{onlyMine ? 'on' : ''}}" bindtap="toggleOnlyMine">
+        <text>{{onlyMine ? '只看有记录的' : '显示全部'}}</text>
+      </view>
+    </view>
+
+    <view class="card {{item.hasResult ? '' : 'no-result'}}" wx:for="{{list}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
       <view class="top">
         <text class="map">{{item.mapName}}</text>
         <text class="status {{item.status}}">{{item.statusText}}</text>
@@ -12,7 +19,8 @@
         <text class="range">{{item.rangeText}}</text>
         <text class="best">{{item.bestText || '无记录'}}</text>
       </view>
-      <view class="sub">目标 {{item.targetLevel}} {{item.targetText || '未设'}} · {{item.recordCount}} 条记录</view>
+      <view class="sub" wx:if="{{item.hasResult}}">目标 {{item.targetLevel}} {{item.targetText || '未设'}} · {{item.recordCount}} 条记录</view>
+      <view class="sub muted" wx:else>本期没有我的成绩，可点进去看别人的记录</view>
     </view>
 
     <view class="empty-box" wx:if="{{list.length === 0}}">

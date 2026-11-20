@@ -10,7 +10,9 @@ function fmtRange(startAt, endAt) {
 Page({
   data: {
     loading: true,
-    list: []
+    allList: [],
+    list: [],
+    onlyMine: false
   },
 
   onLoad() {
@@ -37,17 +39,29 @@ Page({
         return;
       }
 
-      const list = (r.list || []).map((t) => {
+      const allList = (r.list || []).map((t) => {
         t.rangeText = fmtRange(t.startAt, t.endAt);
         return t;
       });
 
-      this.setData({ loading: false, list });
+      this.setData({ loading: false, allList });
+      this.applyFilter();
     } catch (err) {
       console.error('加载历史失败', err);
       this.setData({ loading: false });
       wx.showToast({ title: '加载失败，请检查云函数', icon: 'none' });
     }
+  },
+
+  applyFilter() {
+    const list = this.data.onlyMine
+      ? this.data.allList.filter((t) => t.hasResult)
+      : this.data.allList;
+    this.setData({ list });
+  },
+
+  toggleOnlyMine() {
+    this.setData({ onlyMine: !this.data.onlyMine }, () => this.applyFilter());
   },
 
   goTask(e) {
