@@ -60,6 +60,23 @@
       </view>
     </view>
 
+    <!-- 演门公告 -->
+    <view class="notice" wx:if="{{announcement.content}}">
+      <view class="notice-left">
+        <text class="notice-label">演门公告</text>
+        <text class="notice-text">{{announcement.content}}</text>
+      </view>
+      <text class="notice-edit" wx:if="{{canManage}}" catchtap="openAnnounceEdit">✏️</text>
+    </view>
+
+    <view class="notice notice-empty" wx:elif="{{canManage}}" bindtap="openAnnounceEdit">
+      <view class="notice-left">
+        <text class="notice-label">演门公告</text>
+        <text class="notice-text muted">点此写一句话公告</text>
+      </view>
+      <text class="notice-edit">✏️</text>
+    </view>
+
     <!-- 进行中任务 -->
     <view class="section">
       <view class="section-head">
@@ -117,6 +134,21 @@
       </button>
     </view>
   </block>
+
+  <!-- 编辑演门公告 -->
+  <view class="modal-mask" wx:if="{{showAnnounce}}" bindtap="closeAnnounceEdit">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">演门公告</view>
+      <view class="form-item">
+        <text class="label">内容（最多 120 字，清空后公告会隐藏）</text>
+        <textarea class="textarea" maxlength="120" placeholder="例如：本周作业先看视频讲解，再录成绩" value="{{announceText}}" bindinput="onAnnounceInput"/>
+      </view>
+      <view class="modal-buttons">
+        <view class="btn cancel" bindtap="closeAnnounceEdit">取消</view>
+        <view class="btn confirm {{savingAnnounce ? 'disabled' : ''}}" bindtap="saveAnnounce">保存</view>
+      </view>
+    </view>
+  </view>
 
   <!-- 拜师申请弹窗 -->
   <view class="modal-mask" wx:if="{{showApplyModal}}" bindtap="hideApplyModal">

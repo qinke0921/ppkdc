@@ -20,6 +20,12 @@ Page({
     activeTasks: [],
     pendingTotal: 0,
 
+    // 演门公告
+    announcement: null,
+    showAnnounce: false,
+    announceText: '',
+    savingAnnounce: false,
+
     showApplyModal: false,
     applyForm: {
       nickname: '',
@@ -144,6 +150,7 @@ Page({
         discipleCount: r.discipleCount || 0,
         canClaimMaster: !!r.canClaimMaster,
         activeTasks: r.activeTasks || [],
+        announcement: r.announcement || null,
         pendingTotal
       });
 
@@ -154,6 +161,51 @@ Page({
       console.error('加载徒弟身份失败', err);
       this.setData({ loading: false });
       this.showError('加载失败，请检查云函数是否已部署');
+    }
+  },
+
+  /* ---------------- 演门公告 ---------------- */
+
+  openAnnounceEdit() {
+    const a = this.data.announcement || {};
+    this.setData({ showAnnounce: true, announceText: a.content || '' });
+  },
+
+  closeAnnounceEdit() {
+    this.setData({ showAnnounce: false });
+  },
+
+  onAnnounceInput(e) {
+    this.setData({ announceText: e.detail.value });
+  },
+
+  async saveAnnounce() {
+    if (this.data.savingAnnounce) return;
+
+    this.setData({ savingAnnounce: true });
+    wx.showLoading({ title: '保存中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'updateDiscipleAnnouncement',
+        data: { content: this.data.announceText }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+      this.setData({ savingAnnounce: false });
+
+      if (!r.success) {
+        this.showError(r.error || '保存失败');
+        return;
+      }
+
+      wx.showToast({ title: '已保存', icon: 'success' });
+      this.setData({ showAnnounce: false });
+      this.loadMyStatus(true);
+    } catch (err) {
+      console.error('保存公告失败', err);
+      wx.hideLoading();
+      this.setData({ savingAnnounce: false });
+      this.showError('保存失败，请检查云函数');
     }
   },
 

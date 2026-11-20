@@ -129,6 +129,7 @@ npm install
 | `getMyTaskRequests` | 主演徒弟：我的成绩申请（任务详情展开时按需查询） |
 | `updateTaskVideo` | 主演徒弟：更新任务的视频讲解（链接 / 提取码 / 说明），并自动处理该任务的失效反馈 |
 | `reportTaskVideo` | 主演徒弟：徒弟反馈视频打不开 |
+| `updateDiscipleAnnouncement` | 主演徒弟：更新「演门公告」（师傅/管理员） |
 | `listTaskReports` / `resolveTaskReport` | 主演徒弟：待处理反馈列表 / 标记已处理 |
 
 ## 数据库集合
@@ -156,6 +157,7 @@ npm install
 | `disciple_task_results` | 主演徒弟任务：结算后的判定快照 |
 | `disciple_task_requests` | 主演徒弟任务：成绩申请（待审批 → 通过才入库） |
 | `disciple_task_reports` | 主演徒弟任务：视频失效反馈（成员报、管理处理） |
+| `disciple_announcement` | 主演徒弟：演门公告（单文档，一句话，首页展示） |
 
 ## 主演徒弟模块
 
@@ -200,6 +202,10 @@ disciples
 **任命管理员**：不做界面，需要时在云开发控制台把该徒弟记录的 `role` 字段改成 `admin` 即可。
 
 **定线流程**：师傅或管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
+
+**演门公告**
+
+首页「进行中任务」上方的一条公告，只存一句话（≤120 字），数据在 `disciple_announcement` 集合里只保留一个文档。师傅/管理员点公告右侧的 ✏️ 即可在线编辑，清空内容等于隐藏公告。读取走 `getMyDiscipleInfo`，不额外增加请求。
 
 **视频讲解**
 

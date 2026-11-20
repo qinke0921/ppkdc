@@ -139,6 +139,22 @@ exports.main = async () => {
     const isAdmin = !!disciple && disciple.role === 'admin';
     const canManage = isMaster || isAdmin;
 
+    // 公告（单文档）
+    let announcement = null;
+    try {
+      const annRes = await db.collection('disciple_announcement').limit(1).get();
+      if (annRes.data && annRes.data.length) {
+        const a = annRes.data[0];
+        announcement = {
+          content: a.content || '',
+          updatedAt: a.updatedAt || null,
+          updatedByName: a.updatedByName || ''
+        };
+      }
+    } catch (err) {
+      announcement = null;
+    }
+
     // 待审批的成绩申请数（管理端红点）
     let pendingRequestCount = 0;
     if (canManage) {
@@ -253,6 +269,7 @@ exports.main = async () => {
       canClaimMaster: !master,
       activeTasks,
       pendingRequestCount,
+      announcement,
       pendingReportCount,
       pendingApplications
     };

@@ -463,3 +463,57 @@ page {
   height: 200rpx;
   margin-bottom: 12rpx;
 }
+
+/* ---------- 演门公告 ---------- */
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20rpx 30rpx 0;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, #fff9ec, #fffdf7);
+  border: 2rpx solid rgba(253, 185, 39, 0.35);
+  border-left: 6rpx solid #FDB927;
+  border-radius: 14rpx;
+}
+
+.notice-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.notice-label {
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  margin-right: 16rpx;
+  font-size: 20rpx;
+  color: #7a5200;
+  background: rgba(253, 185, 39, 0.28);
+  border-radius: 8rpx;
+}
+
+.notice-text {
+  flex: 1;
+  font-size: 25rpx;
+  color: #5a4200;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.notice-text.muted {
+  color: #b8a97e;
+}
+
+.notice-edit {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 26rpx;
+}
+
+.notice-empty {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.06);
+  border-left-color: #e3dcc9;
+}
