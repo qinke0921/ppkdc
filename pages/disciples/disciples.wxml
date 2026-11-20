@@ -5,7 +5,7 @@
   <!-- 朋友圈单页模式：无登录态，只做静态介绍 -->
   <block wx:if="{{singlePageMode}}">
     <view class="single-page">
-      <view class="lock-icon">🥋</view>
+      <image class="lock-avatar small" src="/images/star-lock.png" mode="aspectFit"/>
       <text class="lock-title">主演徒弟</text>
       <text class="lock-desc">拜师申请 · 实力定线</text>
       <view class="single-hint">点击底部「前往小程序」，查看徒弟名单并提交拜师申请</view>
@@ -19,7 +19,7 @@
   <!-- 非徒弟 -->
   <block wx:elif="{{!isDisciple}}">
     <view class="lock-section">
-      <view class="lock-icon">🥋</view>
+      <image class="lock-avatar" src="/images/star-lock.png" mode="aspectFit"/>
       <text class="lock-title">主演徒弟</text>
       <text class="lock-desc">提交拜师申请，通过后即可查看徒弟名单与作业任务</text>
       <view class="apply-btn" bindtap="showApplyModal">
@@ -39,8 +39,11 @@
     <!-- 师傅 -->
     <view class="master-card" wx:if="{{masterInfo}}">
       <view class="master-left">
-        <text class="master-tag">👑 师傅</text>
-        <text class="master-name">{{masterInfo.nickname || '主演'}}</text>
+        <image class="master-avatar" src="/images/star-avatar.png" mode="aspectFill"/>
+        <view class="master-text">
+          <text class="master-tag">👑 师傅</text>
+          <text class="master-name">{{masterInfo.nickname || '主演'}}</text>
+        </view>
       </view>
       <text class="master-game">{{masterInfo.gameName || ''}}</text>
     </view>

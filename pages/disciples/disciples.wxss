@@ -27,9 +27,12 @@ page {
   padding: 120rpx 60rpx 0;
 }
 
-.lock-icon {
-  font-size: 120rpx;
-  margin-bottom: 30rpx;
+.lock-avatar {
+  width: 240rpx;
+  height: 240rpx;
+  margin-bottom: 20rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, rgba(253, 185, 39, 0.22), rgba(85, 37, 131, 0) 68%);
 }
 
 .lock-title {
@@ -86,16 +89,32 @@ page {
   align-items: center;
 }
 
+.master-avatar {
+  width: 92rpx;
+  height: 92rpx;
+  margin-right: 20rpx;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3rpx solid rgba(253, 185, 39, 0.85);
+  box-sizing: border-box;
+}
+
+.master-text {
+  display: flex;
+  flex-direction: column;
+}
+
 .master-tag {
-  padding: 6rpx 16rpx;
-  margin-right: 16rpx;
-  font-size: 22rpx;
+  align-self: flex-start;
+  padding: 4rpx 14rpx;
+  font-size: 20rpx;
   color: #7a5200;
   background: rgba(253, 185, 39, 0.25);
   border-radius: 8rpx;
 }
 
 .master-name {
+  margin-top: 8rpx;
   font-size: 30rpx;
   font-weight: 600;
   color: #333;
@@ -436,4 +455,11 @@ page {
   color: #fff;
   background: #e74c3c;
   border-radius: 17rpx;
+}
+
+/* 朋友圈单页模式：形象略小，避免顶满 */
+.lock-avatar.small {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 12rpx;
 }
