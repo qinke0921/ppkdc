@@ -251,6 +251,17 @@ disciples
 
 返回 `nextCursor` 后继续调用，直到 `done: true`；首次可加 `"dryRun": true` 只统计不写库。
 
+只重导某几期（解析修正后常用），用 `keys` 限定期次、`resetKeys` 先精确清理：
+
+```json
+{
+  "keys": ["legacy:2026.6.29-2026.7.5"],
+  "resetKeys": ["legacy:2026.6.29-2026.7.5"],
+  "cursor": 0,
+  "batch": 1
+}
+```
+
 重复导入或修正解析后重跑，加 `"reset": true` 即可先清空上一次的历史数据（只删 `source: legacy` 的成绩与 `imported: true` 的任务，不影响新录入的数据）：
 
 ```json

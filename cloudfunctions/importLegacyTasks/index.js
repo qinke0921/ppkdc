@@ -273,6 +273,18 @@ exports.main = async (event) => {
   const payload = event || {};
 
   try {
+    // 可选：只重导指定期次（按 legacyKey 精确清理）
+    if (Array.isArray(payload.resetKeys) && payload.resetKeys.length) {
+      for (const key of payload.resetKeys) {
+        const olds = await db.collection('disciple_tasks').where({ legacyKey: key }).get();
+        for (const t of olds.data || []) {
+          await db.collection('disciple_task_records').where({ taskId: t._id }).remove();
+          await db.collection('disciple_task_results').where({ taskId: t._id }).remove();
+          await db.collection('disciple_tasks').doc(t._id).remove();
+        }
+      }
+    }
+
     // 可选：先清空上一次导入的历史数据（只删 legacy 来源，不动新录入的成绩）
     let resetDone = false;
     if (payload.reset === true) {
@@ -299,7 +311,12 @@ exports.main = async (event) => {
     }
 
     // data.json 是期数数组；兼容 { weeks: [...] } 结构
-    const weeks = Array.isArray(legacyData) ? legacyData : (legacyData.weeks || []);
+    let weeks = Array.isArray(legacyData) ? legacyData : (legacyData.weeks || []);
+
+    // 只处理指定期次（按 legacyKey）
+    if (Array.isArray(payload.keys) && payload.keys.length) {
+      weeks = weeks.filter((w) => payload.keys.indexOf(w.legacyKey) >= 0);
+    }
     const slice = weeks.slice(cursor, cursor + batch);
 
     // 地图库：名字 → mapId
