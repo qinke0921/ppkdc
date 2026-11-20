@@ -21,7 +21,7 @@
     <view class="lock-section">
       <image class="lock-avatar" src="/images/star-lock.png" mode="aspectFit"/>
       <text class="lock-title">主演徒弟</text>
-      <text class="lock-desc">提交拜师申请，通过后即可查看徒弟名单与作业任务</text>
+      <text class="lock-desc">本页面仅限主演徒弟使用，拜师请联系主演。已拜师请提交拜师申请，通过后即可查看…</text>
       <view class="apply-btn" bindtap="showApplyModal">
         <text>申请拜师</text>
       </view>

@@ -43,11 +43,12 @@ page {
 }
 
 .lock-desc {
-  font-size: 28rpx;
-  color: #999;
+  max-width: 560rpx;
+  font-size: 26rpx;
+  color: #8a8a8a;
   margin-bottom: 60rpx;
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.75;
 }
 
 .apply-btn {
