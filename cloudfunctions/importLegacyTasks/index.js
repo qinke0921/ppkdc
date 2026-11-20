@@ -252,6 +252,10 @@ async function settleTask(taskId, onlyOpenids, operator) {
 // 历史数据导入：按批处理 legacy/import.json
 // 用法：{ "cursor": 0, "batch": 5 } → 返回 nextCursor，继续调用直到 done:true
 // 可加 "dryRun": true 只统计不写库
+//
+// ⚠️ 本函数【无鉴权】：云开发控制台的「云端测试」没有登录态，
+//    getWXContext().OPENID 为空，基于身份的判断永远无法通过。
+//    仅供开发期一次性使用，导入完成后请立即在控制台删除本云函数。
 const legacyData = require('./data.json');
 
 function nameKey(s) {
@@ -259,15 +263,9 @@ function nameKey(s) {
 }
 
 exports.main = async (event) => {
-  const { OPENID } = cloud.getWXContext();
   const payload = event || {};
 
   try {
-    const caller = await getCaller(OPENID);
-    if (!isManager(caller)) {
-      return { success: false, error: '仅师傅或管理员可导入历史数据' };
-    }
-
     const cursor = Math.max(0, Number(payload.cursor) || 0);
     const batch = Math.min(50, Math.max(1, Number(payload.batch) || 5));
     const dryRun = payload.dryRun === true;

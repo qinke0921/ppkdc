@@ -249,6 +249,8 @@ disciples
 
 返回 `nextCursor` 后继续调用，直到 `done: true`；首次可加 `"dryRun": true` 只统计不写库。
 
+> ⚠️ 该函数**无鉴权**（云端测试没有登录态，无法判断调用者身份），仅供开发期一次性使用。**导入完成后请立即在控制台删除 `importLegacyTasks`**，不要留在线上环境。
+
 ### 任务（周图任务）设计
 
 任务系统的完整设计（口径、判定规则、数据模型、页面与接口）见 [docs/disciple-tasks-design.md](docs/disciple-tasks-design.md)。
