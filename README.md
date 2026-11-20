@@ -229,6 +229,8 @@ disciples
 
 把《徒弟作业成绩记录.xlsx》的 47 期历史成绩导入平台，数据已清洗为 `legacy/import.json`（同时打包进 `cloudfunctions/importLegacyTasks/data.json`）。
 
+清洗结果：47 期、2261 条有效成绩（国服表）、19 条非法时间被跳过、726 行台服表跳过。
+
 **清洗规则**
 
 | 项 | 处理 |

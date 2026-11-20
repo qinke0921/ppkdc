@@ -270,8 +270,16 @@ exports.main = async (event) => {
     const batch = Math.min(50, Math.max(1, Number(payload.batch) || 5));
     const dryRun = payload.dryRun === true;
 
-    const weeks = legacyData.weeks || [];
+    // data.json 是期数数组；兼容 { weeks: [...] } 结构
+    const weeks = Array.isArray(legacyData) ? legacyData : (legacyData.weeks || []);
     const slice = weeks.slice(cursor, cursor + batch);
+
+    // 地图库：名字 → mapId
+    const maps = await fetchAll('map_data', {});
+    const mapByName = {};
+    maps.forEach((m) => {
+      if (m && m.name) mapByName[nameKey(m.name)] = m;
+    });
 
     // 现有徒弟：名字 → 账号
     const roster = await fetchAll('disciples', { status: 'approved' });
@@ -315,12 +323,14 @@ exports.main = async (event) => {
         continue;
       }
 
+      const mapDoc = mapByName[nameKey(week.mapName)] || null;
+
       const taskDoc = {
         legacyKey: week.legacyKey,
         title: '历史 · ' + week.mapName + ' · ' + week.weekLabel,
-        mapId: '',
+        mapId: mapDoc ? mapDoc._id : '',
         mapName: week.mapName,
-        difficulty: week.difficulty || '',
+        difficulty: week.difficulty || (mapDoc && mapDoc['难度']) || '',
         server: '国服',
         lineTable: week.lineTable,
         startAt: week.startAt,
