@@ -47,7 +47,7 @@
     <view class="card">
       <view class="row">
         <text class="k">我的定线</text>
-        <text class="v line">{{me.line}}{{me.lineSource === 'default' ? '（未定线，按娱乐）' : ''}}</text>
+        <text class="v line">{{me.line}}{{me.lineIsHistorical ? '（当时）' : ''}}{{me.lineSource === 'default' ? '（未定线，按娱乐）' : ''}}</text>
       </view>
       <view class="row">
         <text class="k">及格目标</text>

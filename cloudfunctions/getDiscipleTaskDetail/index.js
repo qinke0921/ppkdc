@@ -299,7 +299,7 @@ exports.main = async (event) => {
         gameName: m.gameName || '',
         nickname: m.nickname || '',
         role: m.role || 'member',
-        line: normalizeLine(m.masterLine).effective,
+        line: normalizeLine(lineAt(m.masterLineHistory, m.masterLine, task.endAt || Date.now())).effective,
         bestText: best ? best.scoreText : '',
         bestMs,
         status: bestMs === null ? (settled ? 'absent' : 'pending') : j.status,
@@ -334,7 +334,13 @@ exports.main = async (event) => {
       myReported = false;
     }
 
-    const myLine = normalizeLine(caller ? caller.masterLine : '');
+    // 历史任务显示「当时」的定线；没有历史则回退当前定线
+    const myLineRaw = lineAt(
+      caller ? caller.masterLineHistory : null,
+      caller ? caller.masterLine : '',
+      task.endAt || Date.now()
+    );
+    const myLine = normalizeLine(myLineRaw);
     const j2 = judge(
       mine ? mine.bestMs : null,
       task.lineTable,
@@ -352,6 +358,9 @@ exports.main = async (event) => {
         gameName: caller.gameName || '',
         line: myLine.effective,
         lineSource: myLine.source,
+        lineNow: normalizeLine(caller ? caller.masterLine : '').effective,
+        lineIsHistorical: !!caller && task.endAt < Date.now()
+          && myLine.effective !== normalizeLine(caller.masterLine).effective,
         targetLevel: j2.targetLevel,
         targetText: formatMs(j2.targetMs),
         targetMs: j2.targetMs,

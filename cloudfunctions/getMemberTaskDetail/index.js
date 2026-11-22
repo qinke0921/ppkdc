@@ -145,7 +145,8 @@ exports.main = async (event) => {
 
     const bestMs = records.length ? Math.min.apply(null, records.map((r) => r.scoreMs)) : null;
     const best = records.filter((r) => r.scoreMs === bestMs)[0] || null;
-    const j = judge(bestMs, task.lineTable, lineAt(target.masterLineHistory, target.masterLine, task.endAt || Date.now()));
+    const targetLineRaw = lineAt(target.masterLineHistory, target.masterLine, task.endAt || Date.now());
+    const j = judge(bestMs, task.lineTable, targetLineRaw);
     const settled = task.status === 'closed';
     const status = bestMs === null ? (settled ? 'absent' : 'pending') : j.status;
 
@@ -162,8 +163,8 @@ exports.main = async (event) => {
         openid: target._openid,
         gameName: target.gameName || '',
         nickname: target.nickname || '',
-        line: normalizeLine(target.masterLine).effective,
-        lineSource: normalizeLine(target.masterLine).source
+        line: normalizeLine(targetLineRaw).effective,
+        lineSource: normalizeLine(targetLineRaw).source
       },
       status,
       statusText: STATUS_TEXT[status] || '',
