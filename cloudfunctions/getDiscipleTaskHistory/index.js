@@ -212,9 +212,14 @@ async function settleTask(taskId, onlyOpenids, operator) {
     byOpenid[r._openid].push(r);
   });
 
-  const targets = (onlyOpenids && onlyOpenids.length)
-    ? roster.filter((m) => onlyOpenids.indexOf(m._openid) >= 0)
-    : roster;
+  // 只统计「任务结束时已经拜师」的人，入队之前不算逃课
+  const targets = roster.filter((m) => {
+    if (onlyOpenids && onlyOpenids.length && onlyOpenids.indexOf(m._openid) < 0) return false;
+    const j = m.joinedAt
+      ? (typeof m.joinedAt === 'number' ? m.joinedAt : new Date(m.joinedAt).getTime())
+      : 0;
+    return !j || j <= (task.endAt || Date.now());
+  });
 
   const results = targets.map((m) => {
     const list = byOpenid[m._openid] || [];
@@ -275,6 +280,18 @@ exports.main = async (event) => {
     // 徒弟之间互相可见（任务榜单已公开成绩，这里只补充汇总与历史列表）
     const targetOpenid = payload.openid || OPENID;
 
+    // 目标成员的拜师时间：早于拜师的期次不算逃课
+    let targetJoined = 0;
+    try {
+      const targetRes = await db.collection('disciples').where({ _openid: targetOpenid }).limit(1).get();
+      if (targetRes.data && targetRes.data.length) {
+        const j = targetRes.data[0].joinedAt;
+        targetJoined = j ? (typeof j === 'number' ? j : new Date(j).getTime()) : 0;
+      }
+    } catch (err) {
+      targetJoined = 0;
+    }
+
     // 以「任务」为主：列出全部已结算任务，再挂上我的结果。
     // 我没有记录（名字不在名单里 / 逃课）时也照样能看到这一期，并可进入看别人的成绩。
     const [results, tasks] = await Promise.all([
@@ -288,6 +305,7 @@ exports.main = async (event) => {
     const list = tasks
       .map((t) => {
         const r = resultMap[t._id] || null;
+        const beforeJoin = !!targetJoined && (t.endAt || 0) < targetJoined;
         return {
           taskId: t._id,
           mapName: t.mapName,
@@ -295,8 +313,9 @@ exports.main = async (event) => {
           startAt: t.startAt,
           endAt: t.endAt,
           hasResult: !!r,
-          status: r ? r.status : 'absent',
-          statusText: r ? (STATUS_TEXT[r.status] || '') : '无记录',
+          beforeJoin,
+          status: beforeJoin ? 'not_joined' : (r ? r.status : 'absent'),
+          statusText: beforeJoin ? '未参与' : (r ? (STATUS_TEXT[r.status] || '') : '无记录'),
           bestText: r ? (r.bestText || '') : '',
           targetLevel: r ? (r.targetLevel || '') : '',
           targetText: r ? formatMs(r.targetMs) : '',
@@ -306,8 +325,10 @@ exports.main = async (event) => {
       .sort((a, b) => (b.endAt || 0) - (a.endAt || 0));
 
     // 总体完成情况：超线 / 达标 / 未达标 / 逃课
-    const summary = { total: tasks.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+    const summary = { total: 0, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0, beforeJoin: 0 };
     list.forEach((item) => {
+      if (item.beforeJoin) { summary.beforeJoin++; return; }
+      summary.total++;
       if (item.status === 'over') summary.over++;
       else if (item.status === 'passed') summary.passed++;
       else if (item.status === 'missed') summary.missed++;

@@ -212,9 +212,14 @@ async function settleTask(taskId, onlyOpenids, operator) {
     byOpenid[r._openid].push(r);
   });
 
-  const targets = (onlyOpenids && onlyOpenids.length)
-    ? roster.filter((m) => onlyOpenids.indexOf(m._openid) >= 0)
-    : roster;
+  // 只统计「任务结束时已经拜师」的人，入队之前不算逃课
+  const targets = roster.filter((m) => {
+    if (onlyOpenids && onlyOpenids.length && onlyOpenids.indexOf(m._openid) < 0) return false;
+    const j = m.joinedAt
+      ? (typeof m.joinedAt === 'number' ? m.joinedAt : new Date(m.joinedAt).getTime())
+      : 0;
+    return !j || j <= (task.endAt || Date.now());
+  });
 
   const results = targets.map((m) => {
     const list = byOpenid[m._openid] || [];

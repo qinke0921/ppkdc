@@ -138,6 +138,33 @@ exports.main = async (event) => {
       return { success: false, error: '成员不存在' };
     }
 
+    const targetJoined = target.joinedAt
+      ? (typeof target.joinedAt === 'number' ? target.joinedAt : new Date(target.joinedAt).getTime())
+      : 0;
+    if (targetJoined && targetJoined > (task.endAt || Date.now())) {
+      return {
+        success: true,
+        member: {
+          openid: target._openid,
+          gameName: target.gameName || '',
+          nickname: target.nickname || '',
+          line: normalizeLine(target.masterLine).effective,
+          lineSource: normalizeLine(target.masterLine).source
+        },
+        status: 'not_joined',
+        statusText: '未参与',
+        bestText: '',
+        bestMs: null,
+        targetLevel: '',
+        targetText: '',
+        targetMs: null,
+        overLevel: null,
+        overText: '',
+        recordCount: 0,
+        records: []
+      };
+    }
+
     const records = await fetchAll('disciple_task_records', {
       taskId: payload.taskId,
       _openid: payload.openid

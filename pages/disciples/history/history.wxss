@@ -155,3 +155,8 @@
   font-size: 22rpx;
   color: #bbb;
 }
+
+.status.not_joined {
+  color: #bbb;
+  background: #f7f7f7;
+}

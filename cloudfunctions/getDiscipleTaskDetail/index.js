@@ -212,9 +212,14 @@ async function settleTask(taskId, onlyOpenids, operator) {
     byOpenid[r._openid].push(r);
   });
 
-  const targets = (onlyOpenids && onlyOpenids.length)
-    ? roster.filter((m) => onlyOpenids.indexOf(m._openid) >= 0)
-    : roster;
+  // 只统计「任务结束时已经拜师」的人，入队之前不算逃课
+  const targets = roster.filter((m) => {
+    if (onlyOpenids && onlyOpenids.length && onlyOpenids.indexOf(m._openid) < 0) return false;
+    const j = m.joinedAt
+      ? (typeof m.joinedAt === 'number' ? m.joinedAt : new Date(m.joinedAt).getTime())
+      : 0;
+    return !j || j <= (task.endAt || Date.now());
+  });
 
   const results = targets.map((m) => {
     const list = byOpenid[m._openid] || [];
@@ -287,7 +292,15 @@ exports.main = async (event) => {
       byOpenid[r._openid].push(r);
     });
 
-    const board = roster.map((m) => {
+    const taskEnd = task.endAt || Date.now();
+    const joinedTs = (m) => (m && m.joinedAt)
+      ? (typeof m.joinedAt === 'number' ? m.joinedAt : new Date(m.joinedAt).getTime())
+      : 0;
+
+    const board = roster.filter((m) => {
+      const j = joinedTs(m);
+      return !j || j <= taskEnd;
+    }).map((m) => {
       const list = byOpenid[m._openid] || [];
       const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
       const best = list.filter((r) => r.scoreMs === bestMs)[0];
@@ -368,8 +381,10 @@ exports.main = async (event) => {
         overText: formatMs(j2.overMs),
         bestText: mine ? mine.bestText : '',
         bestMs: mine ? mine.bestMs : null,
-        status: (mine && mine.bestMs !== null) ? j2.status : (settled ? 'absent' : 'pending'),
-        statusText: STATUS_TEXT[(mine && mine.bestMs !== null) ? j2.status : (settled ? 'absent' : 'pending')],
+        status: (mine && mine.bestMs !== null) ? j2.status
+          : ((caller && joinedTs(caller) > taskEnd) ? 'not_joined' : (settled ? 'absent' : 'pending')),
+        statusText: (mine && mine.bestMs !== null) ? STATUS_TEXT[j2.status]
+          : ((caller && joinedTs(caller) > taskEnd) ? '未参与' : STATUS_TEXT[settled ? 'absent' : 'pending']),
         recordCount: mine ? mine.recordCount : 0
       } : null,
       myRecords: myRecords.map((r) => ({

@@ -39,7 +39,8 @@
         <text class="range">{{item.rangeText}}</text>
         <text class="best">{{item.bestText || '无记录'}}</text>
       </view>
-      <view class="sub" wx:if="{{item.hasResult}}">目标 {{item.targetLevel}} {{item.targetText || '未设'}} · {{item.recordCount}} 条记录</view>
+      <view class="sub" wx:if="{{item.beforeJoin}}">当时还没拜师</view>
+      <view class="sub" wx:elif="{{item.hasResult}}">目标 {{item.targetLevel}} {{item.targetText || '未设'}} · {{item.recordCount}} 条记录</view>
       <view class="sub muted" wx:else>本期没有我的成绩，可点进去看别人的记录</view>
     </view>
 
