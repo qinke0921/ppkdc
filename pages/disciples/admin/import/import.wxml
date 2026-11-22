@@ -21,6 +21,10 @@
   </view>
 
   <view class="actions">
+    <view class="btn ghost {{recomputing ? 'disabled' : ''}}" bindtap="recompute">{{recomputing ? '重算中...' : '④ 重算历史判定'}}</view>
+  </view>
+
+  <view class="actions">
     <view class="btn danger {{resetting ? 'disabled' : ''}}" bindtap="resetAll">{{resetting ? '重置中...' : '③ 重置并重导前先清空'}}</view>
   </view>
 

@@ -7,6 +7,7 @@ Page({
     checking: false,
     importing: false,
     resetting: false,
+    recomputing: false,
     progress: '',
     stats: null,
     unmatched: [],
@@ -39,6 +40,72 @@ Page({
       this.setData({ checking: false, progress: '' });
       wx.showToast({ title: '检查失败（可能超时），可直接开始导入', icon: 'none' });
     }
+  },
+
+  async recompute() {
+    if (this.data.recomputing || this.data.importing) return;
+
+    const confirmed = await new Promise((resolve) => {
+      wx.showModal({
+        title: '重算历史判定',
+        content: '按每期结束时的定线，重新计算 47 期历史任务的判定与统计。只改动导入的任务，不影响新发布的任务。',
+        confirmText: '开始重算',
+        success: (r) => resolve(!!r.confirm),
+        fail: () => resolve(false)
+      });
+    });
+    if (!confirmed) return;
+
+    this.setData({ recomputing: true, progress: '准备重算...' });
+
+    let cursor = 0;
+    let done = false;
+    let batch = 5;
+    let updated = 0;
+
+    while (!done) {
+      this.setData({
+        progress: '重算中 ' + cursor + '/47 期 · 已更新 ' + updated + ' 条判定（每批 ' + batch + ' 期）'
+      });
+
+      let r = null;
+      let attempt = 0;
+      while (attempt < 3) {
+        try {
+          const res = await wx.cloud.callFunction({
+            name: 'importLegacyTasks',
+            data: { recompute: true, cursor, batch }
+          });
+          r = (res && res.result) || {};
+          break;
+        } catch (err) {
+          attempt += 1;
+          if (batch > 1) {
+            batch = Math.max(1, Math.floor(batch / 2));
+            break;
+          }
+          if (attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            continue;
+          }
+          this.setData({ recomputing: false, progress: '重算中断，请重试（幂等，可重复执行）' });
+          return;
+        }
+      }
+
+      if (!r) continue;
+      if (!r.success) {
+        this.setData({ recomputing: false, progress: r.error || '重算失败' });
+        return;
+      }
+
+      updated += r.resultsUpdated || 0;
+      cursor = r.nextCursor || (cursor + batch);
+      done = !!r.done;
+    }
+
+    this.setData({ recomputing: false, progress: '重算完成：更新了 ' + updated + ' 条判定' });
+    wx.showToast({ title: '重算完成', icon: 'success' });
   },
 
   async resetAll() {
