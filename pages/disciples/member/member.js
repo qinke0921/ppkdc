@@ -12,6 +12,10 @@ Page({
 
     editing: false,
     saving: false,
+
+    showStats: false,
+    stats: null,
+    statsLoading: false,
     lineOptions: util.DISCIPLE_LINES,
     lineIndex: 0,
     form: {
@@ -77,6 +81,41 @@ Page({
       wx.hideLoading();
     }
   },
+
+  async openStats() {
+    const member = this.data.member;
+    if (!member || !member._openid || this.data.statsLoading) return;
+
+    this.setData({ statsLoading: true });
+    wx.showLoading({ title: '统计中...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getDiscipleTaskHistory',
+        data: { openid: member._openid, summaryOnly: true }
+      });
+      const r = (res && res.result) || {};
+      wx.hideLoading();
+      this.setData({ statsLoading: false });
+
+      if (!r.success) {
+        wx.showToast({ title: r.error || '统计失败', icon: 'none' });
+        return;
+      }
+
+      this.setData({ showStats: true, stats: r.summary || null });
+    } catch (err) {
+      console.error('统计失败', err);
+      wx.hideLoading();
+      this.setData({ statsLoading: false });
+      wx.showToast({ title: '统计失败，请检查云函数', icon: 'none' });
+    }
+  },
+
+  closeStats() {
+    this.setData({ showStats: false });
+  },
+
+  stopPropagation() {},
 
   startEdit() {
     const m = this.data.member;

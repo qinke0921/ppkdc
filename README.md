@@ -121,7 +121,7 @@ npm install
 | `publishDiscipleTask` / `closeDiscipleTask` | 主演徒弟：发布/编辑任务、结算并生成判定快照 |
 | `getScoreSheet` / `saveTaskScores` | 主演徒弟：按日批量录入成绩（有日期覆盖 / 无日期追加） |
 | `getDiscipleTaskDetail` | 主演徒弟：任务详情、我的目标、全员榜单 |
-| `getDiscipleTaskHistory` / `getAdminHistory` | 主演徒弟：个人历史 / 全部任务历史 |
+| `getDiscipleTaskHistory` / `getAdminHistory` | 主演徒弟：个人历史 / 全部任务历史；前者支持 `summaryOnly` 返回四态汇总 |
 | `getMemberTaskDetail` | 主演徒弟：查看某人在某任务的判定、记录与曲线（互相可见） |
 | `submitTaskScoreRequest` | 主演徒弟：徒弟提交自己的成绩申请（待审批） |
 | `reviewTaskScoreRequest` | 主演徒弟：审批成绩申请，通过才写入成绩 |

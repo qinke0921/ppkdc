@@ -12,7 +12,8 @@ Page({
     loading: true,
     allList: [],
     list: [],
-    onlyMine: false
+    onlyMine: false,
+    summary: null
   },
 
   onLoad() {
@@ -44,7 +45,7 @@ Page({
         return t;
       });
 
-      this.setData({ loading: false, allList });
+      this.setData({ loading: false, allList, summary: r.summary || null });
       this.applyFilter();
     } catch (err) {
       console.error('加载历史失败', err);

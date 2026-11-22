@@ -78,6 +78,7 @@
     </view>
 
     <view class="actions" wx:if="{{!editing}}">
+      <view class="btn stats" bindtap="openStats">📊 作业完成情况</view>
       <view class="btn edit" wx:if="{{isSelf || canManage}}" bindtap="startEdit">✏️ 编辑资料{{canManage ? ' / 定线' : ''}}</view>
     </view>
 
@@ -86,5 +87,37 @@
       <view class="btn confirm {{saving ? 'disabled' : ''}}" bindtap="save">保存</view>
     </view>
   </block>
+
+  <!-- 作业完成情况 -->
+  <view class="modal-mask" wx:if="{{showStats}}" bindtap="closeStats">
+    <view class="modal" catchtap="stopPropagation">
+      <view class="modal-title">{{member.gameName}} 的作业完成情况</view>
+
+      <view class="stats-grid" wx:if="{{stats}}">
+        <view class="stats-item">
+          <text class="stats-num over">{{stats.over}}</text>
+          <text class="stats-label">超线</text>
+        </view>
+        <view class="stats-item">
+          <text class="stats-num passed">{{stats.passed}}</text>
+          <text class="stats-label">达标</text>
+        </view>
+        <view class="stats-item">
+          <text class="stats-num missed">{{stats.missed}}</text>
+          <text class="stats-label">未达标</text>
+        </view>
+        <view class="stats-item">
+          <text class="stats-num absent">{{stats.absent}}</text>
+          <text class="stats-label">逃课</text>
+        </view>
+      </view>
+
+      <text class="stats-total" wx:if="{{stats}}">共 {{stats.total}} 期</text>
+
+      <view class="modal-buttons">
+        <view class="btn cancel" catchtap="closeStats">关闭</view>
+      </view>
+    </view>
+  </view>
 
 </view>

@@ -272,10 +272,8 @@ exports.main = async (event) => {
       return { success: false, error: '未获取到用户身份' };
     }
 
+    // 徒弟之间互相可见（任务榜单已公开成绩，这里只补充汇总与历史列表）
     const targetOpenid = payload.openid || OPENID;
-    if (targetOpenid !== OPENID && !isManager(caller)) {
-      return { success: false, error: '仅师傅或管理员可查看他人历史' };
-    }
 
     // 以「任务」为主：列出全部已结算任务，再挂上我的结果。
     // 我没有记录（名字不在名单里 / 逃课）时也照样能看到这一期，并可进入看别人的成绩。
@@ -307,7 +305,21 @@ exports.main = async (event) => {
       })
       .sort((a, b) => (b.endAt || 0) - (a.endAt || 0));
 
-    return { success: true, list };
+    // 总体完成情况：超线 / 达标 / 未达标 / 逃课
+    const summary = { total: tasks.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+    list.forEach((item) => {
+      if (item.status === 'over') summary.over++;
+      else if (item.status === 'passed') summary.passed++;
+      else if (item.status === 'missed') summary.missed++;
+      else if (item.status === 'no_target') summary.noTarget++;
+      else summary.absent++;
+    });
+
+    if (payload.summaryOnly === true) {
+      return { success: true, summary, summaryOnly: true };
+    }
+
+    return { success: true, list, summary };
   } catch (err) {
     if (isMissingCollection(err)) return missingErr();
     return { success: false, error: err.message };
