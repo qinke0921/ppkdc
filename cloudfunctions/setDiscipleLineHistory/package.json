@@ -1,0 +1,9 @@
+{
+  "name": "setDiscipleLineHistory",
+  "version": "1.0.0",
+  "description": "主演徒弟：设定分线历史",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

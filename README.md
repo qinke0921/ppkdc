@@ -131,6 +131,7 @@ npm install
 | `reportTaskVideo` | 主演徒弟：徒弟反馈视频打不开 |
 | `updateDiscipleAnnouncement` | 主演徒弟：更新「演门公告」（师傅/管理员） |
 | `importLegacyTasks` | 主演徒弟：分批导入历史作业数据（一次性，幂等，可 dryRun） |
+| `setDiscipleLineHistory` | 主演徒弟：按参数直接设定某人的分线历史（昵称 + 拜师时间 + 多次定线） |
 | `listTaskReports` / `resolveTaskReport` | 主演徒弟：待处理反馈列表 / 标记已处理 |
 
 ## 数据库集合
@@ -227,6 +228,46 @@ disciples
 | 徒弟自己申请 | 徒弟本人（只能给自己） | **需审批**，通过才入库 |
 
 申请由 `disciple_task_requests` 承载：同一任务同一人只保留一条待审批申请，再次提交视为更新；审批通过时按「任务 + 成员 + 日期」覆盖原成绩（无日期则追加），已结算任务会重算当事人。
+
+### 手动设定分线历史
+
+用 `setDiscipleLineHistory` 直接给某个徒弟写入完整的分线历史（一次性整理老数据时用）。
+
+**单个成员**
+
+```json
+{
+  "nickname": "小凡",
+  "joinedAt": "2025-11-10",
+  "lines": [
+    { "line": "强主", "at": "2025-11-10" },
+    { "line": "主力", "at": "2026-02-25" },
+    { "line": "一线", "at": "2026-11-20" }
+  ]
+}
+```
+
+**批量**
+
+```json
+{
+  "members": [
+    { "nickname": "小凡", "joinedAt": "2025-11-10", "lines": [{ "line": "一线", "at": "2026-11-20" }] },
+    { "gameName": "超级瑞", "lines": [{ "line": "强主", "at": "2025-11-10" }] }
+  ]
+}
+```
+
+| 参数 | 说明 |
+|---|---|
+| `nickname` / `gameName` | 按昵称或游戏名精确匹配（忽略空格）；重名会报错，改用 `discipleId` |
+| `openid` / `discipleId` | 精确定位，优先级最高 |
+| `joinedAt` | 拜师时间，支持 `2025-11-10`、`2025-11-10 20:30` 或时间戳 |
+| `lines` | 按时间升序传入 `{ line, at }`；最后一条决定当前 `masterLine` |
+| `dryRun` | `true` 只返回将写入的内容，不落库 |
+| `key` | 若云函数环境变量配了 `LINE_HISTORY_KEY`，调用需带上相同值 |
+
+> ⚠️ 该函数无内置身份校验（云端测试没有登录态）。如担心被小程序端调用，请在云函数环境变量里配置 `LINE_HISTORY_KEY`，或使用后删除。
 
 ### 历史数据导入（Excel）
 
