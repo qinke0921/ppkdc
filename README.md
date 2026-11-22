@@ -269,6 +269,18 @@ disciples
 
 > ⚠️ 该函数无内置身份校验（云端测试没有登录态）。如担心被小程序端调用，请在云函数环境变量里配置 `LINE_HISTORY_KEY`，或使用后删除。
 
+**批量写入 Excel 颜色生成的历史**（数据已打包为 `cloudfunctions/setDiscipleLineHistory/data.json`，95 人）：
+
+```json
+{ "fromFile": true, "dryRun": true }
+```
+
+确认无误后去掉 `dryRun` 再跑一次。写入后历史判定仍是旧快照，需要再用 `importLegacyTasks` 的 `recompute` 模式分批重算：
+
+```json
+{ "recompute": true, "cursor": 0, "batch": 5 }
+```
+
 ### 历史数据导入（Excel）
 
 把《徒弟作业成绩记录.xlsx》的 47 期历史成绩导入平台，数据已清洗为 `legacy/import.json`（同时打包进 `cloudfunctions/importLegacyTasks/data.json`）。

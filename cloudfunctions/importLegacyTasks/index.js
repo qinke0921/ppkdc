@@ -286,6 +286,77 @@ exports.main = async (event) => {
   const payload = event || {};
 
   try {
+    // 重算已有历史任务的判定（设定分线历史后用）
+    // 用法：{ "recompute": true, "cursor": 0, "batch": 5 }
+    if (payload.recompute === true) {
+      const tasks = await fetchAll('disciple_tasks', { imported: true });
+      tasks.sort((a, b) => (a.startAt || 0) - (b.startAt || 0));
+
+      const cursor0 = Math.max(0, Number(payload.cursor) || 0);
+      const take = Math.min(20, Math.max(1, Number(payload.batch) || 5));
+      const slice = tasks.slice(cursor0, cursor0 + take);
+
+      const roster = await fetchAll('disciples', { status: 'approved' });
+      const memberByOpenid = {};
+      roster.forEach((m) => { memberByOpenid[m._openid] = m; });
+
+      let changed = 0;
+
+      for (const task of slice) {
+        const results = await fetchAll('disciple_task_results', { taskId: task._id });
+        if (!results.length) continue;
+
+        const records = await fetchAll('disciple_task_records', { taskId: task._id });
+        const recByOpenid = {};
+        records.forEach((r) => {
+          if (!recByOpenid[r._openid]) recByOpenid[r._openid] = [];
+          recByOpenid[r._openid].push(r);
+        });
+
+        const summary = { total: results.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+
+        for (const res of results) {
+          const member = memberByOpenid[res._openid] || { masterLine: '' };
+          const list = recByOpenid[res._openid] || [];
+          const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
+          const best = list.filter((r) => r.scoreMs === bestMs)[0];
+          const j = judge(bestMs, task.lineTable, lineAt(member.masterLineHistory, member.masterLine, task.endAt));
+
+          await db.collection('disciple_task_results').doc(res._id).update({
+            data: {
+              bestMs,
+              bestText: best ? best.scoreText : '',
+              targetLevel: j.targetLevel,
+              targetMs: j.targetMs,
+              status: j.status,
+              recordCount: list.length,
+              computedAt: Date.now(),
+              computedBy: 'recompute'
+            }
+          });
+          changed++;
+
+          if (j.status === 'over') summary.over++;
+          else if (j.status === 'passed') summary.passed++;
+          else if (j.status === 'missed') summary.missed++;
+          else if (j.status === 'no_target') summary.noTarget++;
+          else summary.absent++;
+        }
+
+        await db.collection('disciple_tasks').doc(task._id).update({ data: { summary } });
+      }
+
+      return {
+        success: true,
+        recompute: true,
+        nextCursor: cursor0 + slice.length,
+        done: cursor0 + slice.length >= tasks.length,
+        total: tasks.length,
+        tasksDone: slice.length,
+        resultsUpdated: changed
+      };
+    }
+
     // 只查状态，不改数据：{ "statusOnly": true }
     if (payload.statusOnly === true) {
       const [taskCnt, recCnt, resCnt] = await Promise.all([

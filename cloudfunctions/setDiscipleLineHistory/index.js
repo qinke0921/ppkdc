@@ -290,9 +290,23 @@ exports.main = async (event) => {
     }
 
     const dryRun = payload.dryRun === true;
-    const specs = Array.isArray(payload.members) && payload.members.length
-      ? payload.members
-      : [payload];
+
+    // fromFile: 使用随函数打包的 data.json（由 Excel 颜色生成的 95 人分线历史）
+    let specs;
+    if (payload.fromFile === true) {
+      let file = null;
+      try {
+        file = require('./data.json');
+      } catch (err) {
+        return { success: false, error: 'data.json 没有随函数上传，请重新部署' };
+      }
+      const list = (file && file.members) || [];
+      specs = list.map((m) => ({ nickname: m.name, lines: m.lines }));
+    } else {
+      specs = Array.isArray(payload.members) && payload.members.length
+        ? payload.members
+        : [payload];
+    }
 
     const roster = await fetchAll('disciples', {});
     const results = [];
@@ -392,13 +406,18 @@ exports.main = async (event) => {
       });
     }
 
+    const failed = results.filter((r) => !r.success);
+    const brief = results.length > 30 ? results.slice(0, 30) : results;
+
     return {
       success: true,
       dryRun,
       count: results.length,
       updated: results.filter((r) => r.success && !r.dryRun).length,
-      failed: results.filter((r) => !r.success).length,
-      results
+      failed: failed.length,
+      failedNames: failed.slice(0, 20).map((r) => r.input + '：' + r.error),
+      resultsTruncated: results.length > 30,
+      results: brief
     };
   } catch (err) {
     if (isMissingCollection(err)) return missingErr();
