@@ -159,7 +159,9 @@ function lineAt(history, fallbackLine, ts) {
   const at = typeof ts === 'number' ? ts : Date.now();
   let line = fallbackLine;
   list.forEach((h) => {
-    if (h && h.line && typeof h.at === 'number' && h.at <= at) line = h.line;
+    if (!h || !h.line) return;
+    const hAt = typeof h.at === 'number' ? h.at : new Date(h.at).getTime();
+    if (!isNaN(hAt) && hAt <= at) line = h.line;
   });
   return line || fallbackLine;
 }

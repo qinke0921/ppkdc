@@ -104,7 +104,10 @@ exports.main = async (event) => {
       if (newLine !== oldLine) {
         const history = Array.isArray(target.masterLineHistory) ? target.masterLineHistory.slice() : [];
         if (!history.length && oldLine) {
-          history.push({ line: oldLine, at: target.joinedAt || Date.now() });
+          const joinedTs = typeof target.joinedAt === 'number'
+            ? target.joinedAt
+            : (new Date(target.joinedAt).getTime() || Date.now());
+          history.push({ line: oldLine, at: joinedTs });
         }
         if (newLine) {
           history.push({ line: newLine, at: Date.now() });

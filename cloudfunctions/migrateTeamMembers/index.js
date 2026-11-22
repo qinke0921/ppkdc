@@ -156,7 +156,12 @@ exports.main = async (event) => {
         gameId: m.gameId || '',
         statement: m.statement || '',
         masterLine: line || '',
-        masterLineHistory: line ? [{ line, at: (keepJoinedAt && m.joinedAt) ? m.joinedAt : Date.now() }] : [],
+        masterLineHistory: line ? [{
+          line,
+          at: (keepJoinedAt && m.joinedAt)
+            ? (typeof m.joinedAt === 'number' ? m.joinedAt : (new Date(m.joinedAt).getTime() || Date.now()))
+            : Date.now()
+        }] : [],
         status: 'approved',
         role: 'member',                       // 车队 admin 不会继承为主演徒弟管理员
         joinedAt: (keepJoinedAt && m.joinedAt) ? m.joinedAt : Date.now(),
