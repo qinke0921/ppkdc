@@ -20,7 +20,14 @@ Page({
 
   onLoad(options) {
     const openid = (options && options.openid) || '';
-    const name = (options && options.name) || '';
+
+    // URL 里的中文是编码过的，取出来要解码，否则标题会显示成 %E5%B0%8F%E5%87%A1
+    let name = (options && options.name) || '';
+    try {
+      name = decodeURIComponent(name);
+    } catch (err) {
+      // 已经解码过或格式不合法时保持原样
+    }
 
     this.setData({ targetOpenid: openid, targetName: name });
 
