@@ -64,7 +64,21 @@ Page({
         return t;
       });
 
-      this.setData({ loading: false, allList, summary: r.summary || null });
+      // 优先用云端返回的真实名字，避免 URL 编码问题导致标题乱码
+      let titleName = this.data.targetName;
+      if (r.member && r.member.gameName) {
+        titleName = r.member.gameName;
+        if (this.data.targetOpenid) {
+          wx.setNavigationBarTitle({ title: titleName + ' 的任务历史' });
+        }
+      }
+
+      this.setData({
+        loading: false,
+        allList,
+        summary: r.summary || null,
+        targetName: titleName
+      });
       this.applyFilter();
     } catch (err) {
       console.error('加载历史失败', err);

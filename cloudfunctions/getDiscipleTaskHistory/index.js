@@ -282,11 +282,14 @@ exports.main = async (event) => {
 
     // 目标成员的拜师时间：早于拜师的期次不算逃课
     let targetJoined = 0;
+    let targetMember = null;
     try {
       const targetRes = await db.collection('disciples').where({ _openid: targetOpenid }).limit(1).get();
       if (targetRes.data && targetRes.data.length) {
-        const j = targetRes.data[0].joinedAt;
+        const t = targetRes.data[0];
+        const j = t.joinedAt;
         targetJoined = j ? (typeof j === 'number' ? j : new Date(j).getTime()) : 0;
+        targetMember = { gameName: t.gameName || '', nickname: t.nickname || '' };
       }
     } catch (err) {
       targetJoined = 0;
@@ -337,10 +340,10 @@ exports.main = async (event) => {
     });
 
     if (payload.summaryOnly === true) {
-      return { success: true, summary, summaryOnly: true };
+      return { success: true, summary, summaryOnly: true, member: targetMember };
     }
 
-    return { success: true, list, summary };
+    return { success: true, list, summary, member: targetMember };
   } catch (err) {
     if (isMissingCollection(err)) return missingErr();
     return { success: false, error: err.message };
