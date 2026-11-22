@@ -99,13 +99,36 @@ Page({
         return;
       }
 
+      // 云函数还是旧版本时，recompute 会被忽略，返回里没有这个标记
+      if (!r.recompute) {
+        this.setData({
+          recomputing: false,
+          progress: '当前云函数不支持重算：请重新部署 importLegacyTasks 后再试'
+        });
+        wx.showModal({
+          title: '需要重新部署',
+          content: '云端运行的 importLegacyTasks 还是旧版本，没有 recompute 逻辑。请在开发者工具里重新上传部署后再点一次。',
+          showCancel: false
+        });
+        return;
+      }
+
       updated += r.resultsUpdated || 0;
       cursor = r.nextCursor || (cursor + batch);
       done = !!r.done;
     }
 
     this.setData({ recomputing: false, progress: '重算完成：更新了 ' + updated + ' 条判定' });
-    wx.showToast({ title: '重算完成', icon: 'success' });
+
+    if (updated === 0) {
+      wx.showModal({
+        title: '没有更新任何判定',
+        content: '可能原因：① 分线历史还没写入；② 历史任务的判定本来就一致。可先到成员详情确认「分线变化」是否有数据。',
+        showCancel: false
+      });
+    } else {
+      wx.showToast({ title: '重算完成', icon: 'success' });
+    }
   },
 
   async resetAll() {

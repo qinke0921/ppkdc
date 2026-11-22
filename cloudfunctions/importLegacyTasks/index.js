@@ -287,14 +287,15 @@ exports.main = async (event) => {
 
   try {
     // 重算已有历史任务的判定（设定分线历史后用）
-    // 用法：{ "recompute": true, "cursor": 0, "batch": 5 }
+    // 用法：{ "recompute": true, "cursor": 0, "batch": 3 }
     if (payload.recompute === true) {
       const tasks = await fetchAll('disciple_tasks', { imported: true });
       tasks.sort((a, b) => (a.startAt || 0) - (b.startAt || 0));
 
       const cursor0 = Math.max(0, Number(payload.cursor) || 0);
-      const take = Math.min(20, Math.max(1, Number(payload.batch) || 5));
+      const take = Math.min(10, Math.max(1, Number(payload.batch) || 3));
       const slice = tasks.slice(cursor0, cursor0 + take);
+      const taskIds = slice.map((t) => t._id);
 
       const roster = await fetchAll('disciples', { status: 'approved' });
       const memberByOpenid = {};
@@ -314,15 +315,23 @@ exports.main = async (event) => {
         });
 
         const summary = { total: results.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+        const updates = [];
 
-        for (const res of results) {
+        results.forEach((res) => {
           const member = memberByOpenid[res._openid] || { masterLine: '' };
           const list = recByOpenid[res._openid] || [];
           const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
           const best = list.filter((r) => r.scoreMs === bestMs)[0];
           const j = judge(bestMs, task.lineTable, lineAt(member.masterLineHistory, member.masterLine, task.endAt));
 
-          await db.collection('disciple_task_results').doc(res._id).update({
+          if (j.status === 'over') summary.over++;
+          else if (j.status === 'passed') summary.passed++;
+          else if (j.status === 'missed') summary.missed++;
+          else if (j.status === 'no_target') summary.noTarget++;
+          else summary.absent++;
+
+          updates.push({
+            id: res._id,
             data: {
               bestMs,
               bestText: best ? best.scoreText : '',
@@ -334,14 +343,14 @@ exports.main = async (event) => {
               computedBy: 'recompute'
             }
           });
-          changed++;
+        });
 
-          if (j.status === 'over') summary.over++;
-          else if (j.status === 'passed') summary.passed++;
-          else if (j.status === 'missed') summary.missed++;
-          else if (j.status === 'no_target') summary.noTarget++;
-          else summary.absent++;
+        // 并发更新，避免 95 条串行写入超时
+        for (let i = 0; i < updates.length; i += 20) {
+          await Promise.all(updates.slice(i, i + 20).map((u) =>
+            db.collection('disciple_task_results').doc(u.id).update({ data: u.data })));
         }
+        changed += updates.length;
 
         await db.collection('disciple_tasks').doc(task._id).update({ data: { summary } });
       }
@@ -349,6 +358,7 @@ exports.main = async (event) => {
       return {
         success: true,
         recompute: true,
+        version: 'recompute-v2',
         nextCursor: cursor0 + slice.length,
         done: cursor0 + slice.length >= tasks.length,
         total: tasks.length,
