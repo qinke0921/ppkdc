@@ -160,3 +160,13 @@
   color: #bbb;
   background: #f7f7f7;
 }
+
+.target-banner {
+  margin-bottom: 16rpx;
+  padding: 18rpx 24rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #552583;
+  background: rgba(85, 37, 131, 0.06);
+  border-radius: 12rpx;
+}

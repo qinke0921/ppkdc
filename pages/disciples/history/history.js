@@ -13,10 +13,21 @@ Page({
     allList: [],
     list: [],
     onlyMine: false,
-    summary: null
+    summary: null,
+    targetOpenid: '',
+    targetName: ''
   },
 
-  onLoad() {
+  onLoad(options) {
+    const openid = (options && options.openid) || '';
+    const name = (options && options.name) || '';
+
+    this.setData({ targetOpenid: openid, targetName: name });
+
+    if (openid) {
+      wx.setNavigationBarTitle({ title: (name || '徒弟') + ' 的任务历史' });
+    }
+
     this.load();
   },
 
@@ -31,7 +42,8 @@ Page({
     if (!silent) this.setData({ loading: true });
 
     try {
-      const res = await wx.cloud.callFunction({ name: 'getDiscipleTaskHistory' });
+      const data = this.data.targetOpenid ? { openid: this.data.targetOpenid } : {};
+      const res = await wx.cloud.callFunction({ name: 'getDiscipleTaskHistory', data });
       const r = (res && res.result) || {};
 
       if (!r.success) {

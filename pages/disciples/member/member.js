@@ -115,6 +115,15 @@ Page({
     this.setData({ showStats: false });
   },
 
+  goStatsDetail() {
+    const m = this.data.member;
+    if (!m) return;
+    this.setData({ showStats: false });
+    wx.navigateTo({
+      url: '/pages/disciples/history/history?openid=' + m._openid + '&name=' + encodeURIComponent(m.gameName || m.nickname || '')
+    });
+  },
+
   stopPropagation() {},
 
   startEdit() {

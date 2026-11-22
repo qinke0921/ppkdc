@@ -271,3 +271,12 @@
   background: #f5f5f5;
   color: #666;
 }
+
+.modal-buttons .btn + .btn {
+  margin-left: 16rpx;
+}
+
+.btn.confirm {
+  color: #fff;
+  background: linear-gradient(135deg, #552583, #3d1e63);
+}

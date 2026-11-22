@@ -116,6 +116,7 @@
 
       <view class="modal-buttons">
         <view class="btn cancel" catchtap="closeStats">关闭</view>
+        <view class="btn confirm" catchtap="goStatsDetail">查看所有细节</view>
       </view>
     </view>
   </view>
