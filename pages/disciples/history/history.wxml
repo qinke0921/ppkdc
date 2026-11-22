@@ -3,6 +3,7 @@
   <view class="loading-box" wx:if="{{loading}}"><text>加载中...</text></view>
 
   <block wx:else>
+    <view class="sticky-head">
     <view class="target-banner" wx:if="{{targetName}}">
       <text>{{targetName}} 的任务历史</text>
     </view>
@@ -32,6 +33,7 @@
       <view class="filter-chip {{onlyMine ? 'on' : ''}}" bindtap="toggleOnlyMine">
         <text>{{onlyMine ? '只看有记录的' : '显示全部'}}</text>
       </view>
+    </view>
     </view>
 
     <view class="card {{item.hasResult ? '' : 'no-result'}}" wx:for="{{list}}" wx:key="taskId" bindtap="goTask" data-id="{{item.taskId}}">
