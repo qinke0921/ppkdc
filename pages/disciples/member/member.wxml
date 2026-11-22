@@ -12,6 +12,18 @@
       <view class="line-badge {{member.masterLine ? '' : 'empty'}}">{{member.masterLine || '未定线'}}</view>
     </view>
 
+    <!-- 分线变化 -->
+    <view class="card" wx:if="{{member.lineHistory.length > 0}}">
+      <view class="row">
+        <text class="k">分线变化</text>
+        <text class="v muted">{{member.lineHistory.length}} 次</text>
+      </view>
+      <view class="lh-row" wx:for="{{member.lineHistory}}" wx:key="at">
+        <text class="lh-line">{{item.line}}</text>
+        <text class="lh-date">{{item.dateText}}</text>
+      </view>
+    </view>
+
     <!-- 只读 -->
     <view class="card" wx:if="{{!editing}}">
       <view class="row">

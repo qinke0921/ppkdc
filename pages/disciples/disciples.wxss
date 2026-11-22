@@ -518,3 +518,46 @@ page {
   border-color: rgba(0, 0, 0, 0.06);
   border-left-color: #e3dcc9;
 }
+
+/* ---------- 分线变化 ---------- */
+.line-history {
+  margin: 16rpx 30rpx 0;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-radius: 14rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.lh-title {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.lh-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.lh-item {
+  display: flex;
+  align-items: center;
+  margin: 0 18rpx 8rpx 0;
+}
+
+.lh-line {
+  padding: 6rpx 16rpx;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: #552583;
+  background: rgba(85, 37, 131, 0.08);
+  border-radius: 8rpx;
+}
+
+.lh-date {
+  margin-left: 8rpx;
+  font-size: 20rpx;
+  color: #bbb;
+}

@@ -80,6 +80,17 @@ async function fetchAll(name, where) {
   return out;
 }
 
+// 取某个时间点的定线：分线历史里 <= ts 的最后一条；没有历史则回退当前定线
+function lineAt(history, fallbackLine, ts) {
+  const list = Array.isArray(history) ? history : [];
+  const at = typeof ts === 'number' ? ts : Date.now();
+  let line = fallbackLine;
+  list.forEach((h) => {
+    if (h && h.line && typeof h.at === 'number' && h.at <= at) line = h.line;
+  });
+  return line || fallbackLine;
+}
+
 function judge(bestMs, lineTable, memberLine) {
   const effective = normalizeLine(memberLine).effective;
   const table = {};
@@ -132,7 +143,7 @@ exports.main = async (event) => {
 
     const bestMs = records.length ? Math.min.apply(null, records.map((r) => r.scoreMs)) : null;
     const best = records.filter((r) => r.scoreMs === bestMs)[0] || null;
-    const j = judge(bestMs, task.lineTable, target.masterLine);
+    const j = judge(bestMs, task.lineTable, lineAt(target.masterLineHistory, target.masterLine, task.endAt || Date.now()));
     const settled = task.status === 'closed';
     const status = bestMs === null ? (settled ? 'absent' : 'pending') : j.status;
 

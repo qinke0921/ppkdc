@@ -55,6 +55,12 @@ Page({
       }
 
       member.formattedJoinedAt = util.formatTime(member.joinedAt);
+
+      const hist = Array.isArray(member.masterLineHistory) ? member.masterLineHistory : [];
+      member.lineHistory = hist
+        .slice()
+        .sort((a, b) => (a.at || 0) - (b.at || 0))
+        .map((h) => ({ line: h.line, at: h.at, dateText: util.formatTime(h.at) }));
       const myOpenid = me.disciple ? me.disciple._openid : '';
 
       this.setData({

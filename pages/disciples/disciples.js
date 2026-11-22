@@ -21,6 +21,7 @@ Page({
     pendingTotal: 0,
 
     // 演门公告
+    lineHistory: [],
     announcement: null,
     showAnnounce: false,
     announceText: '',
@@ -122,6 +123,14 @@ Page({
       const info = r.disciple || null;
       if (info) info.formattedJoinedAt = this.formatTime(info.joinedAt);
 
+      // 分线变化（最近 5 次）
+      const raw = (info && Array.isArray(info.masterLineHistory)) ? info.masterLineHistory : [];
+      const lineHistory = raw
+        .slice()
+        .sort((a, b) => (a.at || 0) - (b.at || 0))
+        .slice(-5)
+        .map((h) => ({ line: h.line, at: h.at, dateText: this.formatTime(h.at) }));
+
       // 待办 = 拜师申请 + 成绩申请
       // 兼容旧版云函数：没返回 pendingRequestCount 时，直接查一次待审批列表
       let pendingRequestCount = r.pendingRequestCount;
@@ -150,6 +159,7 @@ Page({
         discipleCount: r.discipleCount || 0,
         canClaimMaster: !!r.canClaimMaster,
         activeTasks: r.activeTasks || [],
+        lineHistory,
         announcement: r.announcement || null,
         pendingTotal
       });

@@ -60,6 +60,17 @@
       </view>
     </view>
 
+    <!-- 分线变化 -->
+    <view class="line-history" wx:if="{{lineHistory.length > 0}}">
+      <text class="lh-title">分线变化</text>
+      <view class="lh-list">
+        <view class="lh-item" wx:for="{{lineHistory}}" wx:key="at">
+          <text class="lh-line">{{item.line}}</text>
+          <text class="lh-date">{{item.dateText}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 演门公告 -->
     <view class="notice" wx:if="{{announcement.content}}">
       <view class="notice-left">

@@ -153,6 +153,17 @@ function buildLineTable(rows) {
 }
 
 // 四态判定：逃课 / 未达标 / 达标 / 超线完成（快一档），另有 no_target
+// 取某个时间点的定线：分线历史里 <= ts 的最后一条；没有历史则回退当前定线
+function lineAt(history, fallbackLine, ts) {
+  const list = Array.isArray(history) ? history : [];
+  const at = typeof ts === 'number' ? ts : Date.now();
+  let line = fallbackLine;
+  list.forEach((h) => {
+    if (h && h.line && typeof h.at === 'number' && h.at <= at) line = h.line;
+  });
+  return line || fallbackLine;
+}
+
 function judge(bestMs, lineTable, memberLine) {
   const effective = normalizeLine(memberLine).effective;
   const table = {};
@@ -207,7 +218,7 @@ async function settleTask(taskId, onlyOpenids, operator) {
     const list = byOpenid[m._openid] || [];
     const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
     const best = list.filter((r) => r.scoreMs === bestMs)[0];
-    const j = judge(bestMs, task.lineTable, m.masterLine);
+    const j = judge(bestMs, task.lineTable, lineAt(m.masterLineHistory, m.masterLine, task.endAt || Date.now()));
     return {
       taskId,
       _openid: m._openid,
@@ -278,7 +289,7 @@ exports.main = async (event) => {
       const list = byOpenid[m._openid] || [];
       const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
       const best = list.filter((r) => r.scoreMs === bestMs)[0];
-      const j = judge(bestMs, task.lineTable, m.masterLine);
+      const j = judge(bestMs, task.lineTable, lineAt(m.masterLineHistory, m.masterLine, task.endAt || Date.now()));
       const settled = task.status === 'closed';
       return {
         id: m._id,
@@ -322,7 +333,11 @@ exports.main = async (event) => {
     }
 
     const myLine = normalizeLine(caller ? caller.masterLine : '');
-    const j2 = judge(mine ? mine.bestMs : null, task.lineTable, caller ? caller.masterLine : '');
+    const j2 = judge(
+      mine ? mine.bestMs : null,
+      task.lineTable,
+      lineAt(caller ? caller.masterLineHistory : null, caller ? caller.masterLine : '', task.endAt || Date.now())
+    );
     const settled = task.status === 'closed';
 
     return {

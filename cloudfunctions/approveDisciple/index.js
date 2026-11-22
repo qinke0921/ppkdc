@@ -95,6 +95,7 @@ exports.main = async (event) => {
         gameId: app.gameId || '',
         statement: app.statement || '',
         masterLine: line,
+        masterLineHistory: line ? [{ line, at: Date.now() }] : [],
         status: 'approved',
         role: 'member',
         joinedAt: Date.now(),

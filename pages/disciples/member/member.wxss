@@ -154,3 +154,30 @@
 .btn.disabled {
   opacity: 0.6;
 }
+
+/* 分线变化 */
+.lh-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f7f7f7;
+}
+
+.lh-row:last-child {
+  border-bottom: none;
+}
+
+.lh-line {
+  padding: 6rpx 18rpx;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #552583;
+  background: rgba(85, 37, 131, 0.08);
+  border-radius: 8rpx;
+}
+
+.lh-date {
+  font-size: 22rpx;
+  color: #bbb;
+}

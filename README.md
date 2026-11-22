@@ -178,7 +178,8 @@ npm install
 ```
 disciples
   _openid, nickname, gameName, gameId, statement,
-  masterLine   # 师傅定线，6 档：强主/主力/一线/二线/三线/娱乐（国服记录仅用于任务超线判定）
+  masterLine          # 师傅定线，6 档：强主/主力/一线/二线/三线/娱乐
+  masterLineHistory   # 定线历史 [{ line, at }]，按时间升序，判定时取任务结束时的定线
   status       # approved（本模块无离队状态）
   role         # master | admin | member
   joinedAt, createdAt, createdBy, updatedAt
@@ -203,6 +204,8 @@ disciples
 **任命管理员**：不做界面，需要时在云开发控制台把该徒弟记录的 `role` 字段改成 `admin` 即可。
 
 **定线流程**：师傅或管理员在审批面板可直接为申请人选择定线（可留空），也可通过「徒弟详情 → 编辑资料 / 定线」随时修改。徒弟本人只能改昵称、游戏昵称、游戏ID、个人宣言，**不能改自己的定线**。
+
+**分线历史**：每次定线变化都会往 `masterLineHistory` 追加 `{ line, at }`，首页与成员详情会展示「分线变化」时间线。判定（达标 / 超线）使用**任务结束时间点**对应的定线，因此历史成绩不会因为后来升线被重新判错；没有历史记录的老数据回退到当前定线。
 
 **演门公告**
 

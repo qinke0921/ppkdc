@@ -61,6 +61,17 @@ function formatMs(ms) {
 }
 
 // 四态判定：快一档为超线，国服记录是天花板
+// 取某个时间点的定线：分线历史里 <= ts 的最后一条；没有历史则回退当前定线
+function lineAt(history, fallbackLine, ts) {
+  const list = Array.isArray(history) ? history : [];
+  const at = typeof ts === 'number' ? ts : Date.now();
+  let line = fallbackLine;
+  list.forEach((h) => {
+    if (h && h.line && typeof h.at === 'number' && h.at <= at) line = h.line;
+  });
+  return line || fallbackLine;
+}
+
 function judge(bestMs, lineTable, memberLine) {
   const idx = TASK_LINES.indexOf(normalizeLine(memberLine).effective);
   const table = {};
@@ -109,6 +120,7 @@ exports.main = async () => {
       statement: raw.statement || '',
       masterLine: lineInfo.effective,
       masterLineRaw: raw.masterLine || '',
+      masterLineHistory: Array.isArray(raw.masterLineHistory) ? raw.masterLineHistory : [],
       lineSource: lineInfo.source,
       role: raw.role || 'member',
       joinedAt: raw.joinedAt || null
@@ -226,7 +238,7 @@ exports.main = async () => {
             const list = byTask[t._id] || [];
             const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
             const best = list.filter((r) => r.scoreMs === bestMs)[0];
-            const j = judge(bestMs, t.lineTable, disciple.masterLineRaw);
+            const j = judge(bestMs, t.lineTable, lineAt(raw ? raw.masterLineHistory : null, disciple.masterLineRaw, t.endAt || Date.now()));
             const status = bestMs === null ? 'pending' : j.status;
 
             return {

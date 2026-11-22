@@ -16,6 +16,7 @@ function pick(d) {
     gameId: d.gameId || '',
     statement: d.statement || '',
     masterLine: d.masterLine || '',
+    masterLineHistory: Array.isArray(d.masterLineHistory) ? d.masterLineHistory : [],
     role: d.role || 'member',
     joinedAt: d.joinedAt || null
   };

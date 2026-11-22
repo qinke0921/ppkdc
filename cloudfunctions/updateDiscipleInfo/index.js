@@ -96,7 +96,21 @@ exports.main = async (event) => {
       if (v && !LINE_ALIAS[v]) {
         return { success: false, error: '定线档位不合法：' + v };
       }
-      data.masterLine = v ? normalizeLine(v).effective : '';
+
+      const newLine = v ? normalizeLine(v).effective : '';
+      const oldLine = target.masterLine || '';
+      data.masterLine = newLine;
+
+      if (newLine !== oldLine) {
+        const history = Array.isArray(target.masterLineHistory) ? target.masterLineHistory.slice() : [];
+        if (!history.length && oldLine) {
+          history.push({ line: oldLine, at: target.joinedAt || Date.now() });
+        }
+        if (newLine) {
+          history.push({ line: newLine, at: Date.now() });
+        }
+        data.masterLineHistory = history;
+      }
     }
 
     if (Object.keys(data).length === 0) {
