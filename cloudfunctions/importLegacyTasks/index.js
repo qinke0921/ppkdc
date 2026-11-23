@@ -412,6 +412,7 @@ exports.main = async (event) => {
       }
     }
 
+    const merge = payload.merge === true;
     const cursor = Math.max(0, Number(payload.cursor) || 0);
     const batch = Math.min(50, Math.max(1, Number(payload.batch) || 5));
     const dryRun = payload.dryRun === true;
@@ -469,8 +470,101 @@ exports.main = async (event) => {
       const exist = await db.collection('disciple_tasks').where({ legacyKey: week.legacyKey }).limit(1).get();
       if (exist.data && exist.data.length) {
         const prev = exist.data[0];
+
+        if (!prev.importing && merge) {
+          // 补录模式：不删任何东西，只补「还没有记录的人」
+          const existingRecords = await fetchAll('disciple_task_records', { taskId: prev._id });
+          const haveOpenid = {};
+          existingRecords.forEach((r) => { haveOpenid[r._openid] = true; });
+
+          const newDocs = [];
+          const newResults = [];
+
+          for (const m of week.members) {
+            const openid = byName[nameKey(m.name)];
+            if (!openid || haveOpenid[openid]) continue;
+
+            const member = roster.filter((x) => x._openid === openid)[0] || {};
+            const joined = member.joinedAt
+              ? (typeof member.joinedAt === 'number' ? member.joinedAt : new Date(member.joinedAt).getTime())
+              : 0;
+
+            // Excel 里出现得比现有拜师时间更早 → 把 joinedAt 修正到那一周
+            // （否则补录进来的历史会被判定成「未参与」）
+            if (!joined || joined > week.startAt) {
+              await db.collection('disciples').doc(member._id).update({ data: { joinedAt: week.startAt } });
+              member.joinedAt = week.startAt;
+            }
+
+            const valid = m.records.filter((r) => typeof r.ms === 'number' && r.ms > 0);
+            if (!valid.length) continue;
+
+            valid.forEach((r) => {
+              newDocs.push({
+                _openid: openid,
+                taskId: prev._id,
+                gameName: m.name,
+                scoreText: r.text,
+                scoreMs: r.ms,
+                recordDate: r.date,
+                recordedAt: new Date(r.date + 'T12:00:00').getTime(),
+                source: 'legacy',
+                recordedBy: 'legacy-import',
+                legacyK: m.legacyK || ''
+              });
+            });
+
+            const bestMs = Math.min.apply(null, valid.map((r) => r.ms));
+            const best = valid.filter((r) => r.ms === bestMs)[0];
+            const j = judge(bestMs, week.lineTable, lineAt(member.masterLineHistory, member.masterLine, week.endAt));
+
+            newResults.push({
+              taskId: prev._id,
+              _openid: openid,
+              gameName: m.name,
+              bestMs,
+              bestText: best.text,
+              targetLevel: j.targetLevel,
+              targetMs: j.targetMs,
+              status: j.status,
+              recordCount: valid.length,
+              legacyK: m.legacyK || '',
+              computedAt: Date.now(),
+              computedBy: 'legacy-import'
+            });
+            haveOpenid[openid] = true;
+          }
+
+          for (let i = 0; i < newDocs.length; i += 20) {
+            await Promise.all(newDocs.slice(i, i + 20).map((doc) =>
+              db.collection('disciple_task_records').add({ data: doc })));
+          }
+          for (let i = 0; i < newResults.length; i += 20) {
+            await Promise.all(newResults.slice(i, i + 20).map((doc) =>
+              db.collection('disciple_task_results').add({ data: doc })));
+          }
+
+          if (newResults.length) {
+            const allResults = await fetchAll('disciple_task_results', { taskId: prev._id });
+            const summary = { total: allResults.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+            allResults.forEach((r) => {
+              if (r.status === 'over') summary.over++;
+              else if (r.status === 'passed') summary.passed++;
+              else if (r.status === 'missed') summary.missed++;
+              else if (r.status === 'no_target') summary.noTarget++;
+              else summary.absent++;
+            });
+            await db.collection('disciple_tasks').doc(prev._id).update({ data: { summary, updatedAt: Date.now() } });
+          }
+
+          stats.merged = (stats.merged || 0) + newResults.length;
+          stats.records += newDocs.length;
+          stats.members += newResults.length;
+          continue;
+        }
+
         if (!prev.importing) {
-          // 已经完整导入过
+          // 已经完整导入过（非补录模式）
           stats.skippedTopics.push(week.weekLabel);
           continue;
         }
@@ -633,6 +727,7 @@ exports.main = async (event) => {
         records: stats.records,
         skippedRecords: stats.skippedRecords,
         results: stats.results,
+        merged: stats.merged || 0,
         skippedTopics: stats.skippedTopics,
         unmatched: unmatchedUnique
       },

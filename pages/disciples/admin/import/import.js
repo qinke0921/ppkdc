@@ -8,6 +8,7 @@ Page({
     importing: false,
     resetting: false,
     recomputing: false,
+    merging: false,
     progress: '',
     stats: null,
     unmatched: [],
@@ -40,6 +41,80 @@ Page({
       this.setData({ checking: false, progress: '' });
       wx.showToast({ title: '检查失败（可能超时），可直接开始导入', icon: 'none' });
     }
+  },
+
+  // 补录：不删除任何数据，只把「现在能匹配上、但之前没导入」的成员记录补进来
+  async mergeImport() {
+    if (this.data.merging || this.data.importing) return;
+
+    const confirmed = await new Promise((resolve) => {
+      wx.showModal({
+        title: '补录成员历史',
+        content: '不删除任何已有数据，只补齐「现在能匹配上、但之前没导入」的成员成绩。适合新加入的徒弟。',
+        confirmText: '开始补录',
+        success: (r) => resolve(!!r.confirm),
+        fail: () => resolve(false)
+      });
+    });
+    if (!confirmed) return;
+
+    this.setData({ merging: true, progress: '准备补录...' });
+
+    let cursor = 0;
+    let done = false;
+    let batch = 5;
+    let merged = 0;
+    let records = 0;
+
+    while (!done) {
+      this.setData({
+        progress: '补录中 ' + cursor + '/47 期 · 已补 ' + merged + ' 人（每批 ' + batch + ' 期）'
+      });
+
+      let r = null;
+      let attempt = 0;
+      while (attempt < 3) {
+        try {
+          const res = await wx.cloud.callFunction({
+            name: 'importLegacyTasks',
+            data: { merge: true, cursor, batch }
+          });
+          r = (res && res.result) || {};
+          break;
+        } catch (err) {
+          attempt += 1;
+          if (batch > 1) {
+            batch = Math.max(1, Math.floor(batch / 2));
+            break;
+          }
+          if (attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            continue;
+          }
+          this.setData({ merging: false, progress: '补录中断，请重试（幂等，可重复执行）' });
+          return;
+        }
+      }
+
+      if (!r) continue;
+      if (!r.success) {
+        this.setData({ merging: false, progress: r.error || '补录失败' });
+        return;
+      }
+      if (!r.stats) {
+        this.setData({ merging: false, progress: '当前云函数不支持补录，请重新部署 importLegacyTasks' });
+        return;
+      }
+
+      merged += r.stats.merged || 0;
+      records += r.stats.records || 0;
+
+      cursor = r.nextCursor || (cursor + batch);
+      done = !!r.done;
+    }
+
+    this.setData({ merging: false, progress: '补录完成：新增 ' + merged + ' 条成员判定 / ' + records + ' 条成绩' });
+    wx.showToast({ title: '补录完成', icon: 'success' });
   },
 
   async recompute() {

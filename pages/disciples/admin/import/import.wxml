@@ -21,7 +21,8 @@
   </view>
 
   <view class="actions">
-    <view class="btn ghost {{recomputing ? 'disabled' : ''}}" bindtap="recompute">{{recomputing ? '重算中...' : '④ 重算历史判定'}}</view>
+    <view class="btn ghost {{merging ? 'disabled' : ''}}" bindtap="mergeImport">{{merging ? '补录中...' : '④ 补录新成员历史'}}</view>
+    <view class="btn ghost {{recomputing ? 'disabled' : ''}}" bindtap="recompute">{{recomputing ? '重算中...' : '⑤ 重算历史判定'}}</view>
   </view>
 
   <view class="actions">

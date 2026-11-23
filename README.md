@@ -325,6 +325,14 @@ disciples
 
 返回 `nextCursor` 后继续调用，直到 `done: true`；首次可加 `"dryRun": true` 只统计不写库。
 
+**补录新成员**（不删任何数据，只补当前能匹配上、之前没导入的人）：
+
+```json
+{ "merge": true, "cursor": 0, "batch": 5 }
+```
+
+补录时会顺带把该成员的 `joinedAt` 修正为他在 Excel 里首次出现的周，避免历史被算成「未参与」。
+
 只重导某几期（解析修正后常用），用 `keys` 限定期次、`resetKeys` 先精确清理：
 
 ```json
