@@ -220,7 +220,9 @@ disciples
 
 首页「进行中任务」上方的一条公告，只存一句话（≤120 字），数据在 `disciple_announcement` 集合里只保留一个文档。师傅/管理员点公告右侧的 ✏️ 即可在线编辑，清空内容等于隐藏公告。读取走 `getMyDiscipleInfo`，不额外增加请求。
 
-**地图笔记（PDF）**
+**地图笔记（PDF）——当前前端已隐藏**
+
+> 前端受 `pages/disciples/task/task.js` 里的 `SHOW_MAP_DOC` 开关控制，当前为 `false`（入口不显示）。云函数 `saveMapDoc`、集合 `map_docs` 与 `getDiscipleTaskDetail` 返回的 `doc` 字段均保留，把开关改为 `true` 即可恢复。
 
 任务详情会显示「📄 查看兔姐笔记」，点击后下载并用 `wx.openDocument` 原生打开 PDF。
 

@@ -16,6 +16,10 @@ function pad2(n) {
   return n < 10 ? '0' + n : String(n);
 }
 
+// 地图 PDF 笔记功能开关：当前关闭（前端隐藏），云函数与数据保留
+// 以后要恢复，把这里改成 true 即可
+const SHOW_MAP_DOC = false;
+
 function formatSize(bytes) {
   if (!bytes || typeof bytes !== 'number') return '';
   if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
@@ -62,7 +66,8 @@ Page({
       return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
     })(),
 
-    // 地图笔记（PDF）
+    // 地图笔记（PDF）：受 SHOW_MAP_DOC 控制
+    showMapDoc: SHOW_MAP_DOC,
     doc: null,
     uploadingDoc: false,
 
