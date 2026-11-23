@@ -16,6 +16,12 @@ function pad2(n) {
   return n < 10 ? '0' + n : String(n);
 }
 
+function formatSize(bytes) {
+  if (!bytes || typeof bytes !== 'number') return '';
+  if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+
 function shortDate(ts) {
   if (!ts) return '';
   const d = new Date(ts);
@@ -55,6 +61,10 @@ Page({
       const pad = (n) => (n < 10 ? '0' + n : String(n));
       return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
     })(),
+
+    // 地图笔记（PDF）
+    doc: null,
+    uploadingDoc: false,
 
     // 视频讲解
     showVideoEdit: false,
@@ -130,6 +140,7 @@ Page({
         me: r.me || null,
         myRecords: r.myRecords || [],
         myReported: !!r.myReported,
+        doc: r.doc ? Object.assign({}, r.doc, { sizeText: formatSize(r.doc.size) }) : null,
         board,
         boardDone,
         boardUndone,
@@ -243,6 +254,86 @@ Page({
           }
         });
       });
+  },
+
+  /* ---------------- 地图笔记（PDF） ---------------- */
+
+  async openDoc() {
+    const doc = this.data.doc;
+    if (!doc || !doc.fileID) {
+      wx.showToast({ title: '还没有笔记', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '下载中...', mask: true });
+    try {
+      const res = await wx.cloud.downloadFile({ fileID: doc.fileID });
+      wx.hideLoading();
+      wx.openDocument({
+        filePath: res.tempFilePath,
+        fileType: 'pdf',
+        showMenu: true,
+        fail: () => wx.showToast({ title: '打开失败，请重试', icon: 'none' })
+      });
+    } catch (err) {
+      console.error('下载笔记失败', err);
+      wx.hideLoading();
+      wx.showToast({ title: '下载失败，请检查文件是否还在', icon: 'none' });
+    }
+  },
+
+  async chooseDoc() {
+    if (this.data.uploadingDoc) return;
+
+    // 从聊天记录选文件：先把 PDF 发到「文件传输助手」即可选择
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['pdf'],
+      success: async (res) => {
+        const file = res.tempFiles[0];
+        if (!file) return;
+
+        this.setData({ uploadingDoc: true });
+        wx.showLoading({ title: '上传中...', mask: true });
+
+        try {
+          const mapKey = this.data.task.mapId || this.data.task.mapName || 'map';
+          const cloudPath = 'map-docs/' + mapKey + '_' + Date.now() + '.pdf';
+          const up = await wx.cloud.uploadFile({ cloudPath, filePath: file.path });
+
+          const save = await wx.cloud.callFunction({
+            name: 'saveMapDoc',
+            data: {
+              mapId: this.data.task.mapId || '',
+              mapName: this.data.task.mapName || '',
+              title: '兔姐笔记',
+              fileID: up.fileID,
+              fileName: file.name || '笔记.pdf',
+              size: file.size || 0
+            }
+          });
+
+          wx.hideLoading();
+          this.setData({ uploadingDoc: false });
+
+          const r = (save && save.result) || {};
+          if (!r.success) {
+            wx.showToast({ title: r.error || '保存失败', icon: 'none' });
+            return;
+          }
+
+          wx.showToast({ title: '上传成功', icon: 'success' });
+          this.load(true);
+        } catch (err) {
+          console.error('上传笔记失败', err);
+          wx.hideLoading();
+          this.setData({ uploadingDoc: false });
+          wx.showToast({ title: '上传失败，请检查云存储权限', icon: 'none' });
+        }
+      },
+      fail: () => {}
+    });
   },
 
   /* ---------------- 视频讲解 ---------------- */

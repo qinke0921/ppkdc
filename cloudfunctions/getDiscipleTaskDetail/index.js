@@ -336,6 +336,21 @@ exports.main = async (event) => {
       return (a.recordedAt || 0) - (b.recordedAt || 0);
     });
 
+    // 地图笔记（PDF）：先按 mapId 找，老任务没有 mapId 时退回按地图名找
+    let doc = null;
+    try {
+      if (task.mapId) {
+        const d1 = await db.collection('map_docs').where({ mapId: task.mapId }).limit(1).get();
+        doc = (d1.data && d1.data[0]) || null;
+      }
+      if (!doc && task.mapName) {
+        const d2 = await db.collection('map_docs').where({ mapName: task.mapName }).limit(1).get();
+        doc = (d2.data && d2.data[0]) || null;
+      }
+    } catch (err) {
+      doc = null;
+    }
+
     // 我是否已反馈该任务的视频失效
     let myReported = false;
     try {
@@ -394,6 +409,7 @@ exports.main = async (event) => {
         recordedAt: r.recordedAt || null
       })),
       myReported,
+      doc,
       board
     };
   } catch (err) {

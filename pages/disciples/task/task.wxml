@@ -12,6 +12,23 @@
       <text class="hero-range">{{dateRange}}</text>
     </view>
 
+    <!-- 地图笔记（PDF） -->
+    <view class="doc-card" wx:if="{{doc}}">
+      <view class="doc-row" bindtap="openDoc">
+        <text class="doc-icon">📄</text>
+        <view class="doc-info">
+          <text class="doc-title">查看兔姐笔记</text>
+          <text class="doc-sub">{{doc.fileName || '地图笔记'}}{{doc.sizeText ? ' · ' + doc.sizeText : ''}}</text>
+        </view>
+        <text class="doc-arrow">›</text>
+      </view>
+      <view class="doc-edit" wx:if="{{canManage}}" catchtap="chooseDoc">更换笔记</view>
+    </view>
+
+    <view class="doc-add" wx:elif="{{canManage}}" bindtap="chooseDoc">
+      <text>📄 上传兔姐笔记（PDF）</text>
+    </view>
+
     <!-- 视频讲解 -->
     <view class="video-card" wx:if="{{task.videoUrl}}">
       <view class="video-head">

@@ -702,3 +702,66 @@
   background: #fff;
   border-radius: 14rpx;
 }
+
+/* 地图笔记 PDF */
+.doc-card {
+  margin-top: 20rpx;
+  padding: 8rpx 26rpx 8rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  border-left: 6rpx solid #2f7d6b;
+}
+
+.doc-row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.doc-icon {
+  font-size: 40rpx;
+  margin-right: 18rpx;
+}
+
+.doc-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.doc-title {
+  font-size: 29rpx;
+  font-weight: 600;
+  color: #2f7d6b;
+}
+
+.doc-sub {
+  margin-top: 4rpx;
+  font-size: 21rpx;
+  color: #aaa;
+}
+
+.doc-arrow {
+  font-size: 32rpx;
+  color: #ccc;
+}
+
+.doc-edit {
+  padding: 14rpx 0;
+  border-top: 2rpx solid #f7f7f7;
+  text-align: right;
+  font-size: 23rpx;
+  color: #552583;
+}
+
+.doc-add {
+  margin-top: 20rpx;
+  padding: 26rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #2f7d6b;
+  background: #fff;
+  border: 2rpx dashed rgba(47, 125, 107, 0.4);
+  border-radius: 16rpx;
+}

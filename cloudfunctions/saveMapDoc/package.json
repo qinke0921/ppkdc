@@ -1,0 +1,9 @@
+{
+  "name": "saveMapDoc",
+  "version": "1.0.0",
+  "description": "主演徒弟：保存地图 PDF 笔记",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

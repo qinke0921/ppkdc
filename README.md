@@ -132,6 +132,7 @@ npm install
 | `updateDiscipleAnnouncement` | 主演徒弟：更新「演门公告」（师傅/管理员） |
 | `importLegacyTasks` | 主演徒弟：分批导入历史作业数据（一次性，幂等，可 dryRun） |
 | `setDiscipleLineHistory` | 主演徒弟：按参数直接设定某人的分线历史（昵称 + 拜师时间 + 多次定线） |
+| `saveMapDoc` | 主演徒弟：保存/更换地图笔记（PDF），按 mapId 唯一 |
 | `listTaskReports` / `resolveTaskReport` | 主演徒弟：待处理反馈列表 / 标记已处理 |
 
 ## 数据库集合
@@ -159,6 +160,7 @@ npm install
 | `disciple_task_results` | 主演徒弟任务：结算后的判定快照 |
 | `disciple_task_requests` | 主演徒弟任务：成绩申请（待审批 → 通过才入库） |
 | `disciple_task_reports` | 主演徒弟任务：视频失效反馈（成员报、管理处理） |
+| `map_docs` | 主演徒弟：地图笔记（PDF，按 mapId 唯一，云存储 fileID） |
 | `disciple_announcement` | 主演徒弟：演门公告（单文档，一句话，首页展示） |
 
 ## 主演徒弟模块
@@ -217,6 +219,14 @@ disciples
 **演门公告**
 
 首页「进行中任务」上方的一条公告，只存一句话（≤120 字），数据在 `disciple_announcement` 集合里只保留一个文档。师傅/管理员点公告右侧的 ✏️ 即可在线编辑，清空内容等于隐藏公告。读取走 `getMyDiscipleInfo`，不额外增加请求。
+
+**地图笔记（PDF）**
+
+任务详情会显示「📄 查看兔姐笔记」，点击后下载并用 `wx.openDocument` 原生打开 PDF。
+
+- 数据存在 `map_docs` 集合，按 `mapId` 唯一；老任务没有 `mapId` 时按地图名匹配
+- 管理在任务详情点「上传兔姐笔记（PDF）」选择文件，自动上传云存储并写库；同一张图再传会覆盖记录（旧文件仍留在存储里，可定期清理）
+- 换笔记不需要发版
 
 **视频讲解**
 
