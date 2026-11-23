@@ -23,6 +23,34 @@
       {
         "type": "folder",
         "value": "assets"
+      },
+      {
+        "type": "folder",
+        "value": ".tmp"
+      },
+      {
+        "type": "folder",
+        "value": "legacy"
+      },
+      {
+        "type": "folder",
+        "value": "python"
+      },
+      {
+        "type": "folder",
+        "value": "docs"
+      },
+      {
+        "type": "file",
+        "value": "README.md"
+      },
+      {
+        "type": "file",
+        "value": "package-lock.json"
+      },
+      {
+        "type": "file",
+        "value": "WechatIMG39.png"
       }
     ],
     "include": []
