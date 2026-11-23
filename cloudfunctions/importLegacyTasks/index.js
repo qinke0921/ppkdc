@@ -300,62 +300,83 @@ exports.main = async (event) => {
       const cursor0 = Math.max(0, Number(payload.cursor) || 0);
       const take = Math.min(10, Math.max(1, Number(payload.batch) || 3));
       const slice = tasks.slice(cursor0, cursor0 + take);
-      const taskIds = slice.map((t) => t._id);
 
       const roster = await fetchAll('disciples', { status: 'approved' });
       const memberByOpenid = {};
       roster.forEach((m) => { memberByOpenid[m._openid] = m; });
 
-      let changed = 0;
+      let updated = 0;
+      let created = 0;
 
       for (const task of slice) {
-        const results = await fetchAll('disciple_task_results', { taskId: task._id });
-        if (!results.length) continue;
+        const [results, records] = await Promise.all([
+          fetchAll('disciple_task_results', { taskId: task._id }),
+          fetchAll('disciple_task_records', { taskId: task._id })
+        ]);
 
-        const records = await fetchAll('disciple_task_records', { taskId: task._id });
+        const resultByOpenid = {};
+        results.forEach((r) => { resultByOpenid[r._openid] = r; });
+
         const recByOpenid = {};
         records.forEach((r) => {
           if (!recByOpenid[r._openid]) recByOpenid[r._openid] = [];
           recByOpenid[r._openid].push(r);
         });
 
-        const summary = { total: results.length, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
-        const updates = [];
+        // 以「有记录的人」和「已有判定的人」的并集为准：
+        // 有记录但没判定的人要补建，否则历史列表会误显示为逃课
+        const openids = {};
+        Object.keys(recByOpenid).forEach((k) => { openids[k] = true; });
+        Object.keys(resultByOpenid).forEach((k) => { openids[k] = true; });
+        const list = Object.keys(openids);
 
-        results.forEach((res) => {
-          const member = memberByOpenid[res._openid] || { masterLine: '' };
-          const list = recByOpenid[res._openid] || [];
-          const bestMs = list.length ? Math.min.apply(null, list.map((r) => r.scoreMs)) : null;
-          const best = list.filter((r) => r.scoreMs === bestMs)[0];
+        const summary = { total: 0, over: 0, passed: 0, missed: 0, absent: 0, noTarget: 0 };
+        const updates = [];
+        const inserts = [];
+
+        list.forEach((openid) => {
+          const member = memberByOpenid[openid] || { masterLine: '' };
+          const recs = recByOpenid[openid] || [];
+          const bestMs = recs.length ? Math.min.apply(null, recs.map((r) => r.scoreMs)) : null;
+          const best = recs.filter((r) => r.scoreMs === bestMs)[0];
           const j = judge(bestMs, task.lineTable, lineAt(member.masterLineHistory, member.masterLine, task.endAt));
+
+          const data = {
+            taskId: task._id,
+            _openid: openid,
+            gameName: (member.gameName || '') || (resultByOpenid[openid] ? resultByOpenid[openid].gameName : ''),
+            bestMs,
+            bestText: best ? best.scoreText : '',
+            targetLevel: j.targetLevel,
+            targetMs: j.targetMs,
+            status: j.status,
+            recordCount: recs.length,
+            computedAt: Date.now(),
+            computedBy: 'recompute'
+          };
 
           if (j.status === 'over') summary.over++;
           else if (j.status === 'passed') summary.passed++;
           else if (j.status === 'missed') summary.missed++;
           else if (j.status === 'no_target') summary.noTarget++;
           else summary.absent++;
+          summary.total++;
 
-          updates.push({
-            id: res._id,
-            data: {
-              bestMs,
-              bestText: best ? best.scoreText : '',
-              targetLevel: j.targetLevel,
-              targetMs: j.targetMs,
-              status: j.status,
-              recordCount: list.length,
-              computedAt: Date.now(),
-              computedBy: 'recompute'
-            }
-          });
+          if (resultByOpenid[openid]) updates.push({ id: resultByOpenid[openid]._id, data });
+          else inserts.push(data);
         });
 
-        // 并发更新，避免 95 条串行写入超时
         for (let i = 0; i < updates.length; i += 20) {
           await Promise.all(updates.slice(i, i + 20).map((u) =>
             db.collection('disciple_task_results').doc(u.id).update({ data: u.data })));
         }
-        changed += updates.length;
+        for (let i = 0; i < inserts.length; i += 20) {
+          await Promise.all(inserts.slice(i, i + 20).map((doc) =>
+            db.collection('disciple_task_results').add({ data: doc })));
+        }
+
+        updated += updates.length;
+        created += inserts.length;
 
         await db.collection('disciple_tasks').doc(task._id).update({ data: { summary } });
       }
@@ -363,12 +384,13 @@ exports.main = async (event) => {
       return {
         success: true,
         recompute: true,
-        version: 'recompute-v2',
+        version: 'recompute-v3',
         nextCursor: cursor0 + slice.length,
         done: cursor0 + slice.length >= tasks.length,
         total: tasks.length,
         tasksDone: slice.length,
-        resultsUpdated: changed
+        resultsUpdated: updated,
+        resultsCreated: created
       };
     }
 
@@ -514,9 +536,15 @@ exports.main = async (event) => {
 
         if (!prev.importing && merge) {
           // 补录模式：不删任何东西，只补「还没有记录的人」
-          const existingRecords = await fetchAll('disciple_task_records', { taskId: prev._id });
+          const [existingRecords, existingResults] = await Promise.all([
+            fetchAll('disciple_task_records', { taskId: prev._id }),
+            fetchAll('disciple_task_results', { taskId: prev._id })
+          ]);
           const haveOpenid = {};
           existingRecords.forEach((r) => { haveOpenid[r._openid] = true; });
+
+          const resultByOpenid = {};
+          existingResults.forEach((r) => { resultByOpenid[r._openid] = r._id; });
 
           const newDocs = [];
           const newResults = [];
@@ -588,8 +616,20 @@ exports.main = async (event) => {
             await Promise.all(newDocs.slice(i, i + 20).map((doc) =>
               db.collection('disciple_task_records').add({ data: doc })));
           }
-          for (let i = 0; i < newResults.length; i += 20) {
-            await Promise.all(newResults.slice(i, i + 20).map((doc) =>
+          // 已有判定（比如旧的「逃课」）则更新，避免一条记录对应两条判定
+          const toAdd = [];
+          const toUpdate = [];
+          newResults.forEach((doc) => {
+            if (resultByOpenid[doc._openid]) toUpdate.push({ id: resultByOpenid[doc._openid], data: doc });
+            else toAdd.push(doc);
+          });
+
+          for (let i = 0; i < toUpdate.length; i += 20) {
+            await Promise.all(toUpdate.slice(i, i + 20).map((u) =>
+              db.collection('disciple_task_results').doc(u.id).update({ data: u.data })));
+          }
+          for (let i = 0; i < toAdd.length; i += 20) {
+            await Promise.all(toAdd.slice(i, i + 20).map((doc) =>
               db.collection('disciple_task_results').add({ data: doc })));
           }
 
