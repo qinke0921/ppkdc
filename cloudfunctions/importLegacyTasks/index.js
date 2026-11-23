@@ -523,7 +523,15 @@ exports.main = async (event) => {
 
           for (const m of week.members) {
             const openid = byName[nameKey(m.name)];
-            if (!openid || haveOpenid[openid]) continue;
+            if (!openid) {
+              stats.mergeUnmatched = (stats.mergeUnmatched || 0) + 1;
+              stats.unmatchedNames.push(m.name);
+              continue;
+            }
+            if (haveOpenid[openid]) {
+              stats.mergeSkipped = (stats.mergeSkipped || 0) + 1;
+              continue;
+            }
 
             const member = roster.filter((x) => x._openid === openid)[0] || {};
             const joined = member.joinedAt
@@ -597,6 +605,11 @@ exports.main = async (event) => {
             });
             await db.collection('disciple_tasks').doc(prev._id).update({ data: { summary, updatedAt: Date.now() } });
           }
+
+          newResults.forEach((r) => {
+            stats.mergeAdded = stats.mergeAdded || [];
+            if (stats.mergeAdded.length < 20) stats.mergeAdded.push(r.gameName + ' · ' + week.weekLabel);
+          });
 
           stats.merged = (stats.merged || 0) + newResults.length;
           stats.records += newDocs.length;
@@ -769,6 +782,9 @@ exports.main = async (event) => {
         skippedRecords: stats.skippedRecords,
         results: stats.results,
         merged: stats.merged || 0,
+        mergeSkipped: stats.mergeSkipped || 0,
+        mergeUnmatched: stats.mergeUnmatched || 0,
+        mergeAdded: stats.mergeAdded || [],
         skippedTopics: stats.skippedTopics,
         unmatched: unmatchedUnique
       },
