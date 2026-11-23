@@ -71,7 +71,6 @@ Page({
     // 地图笔记（PDF）：受 SHOW_MAP_DOC 控制
     showMapDoc: SHOW_MAP_DOC,
     doc: null,
-    uploadingDoc: false,
 
     // 视频讲解
     showVideoEdit: false,
@@ -297,86 +296,7 @@ Page({
     }
   },
 
-  async chooseDoc() {
-    if (this.data.uploadingDoc) return;
-
-    // 从聊天记录选文件：先把 PDF 发到「文件传输助手」即可选择
-    wx.chooseMessageFile({
-      count: 1,
-      type: 'file',
-      extension: ['pdf'],
-      success: async (res) => {
-        const file = res.tempFiles[0];
-        if (!file) return;
-
-        this.setData({ uploadingDoc: true });
-        wx.showLoading({ title: '上传中...', mask: true });
-
-        try {
-          const mapKey = this.data.task.mapId || this.data.task.mapName || 'map';
-          const cloudPath = 'map-docs/' + mapKey + '_' + Date.now() + '.pdf';
-          const up = await wx.cloud.uploadFile({ cloudPath, filePath: file.path });
-
-          const save = await wx.cloud.callFunction({
-            name: 'saveMapDoc',
-            data: {
-              mapId: this.data.task.mapId || '',
-              mapName: this.data.task.mapName || '',
-              title: '兔姐笔记',
-              fileID: up.fileID,
-              fileName: file.name || '笔记.pdf',
-              size: file.size || 0
-            }
-          });
-
-          wx.hideLoading();
-          this.setData({ uploadingDoc: false });
-
-          const r = (save && save.result) || {};
-          if (!r.success) {
-            wx.showToast({ title: r.error || '保存失败', icon: 'none' });
-            return;
-          }
-
-          wx.showToast({ title: '上传成功', icon: 'success' });
-          this.load(true);
-        } catch (err) {
-          console.error('上传笔记失败', err);
-          wx.hideLoading();
-          this.setData({ uploadingDoc: false });
-          wx.showToast({ title: '上传失败，请检查云存储权限', icon: 'none' });
-        }
-      },
-      fail: () => {}
-    });
-  },
-
   /* ---------------- 视频讲解 ---------------- */
-
-  copyVideoLink() {
-    const url = this.data.task && this.data.task.videoUrl;
-    if (!url) return;
-    wx.setClipboardData({
-      data: url,
-      success: () => {
-        wx.showModal({
-          title: '链接已复制',
-          content: '微信内不能直接打开网盘链接。请打开网盘 App 或浏览器，粘贴后即可查看。',
-          showCancel: false,
-          confirmText: '知道了'
-        });
-      }
-    });
-  },
-
-  copyVideoCode() {
-    const code = this.data.task && this.data.task.videoCode;
-    if (!code) return;
-    wx.setClipboardData({
-      data: code,
-      success: () => wx.showToast({ title: '提取码已复制', icon: 'success' })
-    });
-  },
 
   openVideoEdit() {
     const t = this.data.task || {};
