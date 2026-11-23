@@ -765,3 +765,30 @@
   border: 2rpx dashed rgba(47, 125, 107, 0.4);
   border-radius: 16rpx;
 }
+
+/* 榜单筛选 */
+.board-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 16rpx 0 10rpx;
+  border-bottom: 2rpx solid #f7f7f7;
+}
+
+.bf-item {
+  padding: 8rpx 18rpx;
+  font-size: 22rpx;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 20rpx;
+}
+
+.bf-item.on {
+  color: #fff;
+  background: #552583;
+}
+
+.bf-item.over.on { background: #b8860b; }
+.bf-item.passed.on { background: #2e7d32; }
+.bf-item.missed.on { background: #c0392b; }
+.bf-item.absent.on { background: #888; }

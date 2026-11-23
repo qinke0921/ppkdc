@@ -43,6 +43,8 @@ Page({
     boardDone: [],
     boardUndone: [],
     showUndone: false,
+    boardFilter: 'all',   // all | over | passed | missed | absent
+    counts: { all: 0, over: 0, passed: 0, missed: 0, absent: 0 },
     settled: false,
     canManage: false,
     dateRange: '',
@@ -136,8 +138,16 @@ Page({
       });
       const now = Date.now();
 
-      const boardDone = board.filter((b) => b.bestMs !== null && b.bestMs !== undefined);
-      const boardUndone = board.filter((b) => b.bestMs === null || b.bestMs === undefined);
+      const counts = { all: board.length, over: 0, passed: 0, missed: 0, absent: 0 };
+      board.forEach((b) => {
+        if (b.status === 'over') counts.over++;
+        else if (b.status === 'passed') counts.passed++;
+        else if (b.status === 'missed') counts.missed++;
+        else if (b.bestMs === null || b.bestMs === undefined) counts.absent++;
+      });
+
+      this._board = board;
+      this._counts = counts;
 
       this.setData({
         loading: false,
@@ -147,13 +157,13 @@ Page({
         myReported: !!r.myReported,
         doc: r.doc ? Object.assign({}, r.doc, { sizeText: formatSize(r.doc.size) }) : null,
         board,
-        boardDone,
-        boardUndone,
+        counts,
         settled: !!r.settled,
         canManage: !!r.canManage,
         dateRange: shortDate(task.startAt) + ' - ' + shortDate(task.endAt),
         daysLeft: Math.max(0, Math.ceil((task.endAt - now) / 86400000))
       }, () => {
+        this.applyBoardFilter(this.data.boardFilter);
         this.drawChart('#curve', this.data.myRecords, (this.data.me || {}).targetMs);
       });
     } catch (err) {
@@ -523,6 +533,31 @@ Page({
   },
 
   /* ---------------- 榜单 ---------------- */
+
+  applyBoardFilter(filter) {
+    const board = this._board || [];
+    const done = board.filter((b) => b.bestMs !== null && b.bestMs !== undefined);
+    const undone = board.filter((b) => b.bestMs === null || b.bestMs === undefined);
+
+    let boardDone = done;
+    let boardUndone = undone;
+    let showUndone = this.data.showUndone;
+
+    if (filter === 'absent') {
+      boardDone = [];
+      boardUndone = undone;
+      showUndone = true;
+    } else if (filter !== 'all') {
+      boardDone = done.filter((b) => b.status === filter);
+      boardUndone = [];
+    }
+
+    this.setData({ boardFilter: filter, boardDone, boardUndone, showUndone });
+  },
+
+  setBoardFilter(e) {
+    this.applyBoardFilter(e.currentTarget.dataset.filter || 'all');
+  },
 
   toggleBoard() {
     this.setData({ boardOpen: !this.data.boardOpen });

@@ -205,6 +205,15 @@
       <text class="toggle-hint">{{boardOpen ? '收起 ▲' : '展开 ▼'}}</text>
     </view>
     <view class="card" wx:if="{{boardOpen}}">
+      <!-- 筛选 -->
+      <view class="board-filter">
+        <view class="bf-item {{boardFilter === 'all' ? 'on' : ''}}" catchtap="setBoardFilter" data-filter="all">全部 {{counts.all}}</view>
+        <view class="bf-item over {{boardFilter === 'over' ? 'on' : ''}}" catchtap="setBoardFilter" data-filter="over">超线 {{counts.over}}</view>
+        <view class="bf-item passed {{boardFilter === 'passed' ? 'on' : ''}}" catchtap="setBoardFilter" data-filter="passed">达标 {{counts.passed}}</view>
+        <view class="bf-item missed {{boardFilter === 'missed' ? 'on' : ''}}" catchtap="setBoardFilter" data-filter="missed">未达标 {{counts.missed}}</view>
+        <view class="bf-item absent {{boardFilter === 'absent' ? 'on' : ''}}" catchtap="setBoardFilter" data-filter="absent">未完成 {{counts.absent}}</view>
+      </view>
+
       <view class="board-row" wx:for="{{boardDone}}" wx:key="openid" bindtap="openMember" data-openid="{{item.openid}}">
         <text class="board-rank">{{index + 1}}</text>
         <view class="board-who">
@@ -220,7 +229,7 @@
         <text>还没有人录入成绩</text>
       </view>
 
-      <view class="undone-toggle" wx:if="{{boardUndone.length > 0}}" bindtap="toggleUndone">
+      <view class="undone-toggle" wx:if="{{boardFilter === 'all' && boardUndone.length > 0}}" bindtap="toggleUndone">
         <text>未完成名单 {{boardUndone.length}} 人</text>
         <text class="undone-arrow">{{showUndone ? '收起 ▲' : '查看 ▼'}}</text>
       </view>
