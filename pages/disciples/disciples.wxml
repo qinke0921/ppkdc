@@ -55,8 +55,8 @@
         <text class="line-value">{{discipleInfo.masterLine}}</text>
         <text class="line-hint" wx:if="{{discipleInfo.lineSource === 'default'}}">未定线，按娱乐档计算</text>
       </view>
-      <view class="role-badge {{isMaster ? 'is-master' : (isAdmin ? 'is-admin' : (isYangLeader ? 'is-yang' : ''))}}">
-        <text>{{isMaster ? '👑 师傅' : (isAdmin ? '⭐ 管理员' : (isYangLeader ? '🐲 阳门门主' : '👤 徒弟'))}}</text>
+      <view class="role-badge {{isMaster ? 'is-master' : (isAdmin ? 'is-admin' : (isYangLeader ? 'is-yang' : (isYangDisciple ? 'is-yang-disciple' : '')))}}">
+        <text>{{isMaster ? '👑 师傅' : (isAdmin ? '⭐ 管理员' : (isYangLeader ? '🐲 阳门门主' : (isYangDisciple ? '🥋 阳门弟子' : '👤 徒弟')))}}</text>
       </view>
     </view>
 

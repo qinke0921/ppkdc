@@ -567,3 +567,9 @@ page {
   color: #0b6b5b;
   background: rgba(11, 107, 91, 0.12);
 }
+
+/* 阳门弟子：同样只是身份展示 */
+.role-badge.is-yang-disciple {
+  color: #2f7d6b;
+  background: rgba(47, 125, 107, 0.1);
+}
