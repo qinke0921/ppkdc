@@ -561,3 +561,9 @@ page {
   font-size: 20rpx;
   color: #bbb;
 }
+
+/* 阳门门主：仅身份展示，权限等同徒弟 */
+.role-badge.is-yang {
+  color: #0b6b5b;
+  background: rgba(11, 107, 91, 0.12);
+}

@@ -151,6 +151,8 @@ exports.main = async () => {
     // 4. 权限判定：师傅与管理员都能管，但只有 master 是「师傅」
     const isMaster = !!disciple && disciple.role === 'master';
     const isAdmin = !!disciple && disciple.role === 'admin';
+    // 阳门门主：仅用于显示，权限等同 member，不参与任何管理判断
+    const isYangLeader = !!disciple && disciple.role === 'yang_leader';
     const canManage = isMaster || isAdmin;
 
     // 公告（单文档）
@@ -276,6 +278,7 @@ exports.main = async () => {
       disciple,
       isMaster,
       isAdmin,
+      isYangLeader,
       canManage,
       master,
       discipleCount: countRes.total,

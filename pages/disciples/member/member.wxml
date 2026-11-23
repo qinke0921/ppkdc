@@ -28,7 +28,7 @@
     <view class="card" wx:if="{{!editing}}">
       <view class="row">
         <text class="k">身份</text>
-        <text class="v">{{member.role === 'master' ? '👑 师傅' : (member.role === 'admin' ? '⭐ 管理员' : '👤 徒弟')}}</text>
+        <text class="v">{{member.role === 'master' ? '👑 师傅' : (member.role === 'admin' ? '⭐ 管理员' : (member.role === 'yang_leader' ? '🐲 阳门门主' : '👤 徒弟'))}}</text>
       </view>
       <view class="row">
         <text class="k">游戏ID</text>
