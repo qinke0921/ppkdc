@@ -372,6 +372,47 @@ exports.main = async (event) => {
       };
     }
 
+    // 名称诊断：{ "checkNames": ["渣男", "金牛"] }
+    // 检查这些名字能否匹配到 disciples，以及在历史数据里有多少期/多少条成绩
+    if (Array.isArray(payload.checkNames) && payload.checkNames.length) {
+      const rosterAll = await fetchAll('disciples', {});
+      const byName = {};
+      rosterAll.forEach((m) => {
+        const g = nameKey(m.gameName);
+        const n = nameKey(m.nickname);
+        if (g && !byName[g]) byName[g] = m;
+        if (n && !byName[n]) byName[n] = m;
+      });
+
+      const weeksAll = Array.isArray(legacyData) ? legacyData : (legacyData.weeks || []);
+      const out = payload.checkNames.map((name) => {
+        const key = nameKey(name);
+        const m = byName[key] || null;
+        let appearances = 0;
+        let records = 0;
+        weeksAll.forEach((w) => {
+          w.members.forEach((mm) => {
+            if (nameKey(mm.name) === key) {
+              appearances++;
+              records += (mm.records || []).length;
+            }
+          });
+        });
+        return {
+          input: name,
+          matched: !!m,
+          gameName: m ? (m.gameName || '') : '',
+          nickname: m ? (m.nickname || '') : '',
+          openid: m ? (m._openid || '') : '',
+          joinedAt: m && m.joinedAt ? m.joinedAt : null,
+          appearances,
+          records
+        };
+      });
+
+      return { success: true, check: out };
+    }
+
     // 只查状态，不改数据：{ "statusOnly": true }
     if (payload.statusOnly === true) {
       const [taskCnt, recCnt, resCnt] = await Promise.all([
